@@ -25,10 +25,11 @@ export function greatCircle(a: Waypoint, b: Waypoint, segments = 24): Waypoint[]
 }
 
 /**
- * One continuous line. Longitudes are unwrapped (they may leave -180..180)
- * so a globe can draw across the antimeridian without a gap.
+ * One continuous line. Longitudes are unwrapped (they may leave -180..180).
+ * Used for bearings and framing. The globe wraps each vertex, so drawing uses
+ * pathCoordinates, which splits this line on the antimeridian.
  */
-export function pathCoordinates(path: Waypoint[], segments = 24): [number, number][][] {
+export function unwrappedPath(path: Waypoint[], segments = 24): [number, number][] {
   const coords: [number, number][] = [];
   let offset = 0;
   let previous: number | null = null;
@@ -46,13 +47,48 @@ export function pathCoordinates(path: Waypoint[], segments = 24): [number, numbe
       previous = lng;
     });
   }
-  return coords.length >= 2 ? [coords] : [];
+  return coords;
+}
+
+/**
+ * Lines the globe can draw. A path that crosses the antimeridian is cut there,
+ * and both pieces end on the meridian so they meet instead of leaving a gap.
+ */
+export function pathCoordinates(path: Waypoint[], segments = 24): [number, number][][] {
+  const line = unwrappedPath(path, segments);
+  if (line.length < 2) return [];
+  const parts: [number, number][][] = [[]];
+  const push = (lng: number, lat: number) => {
+    const part = parts[parts.length - 1];
+    const last = part[part.length - 1];
+    if (last && last[0] === lng && last[1] === lat) return;
+    part.push([lng, lat]);
+  };
+  push(wrapLongitude(line[0][0]), line[0][1]);
+  for (let i = 1; i < line.length; i += 1) {
+    const prev = line[i - 1];
+    const curr = line[i];
+    const prevLng = wrapLongitude(prev[0]);
+    const currLng = wrapLongitude(curr[0]);
+    if (Math.abs(currLng - prevLng) > 180) {
+      const edge = antimeridianBetween(prev[0], curr[0]);
+      const span = curr[0] - prev[0];
+      const t = span === 0 ? 0 : (edge - prev[0]) / span;
+      const lat = prev[1] + t * (curr[1] - prev[1]);
+      const leaving = curr[0] > prev[0] ? 180 : -180;
+      push(leaving, lat);
+      parts.push([]);
+      push(-leaving, lat);
+    }
+    push(currLng, curr[1]);
+  }
+  return parts.filter((part) => part.length >= 2);
 }
 
 /** Bearing at the arrival end of the drawn curve, clockwise from north. */
 export function arrivalBearing(path: Waypoint[]): number {
-  const line = pathCoordinates(path)[0];
-  if (!line || line.length < 2) return 0;
+  const line = unwrappedPath(path);
+  if (line.length < 2) return 0;
   const before = line[line.length - 2];
   const end = line[line.length - 1];
   return bearing({ lng: before[0], lat: before[1] }, { lng: end[0], lat: end[1] });
@@ -110,6 +146,22 @@ function dot(a: Vector, b: Vector): number {
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
+}
+
+function wrapLongitude(lng: number): number {
+  return ((((lng + 180) % 360) + 360) % 360) - 180;
+}
+
+/** Antimeridian (±180 + 360k) strictly between two unwrapped longitudes. */
+function antimeridianBetween(from: number, to: number): number {
+  if (to > from) {
+    let edge = 180 + 360 * Math.floor((from - 180) / 360);
+    if (edge <= from) edge += 360;
+    return edge;
+  }
+  let edge = 180 + 360 * Math.ceil((from - 180) / 360);
+  if (edge >= from) edge -= 360;
+  return edge;
 }
 
 function toRad(degrees: number): number {

@@ -1,6 +1,6 @@
 import { GeoJSONSource, Map as MapLibreMap, Marker, Popup, type StyleSpecification } from 'maplibre-gl';
 import { formatEventDate } from './dates';
-import { arrivalBearing, pathCoordinates } from './geo';
+import { arrivalBearing, pathCoordinates, unwrappedPath } from './geo';
 import { displayPositions } from './spread';
 import { LABEL_MIN_ZOOM, visibleLabelIds, type LabelBox } from './labels';
 import type { HistoryEvent } from './types';
@@ -273,7 +273,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   function framePath(event: HistoryEvent): boolean {
     const path = event.path;
     if (!path || path.length < 2) return false;
-    const line = pathCoordinates(path)[0];
+    const line = unwrappedPath(path);
     if (!line || line.length < 2) return false;
     const lngs = line.map((coord) => coord[0]);
     const lats = line.map((coord) => coord[1]);

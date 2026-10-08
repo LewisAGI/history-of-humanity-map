@@ -11,21 +11,29 @@ describe('greatCircle', () => {
     expect(points.length).toBe(9);
   });
 
-  it('draws across the antimeridian as one unwrapped line', () => {
+  it('meets itself on the antimeridian', () => {
     const parts = pathCoordinates(
       [
         { lat: 66, lng: 170 },
         { lat: 65, lng: -168 },
         { lat: 64, lng: -155 },
       ],
-      4,
+      8,
     );
-    expect(parts).toHaveLength(1);
-    const line = parts[0];
-    expect(Math.max(...line.map((coord) => coord[0]))).toBeGreaterThan(180);
-    for (let i = 1; i < line.length; i += 1) {
-      expect(Math.abs(line[i][0] - line[i - 1][0])).toBeLessThanOrEqual(180);
-    }
+    expect(parts.length).toBeGreaterThan(1);
+    const ends = parts.slice(0, -1).map((part) => part[part.length - 1]);
+    const starts = parts.slice(1).map((part) => part[0]);
+    ends.forEach((end, index) => {
+      expect(Math.abs(Math.abs(end[0]) - 180)).toBeLessThan(1e-6);
+      expect(Math.abs(Math.abs(starts[index][0]) - 180)).toBeLessThan(1e-6);
+      expect(end[0]).toBe(-starts[index][0]);
+      expect(end[1]).toBeCloseTo(starts[index][1], 5);
+    });
+    parts.forEach((part) => {
+      for (let i = 1; i < part.length; i += 1) {
+        expect(Math.abs(part[i][0] - part[i - 1][0])).toBeLessThanOrEqual(180);
+      }
+    });
   });
 
   it('aims the arrowhead along the end of a long curve', () => {

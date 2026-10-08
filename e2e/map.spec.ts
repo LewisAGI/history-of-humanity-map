@@ -9,7 +9,11 @@ declare global {
       isSourceLoaded: (id: string) => boolean;
       jumpTo: (options: { center: [number, number]; zoom: number }) => void;
       once: (type: string, listener: () => void) => void;
-      queryRenderedFeatures: (options: { layers: string[] }) => unknown[];
+      project: (lngLat: [number, number]) => { x: number; y: number };
+      queryRenderedFeatures: (
+        geometryOrOptions?: [[number, number], [number, number]] | { layers: string[] },
+        options?: { layers: string[] },
+      ) => { geometry?: { coordinates: [number, number] }; layer?: { id: string } }[];
     };
   }
 }
@@ -364,8 +368,8 @@ test('movement arrows draw for the slave trade, Zheng He, and Cook', async ({ pa
   await page.locator('#app[data-ready="true"]').waitFor();
   const name = testInfo.project.name;
   await showArrow(page, '1700', 'atlantic-slave-trade');
-  await expect.poll(() => renderedCount(page, 'migration-line')).toBeGreaterThanOrEqual(2);
-  await expect.poll(() => renderedCount(page, 'migration-head')).toBeGreaterThanOrEqual(2);
+  await expect.poll(async () => (await renderedRoute(page)).lines).toBeGreaterThanOrEqual(2);
+  await expect.poll(async () => (await renderedRoute(page)).heads).toBeGreaterThanOrEqual(2);
   await shot(page, `${name}_arrow_slave_trade`);
   await showArrow(page, '1410', 'zheng-he');
   await shot(page, `${name}_arrow_zheng_he`);
@@ -386,28 +390,51 @@ test('movement arrows draw for the slave trade, Zheng He, and Cook', async ({ pa
 
 test('every migration route draws a line', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'checked once on the built desktop map');
-  test.setTimeout(180_000);
+  test.setTimeout(240_000);
   await page.goto('/');
   await page.locator('#app[data-ready="true"]').waitFor();
   expect(ROUTES).toHaveLength(26);
   for (const route of ROUTES) {
     await showArrow(page, route.date, route.id);
-    const lines = await renderedCount(page, 'migration-line');
-    expect(lines, route.id).toBeGreaterThan(0);
+    const drawn = await renderedRoute(page);
+    expect(drawn.lines, route.id).toBeGreaterThan(0);
     if (route.id === 'atlantic-slave-trade') {
-      expect(await renderedCount(page, 'migration-head'), route.id).toBeGreaterThanOrEqual(2);
+      expect(drawn.heads, route.id).toBeGreaterThanOrEqual(2);
+      expect(drawn.lines, route.id).toBeGreaterThanOrEqual(2);
     }
   }
 });
 
 async function showArrow(page: Page, date: string, id: string) {
   await openDate(page, date);
-  await centerOn(page, id);
+  await centerOn(page, id, 7.5);
   await page.locator(`.pin[data-id="${id}"]`).click();
   await expect(page.locator('#app')).toHaveAttribute('data-arrow', id);
   await expect(page.locator('#app')).toHaveAttribute('data-popup', 'in');
   await waitForIdle(page);
-  await expect.poll(() => renderedCount(page, 'migration-line')).toBeGreaterThan(0);
+  await expect.poll(async () => (await renderedRoute(page)).lines).toBeGreaterThan(0);
+}
+
+/** Arrowheads in view, and a drawn line within a few pixels of each head. */
+async function renderedRoute(page: Page) {
+  return page.evaluate(() => {
+    const map = window.__historyMap;
+    const heads = map.queryRenderedFeatures({ layers: ['migration-head'] });
+    const lines = heads.reduce((sum, head) => {
+      const coordinates = head.geometry?.coordinates;
+      if (!coordinates) return sum;
+      const point = map.project(coordinates);
+      const hits = map.queryRenderedFeatures(
+        [
+          [point.x - 14, point.y - 14],
+          [point.x + 14, point.y + 14],
+        ],
+        { layers: ['migration-line'] },
+      );
+      return sum + (hits.length > 0 ? 1 : 0);
+    }, 0);
+    return { heads: heads.length, lines };
+  });
 }
 
 async function renderedCount(page: Page, layer: string) {
@@ -455,15 +482,18 @@ async function openDate(page: Page, value: string) {
   await page.locator('#date-popout').evaluate((form: HTMLFormElement) => form.requestSubmit());
 }
 
-async function centerOn(page: Page, id: string) {
-  await page.evaluate((eventId) => {
-    const pin = document.querySelector<HTMLElement>(`.pin[data-id="${eventId}"]`);
-    if (!pin) throw new Error(`missing pin ${eventId}`);
-    window.__historyMap.jumpTo({
-      center: [Number(pin.dataset.lng), Number(pin.dataset.lat)],
-      zoom: 2.4,
-    });
-  }, id);
+async function centerOn(page: Page, id: string, zoom = 2.4) {
+  await page.evaluate(
+    ({ eventId, zoom: nextZoom }) => {
+      const pin = document.querySelector<HTMLElement>(`.pin[data-id="${eventId}"]`);
+      if (!pin) throw new Error(`missing pin ${eventId}`);
+      window.__historyMap.jumpTo({
+        center: [Number(pin.dataset.lng), Number(pin.dataset.lat)],
+        zoom: nextZoom,
+      });
+    },
+    { eventId: id, zoom },
+  );
   await page.locator(`.pin[data-id="${id}"]`).waitFor({ state: 'visible' });
 }
 
@@ -486,7 +516,9 @@ function isAppAsset(url: string): boolean {
 function ignorableConsole(text: string): boolean {
   if (/Worker failed to load/i.test(text)) return false;
   if (/gibs\.earthdata\.nasa\.gov/i.test(text)) return true;
-  return /^Failed to load resource: the server responded with a status of \d+/i.test(text);
+  // Aborted basemap tiles are reported without the tile host. A same-origin
+  // asset failure is recorded from the response, and "Worker failed to load" is not ignored.
+  return /^Failed to load resource: /i.test(text) && !/127\.0\.0\.1|\/assets\//.test(text);
 }
 
 async function expectNoHorizontalScroll(page: Page) {

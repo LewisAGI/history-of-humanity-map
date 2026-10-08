@@ -100,6 +100,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   let selectedId: string | null = null;
   let anchorObserver: MutationObserver | null = null;
   let pinClearAttempts = 0;
+  let poleClearAttempts = 0;
   const sheet = document.createElement('div');
   sheet.className = 'event-sheet';
   sheet.hidden = true;
@@ -114,10 +115,12 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   map.on('zoom', () => {
     root.dataset.zoom = map.getZoom().toFixed(2);
     refreshLabels();
+    layoutPinOffsets();
   });
   map.on('move', () => {
     refreshLabels();
     moveHandler();
+    layoutPinOffsets();
   });
   map.on('render', () => refreshLabels());
   map.on('idle', () => {
@@ -129,6 +132,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       markSheet();
     }
     keepSelectedPinClear();
+    keepPolePinsClear();
   });
 
   window.__historyMap = map;
@@ -413,6 +417,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
 
   function framePolar(event: HistoryEvent): boolean {
     if (Math.abs(event.lat) < 80) return false;
+    clearFramePadding();
     map.easeTo({
       center: [event.lng, clampCenterLat(event.lat)],
       zoom: Math.min(map.getZoom(), 1.8),
@@ -433,7 +438,19 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     const maxLat = Math.max(...lats);
     const span = Math.max(maxLng - minLng, maxLat - minLat);
     if (span <= 2) return framePolar(event);
+    clearFramePadding();
     const padding = framePadding();
+    const midLat = (minLat + maxLat) / 2;
+    if (useSheet() && Math.abs(midLat) > 60 && maxLng <= 180 && minLng >= -180) {
+      const shrunk = (maxLng - minLng) * Math.cos((Math.abs(midLat) * Math.PI) / 180);
+      map.easeTo({
+        center: [wrapLng((minLng + maxLng) / 2), Math.max(-70, Math.min(70, midLat))],
+        zoom: zoomForSpan(Math.max(shrunk, 6), Math.max(maxLat - minLat, 4), padding, 2.2),
+        padding,
+        duration: 800,
+      });
+      return true;
+    }
     if (maxLng > 180 || minLng < -180) {
       const centerLng = ((((minLng + maxLng) / 2 + 540) % 360) + 360) % 360 - 180;
       const heads = routeLines(event.path).map((line) => line[line.length - 1]);
@@ -445,7 +462,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
         : [centerLng, centerLat];
       map.easeTo({
         center: center as [number, number],
-        zoom: zoomForSpan(maxLng - minLng, maxLat - minLat, padding),
+        zoom: zoomForSpan(maxLng - minLng, maxLat - minLat, padding, useSheet() ? 1.35 : 3.2),
         duration: 800,
         padding,
       });
@@ -459,6 +476,10 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       { padding, maxZoom: useSheet() ? 2.4 : 3.2, duration: 800 },
     );
     return true;
+  }
+
+  function clearFramePadding() {
+    map.setPadding({ top: 0, bottom: 0, left: 0, right: 0 });
   }
 
   function framePadding(): { top: number; bottom: number; left: number; right: number } {
@@ -481,29 +502,72 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     lngSpan: number,
     latSpan: number,
     padding: { top: number; bottom: number; left: number; right: number },
+    cap = 3.2,
   ): number {
     const width = Math.max(64, map.getContainer().clientWidth - padding.left - padding.right);
     const height = Math.max(64, map.getContainer().clientHeight - padding.top - padding.bottom);
     const world = 512;
     const zoomLng = Math.log2((width * 360) / (Math.max(lngSpan, 1) * world));
     const zoomLat = Math.log2((height * 160) / (Math.max(latSpan, 1) * world));
-    let zoom = Math.min(3.2, zoomLng, zoomLat);
+    let zoom = Math.min(cap, zoomLng, zoomLat);
     if (!useSheet()) zoom = Math.max(1.75, zoom);
-    else zoom = Math.min(zoom, 1.35);
     return Math.max(map.getMinZoom(), zoom);
   }
 
   function layoutPinOffsets() {
     const visible = markers.filter((pin) => !pin.element.classList.contains('maplibregl-marker-covered'));
-    const points = visible.map((pin) => {
-      const projected = map.project([pin.at.lng, pin.at.lat]);
-      return { id: pin.event.id, x: projected.x + pin.at.offsetX, y: projected.y + pin.at.offsetY };
+    const points = visible.flatMap((pin) => {
+      const rect = pin.element.getBoundingClientRect();
+      if (rect.width < 2 || rect.height < 2) return [];
+      const current = pin.marker.getOffset();
+      return [
+        {
+          id: pin.event.id,
+          x: rect.left + rect.width / 2 - current.x + pin.at.offsetX,
+          y: rect.top + rect.height / 2 - current.y + pin.at.offsetY,
+        },
+      ];
     });
     const extra = spreadOverlaps(points);
     markers.forEach((pin) => {
       const add = extra.get(pin.event.id) ?? { x: 0, y: 0 };
-      pin.marker.setOffset([pin.at.offsetX + add.x, pin.at.offsetY + add.y]);
+      const nextX = pin.at.offsetX + add.x;
+      const nextY = pin.at.offsetY + add.y;
+      const current = pin.marker.getOffset();
+      if (Math.abs(current.x - nextX) < 0.5 && Math.abs(current.y - nextY) < 0.5) return;
+      pin.marker.setOffset([nextX, nextY]);
     });
+  }
+
+  function keepPolePinsClear() {
+    const poles = markers.filter((pin) => pin.at.lat <= -85);
+    if (poles.length === 0 || poleClearAttempts >= 3) return;
+    const lookingSouth = map.getCenter().lat <= -60 || poles.some((pin) => pin.event.id === selectedId);
+    if (!lookingSouth) return;
+    const time = visibleRect(document.querySelector('.time'));
+    const blocked = poles.some((pin) => pinBlocked(pin.element, time));
+    if (!blocked) {
+      poleClearAttempts = 0;
+      return;
+    }
+    poleClearAttempts += 1;
+    const pin = poles[0];
+    clearFramePadding();
+    map.easeTo({
+      center: [pin.at.lng, clampCenterLat(pin.at.lat)],
+      zoom: Math.min(map.getZoom(), 1.45),
+      padding: framePadding(),
+      duration: 450,
+    });
+  }
+
+  function pinBlocked(element: HTMLElement, time: DOMRect | null): boolean {
+    const rect = element.getBoundingClientRect();
+    if (element.classList.contains('maplibregl-marker-covered')) return true;
+    if (rect.width < 2) return true;
+    if (rect.top < 0 || rect.bottom > window.innerHeight || rect.left < 0 || rect.right > window.innerWidth) return true;
+    if (!time) return false;
+    return rect.bottom > time.top - 4 && rect.right > time.left && rect.left < time.right;
   }
 
   function keepSelectedPinClear() {
@@ -527,6 +591,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     const stuck = Math.abs(next.lat - before.lat) < 0.08 && Math.abs(next.lng - before.lng) < 0.08;
     if (stuck) {
       if (map.getZoom() > 1.25) {
+        clearFramePadding();
         map.easeTo({
           center: [pin.at.lng, clampCenterLat(pin.at.lat)],
           zoom: Math.max(1.15, map.getZoom() - 0.55),
@@ -588,6 +653,10 @@ function useSheet(): boolean {
 
 function clampCenterLat(lat: number): number {
   return Math.max(-85, Math.min(85, lat));
+}
+
+function wrapLng(lng: number): number {
+  return ((((lng + 180) % 360) + 360) % 360) - 180;
 }
 
 function popupMaxWidth(): string {

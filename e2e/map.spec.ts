@@ -348,7 +348,12 @@ test('visiting 1911 then 1960 shows each period pin count', async ({ page }, tes
   });
   await waitForIdle(page);
   await expect(page.locator('.pin[data-id="scott-pole"]')).toBeVisible();
-  await page.locator('.pin[data-id="scott-pole"]').click({ force: true });
+  await expect.poll(async () => page.evaluate(() => {
+    const pin = document.querySelector('.pin[data-id="scott-pole"]')!.getBoundingClientRect();
+    const time = document.querySelector('.time')!.getBoundingClientRect();
+    return pin.width > 2 && pin.bottom <= time.top - 1 && pin.top >= 0;
+  })).toBe(true);
+  await page.locator('.pin[data-id="scott-pole"]').click();
   await expect(page.locator('#app')).toHaveAttribute('data-popup', 'in');
   await waitForIdle(page);
   await page.waitForTimeout(900);
@@ -473,12 +478,11 @@ test('Trail of Tears and Sequoyah can both be reached', async ({ page }, testInf
   const sequoyah = page.locator('.pin[data-id="sequoyah"]');
   await expect(trail).toBeVisible();
   await expect(sequoyah).toBeVisible();
-  const gap = await page.evaluate(() => {
+  await expect.poll(async () => page.evaluate(() => {
     const a = document.querySelector('.pin[data-id="trail-of-tears"]')!.getBoundingClientRect();
     const b = document.querySelector('.pin[data-id="sequoyah"]')!.getBoundingClientRect();
     return Math.hypot(a.x + a.width / 2 - (b.x + b.width / 2), a.y + a.height / 2 - (b.y + b.height / 2));
-  });
-  expect(gap).toBeGreaterThan(18);
+  })).toBeGreaterThan(18);
   await sequoyah.click();
   await expect(eventCard(page)).toContainText('Sequoyah');
   await trail.click();

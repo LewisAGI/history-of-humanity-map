@@ -1,3 +1,5 @@
+import { resolvePeriod } from './timeline';
+
 /**
  * Historical signed years: -500 is 500 BCE, 1066 is 1066 CE. There is no year 0.
  */
@@ -50,7 +52,20 @@ export function formatEventDate(start: number, end: number, dateNote: string): s
   return dateIsApproximate(dateNote) ? `approx. ${range}` : range;
 }
 
-function roundDisplayYear(year: number): number {
+/** Rounded year used in the popup. It stays inside the timeline step that contains the stored year. */
+export function roundDisplayYear(year: number): number {
+  const preferred = preferredRound(year);
+  if (insideStoredStep(preferred, year)) return preferred;
+  const magnitude = Math.abs(year);
+  const grids = magnitude >= 10_000 ? [10_000, 5_000, 1_000, 500] : [500, 100];
+  for (const grid of grids) {
+    const snapped = nearestOnGridInside(year, grid);
+    if (snapped !== null) return snapped;
+  }
+  return year === 0 ? 1 : year;
+}
+
+function preferredRound(year: number): number {
   const negative = year < 0;
   const magnitude = Math.abs(year);
   let rounded = magnitude;
@@ -58,6 +73,28 @@ function roundDisplayYear(year: number): number {
   else if (magnitude >= 10_000) rounded = Math.round(magnitude / 500) * 500;
   if (rounded === 0) return negative ? -1 : 1;
   return negative ? -rounded : rounded;
+}
+
+function insideStoredStep(shown: number, stored: number): boolean {
+  const period = resolvePeriod(stored);
+  return shown >= period.start && shown <= period.end && shown !== 0;
+}
+
+function nearestOnGridInside(year: number, grid: number): number | null {
+  const negative = year < 0;
+  const magnitude = Math.abs(year);
+  const base = Math.round(magnitude / grid) * grid;
+  let best: number | null = null;
+  let bestDist = Infinity;
+  for (const mag of [base - 2 * grid, base - grid, base, base + grid, base + 2 * grid]) {
+    if (mag <= 0) continue;
+    const signed = negative ? -mag : mag;
+    const dist = Math.abs(signed - year);
+    if (dist > grid || dist >= bestDist || !insideStoredStep(signed, year)) continue;
+    best = signed;
+    bestDist = dist;
+  }
+  return best;
 }
 
 export function dateIsApproximate(dateNote: string): boolean {

@@ -10,6 +10,8 @@ declare global {
       jumpTo: (options: { center: [number, number]; zoom: number }) => void;
       once: (type: string, listener: () => void) => void;
       project: (lngLat: [number, number]) => { x: number; y: number };
+      getSource: (id: string) => { getData: () => Promise<{ features?: { properties?: { role?: string }; geometry?: { type?: string; coordinates?: unknown } }[] }> };
+      unproject: (point: [number, number]) => { lng: number; lat: number };
       queryRenderedFeatures: (
         geometryOrOptions?: [[number, number], [number, number]] | { layers: string[] },
         options?: { layers: string[] },
@@ -126,7 +128,7 @@ test('timeline, globe, pins, and labels', async ({ page }, testInfo) => {
 
   await centerOn(page, 'hastings');
   await page.locator('.pin[data-id="hastings"]').click();
-  const popup = page.locator('.maplibregl-popup');
+  const popup = eventCard(page);
   await expect(popup).toContainText('Norman conquest');
   await expect(popup.locator('.popup-date')).toHaveText('1066 CE');
   await expect(popup).toContainText('Hastings');
@@ -147,8 +149,8 @@ test('timeline, globe, pins, and labels', async ({ page }, testInfo) => {
   await page.getByRole('button', { name: 'Zoom out' }).click();
   await expect.poll(() => zoomOf(page)).toBeLessThan(beforeOut);
 
-  await page.locator('.maplibregl-popup-close-button').click();
-  await expect(page.locator('.maplibregl-popup')).toBeHidden();
+  await page.locator('.maplibregl-popup-close-button, .event-sheet:not([hidden]) .sheet-close').click();
+  await expect(eventCard(page)).toHaveCount(0);
 
   if (name === 'desktop') {
     const beforeWheel = await zoomOf(page);
@@ -166,7 +168,7 @@ test('timeline, globe, pins, and labels', async ({ page }, testInfo) => {
   await centerOn(page, 'out-of-africa');
   await page.locator('.pin[data-id="out-of-africa"]').click();
   await expect(page.locator('#app')).toHaveAttribute('data-arrow', 'out-of-africa');
-  await expect(page.locator('.maplibregl-popup')).toContainText('Out of Africa');
+  await expect(eventCard(page)).toContainText('Out of Africa');
   await expect(page.locator('.popup-note')).toContainText('Approximate');
   await page.waitForTimeout(1000);
   await shot(page, `${name}_prehistory_out_of_africa`);
@@ -278,8 +280,8 @@ test('covered pins do not take clicks or labels', async ({ page }, testInfo) => 
   );
   expect(faulty).toEqual([]);
   await page.locator('.pin[data-id="ghana-independence"]').click();
-  await expect(page.locator('.maplibregl-popup')).toContainText('Independence of Ghana');
-  await expect(page.locator('.maplibregl-popup')).not.toContainText('Moruroa');
+  await expect(eventCard(page)).toContainText('Independence of Ghana');
+  await expect(eventCard(page)).not.toContainText('Moruroa');
   await shot(page, `${testInfo.project.name}_no_ghost_pins`);
 });
 
@@ -327,9 +329,9 @@ test('co-located pins can both be reached', async ({ page }, testInfo) => {
   });
   expect(gap).toBeGreaterThan(18);
   await war.click();
-  await expect(page.locator('.maplibregl-popup')).toContainText('Trojan War');
+  await expect(eventCard(page)).toContainText('Trojan War');
   await troy.click();
-  await expect(page.locator('.maplibregl-popup')).toContainText('Bronze Age Troy');
+  await expect(eventCard(page)).toContainText('Bronze Age Troy');
   await shot(page, `${testInfo.project.name}_offset_pins`);
 });
 
@@ -346,6 +348,16 @@ test('visiting 1911 then 1960 shows each period pin count', async ({ page }, tes
   });
   await waitForIdle(page);
   await expect(page.locator('.pin[data-id="scott-pole"]')).toBeVisible();
+  await page.locator('.pin[data-id="scott-pole"]').click({ force: true });
+  await expect(page.locator('#app')).toHaveAttribute('data-popup', 'in');
+  await waitForIdle(page);
+  await page.waitForTimeout(900);
+  const aboveTime = await page.evaluate(() => {
+    const pin = document.querySelector('.pin[data-id="scott-pole"]')!.getBoundingClientRect();
+    const time = document.querySelector('.time')!.getBoundingClientRect();
+    return pin.width > 2 && pin.bottom <= time.top - 1 && pin.top >= 0 && pin.right <= window.innerWidth;
+  });
+  expect(aboveTime).toBe(true);
   await shot(page, `${testInfo.project.name}_scott_1911`);
 
   await openDate(page, '1960');
@@ -374,7 +386,9 @@ test('movement arrows draw for the slave trade, Zheng He, and Cook', async ({ pa
   await showArrow(page, '1410', 'zheng-he');
   await shot(page, `${name}_arrow_zheng_he`);
   await showArrow(page, '1770', 'cook-pacific');
-  expect(await zoomOf(page)).toBeGreaterThanOrEqual(1.6);
+  if ((page.viewportSize()?.width ?? 0) > 600) {
+    expect(await zoomOf(page)).toBeGreaterThanOrEqual(1.6);
+  }
   await shot(page, `${name}_arrow_cook`);
   await openDate(page, '13000 BCE');
   await page.evaluate(() => {
@@ -388,8 +402,101 @@ test('movement arrows draw for the slave trade, Zheng He, and Cook', async ({ pa
   await shot(page, `${name}_antimeridian_arrow`);
 });
 
-test('every migration route draws a line', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'desktop', 'checked once on the built desktop map');
+test('phone routes stay visible beside the open popup', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'iphone', 'the sheet is the 390 layout');
+  test.setTimeout(240_000);
+  await page.goto('/');
+  await page.locator('#app[data-ready="true"]').waitFor();
+  const results: { id: string; pct: number; heads: number; headsClear: number }[] = [];
+  for (const route of ROUTES) {
+    await showArrow(page, route.date, route.id);
+    await page.waitForTimeout(300);
+    const vis = await routeVisibility(page);
+    results.push({ id: route.id, pct: vis.pct, heads: vis.heads, headsClear: vis.headsClear });
+    if (['zheng-he', 'out-of-africa', 'atlantic-slave-trade', 'cook-pacific'].includes(route.id)) {
+      await shot(page, `${testInfo.project.name}_${route.id}_sheet`);
+    }
+  }
+  console.log(results.map((item) => `${item.id} ${Math.round(item.pct * 100)}% heads ${item.headsClear}/${item.heads}`).join('\n'));
+  const hidden = results.filter((item) => item.pct < 0.5 || item.heads < 1 || item.headsClear !== item.heads);
+  expect(hidden).toEqual([]);
+  await showArrow(page, '1410', 'zheng-he');
+  await page.locator('.maplibregl-popup-close-button, .sheet-close').click();
+  await expect(page.locator('#app')).toHaveAttribute('data-arrow', 'zheng-he');
+  await expect.poll(async () => (await renderedRoute(page)).lines).toBeGreaterThan(0);
+  await shot(page, `${testInfo.project.name}_zheng_he_after_close`);
+});
+
+test('Qesem Cave stays on screen', async ({ page }, testInfo) => {
+  await page.goto('/');
+  await page.locator('#app[data-ready="true"]').waitFor();
+  await openDate(page, '300000 BCE');
+  await page.evaluate(() => {
+    window.__historyMap.jumpTo({ center: [18, 12], zoom: 0.9 });
+  });
+  await waitForIdle(page);
+  await page.locator('.pin[data-id="qesem-fire"]').click({ force: true });
+  await expect(page.locator('#app')).toHaveAttribute('data-popup', 'in');
+  await waitForIdle(page);
+  await page.waitForTimeout(1000);
+  await expectPopupInside(page);
+  await expectPopupClearOfControls(page);
+  await shot(page, `${testInfo.project.name}_qesem`);
+});
+
+test('Tiananmen stays on screen', async ({ page }, testInfo) => {
+  await page.goto('/');
+  await page.locator('#app[data-ready="true"]').waitFor();
+  await openDate(page, '1960');
+  await page.evaluate(() => {
+    window.__historyMap.jumpTo({ center: [100, 20], zoom: 1.2 });
+  });
+  await waitForIdle(page);
+  await page.locator('.pin[data-id="tiananmen-1989"]').click({ force: true });
+  await expect(page.locator('#app')).toHaveAttribute('data-popup', 'in');
+  await waitForIdle(page);
+  await page.waitForTimeout(1000);
+  await expectPopupInside(page);
+  await expectPopupClearOfControls(page);
+  await shot(page, `${testInfo.project.name}_tiananmen`);
+});
+
+test('Trail of Tears and Sequoyah can both be reached', async ({ page }, testInfo) => {
+  await page.goto('/');
+  await page.locator('#app[data-ready="true"]').waitFor();
+  await openDate(page, '1830');
+  await page.evaluate(() => {
+    window.__historyMap.jumpTo({ center: [-84.45, 35.485], zoom: 3.5 });
+  });
+  await waitForIdle(page);
+  const trail = page.locator('.pin[data-id="trail-of-tears"]');
+  const sequoyah = page.locator('.pin[data-id="sequoyah"]');
+  await expect(trail).toBeVisible();
+  await expect(sequoyah).toBeVisible();
+  const gap = await page.evaluate(() => {
+    const a = document.querySelector('.pin[data-id="trail-of-tears"]')!.getBoundingClientRect();
+    const b = document.querySelector('.pin[data-id="sequoyah"]')!.getBoundingClientRect();
+    return Math.hypot(a.x + a.width / 2 - (b.x + b.width / 2), a.y + a.height / 2 - (b.y + b.height / 2));
+  });
+  expect(gap).toBeGreaterThan(18);
+  await sequoyah.click();
+  await expect(eventCard(page)).toContainText('Sequoyah');
+  await trail.click();
+  await expect(eventCard(page)).toContainText('Indian Removal');
+  await shot(page, `${testInfo.project.name}_trail_sequoyah`);
+});
+
+test('escape closes the popup and keeps the route', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('#app[data-ready="true"]').waitFor();
+  await showArrow(page, '1410', 'zheng-he');
+  await page.keyboard.press('Escape');
+  await expect(eventCard(page)).toHaveCount(0);
+  await expect(page.locator('#app')).toHaveAttribute('data-arrow', 'zheng-he');
+  await expect.poll(async () => (await renderedRoute(page)).lines).toBeGreaterThan(0);
+});
+
+test('every migration route draws a line', async ({ page }) => {
   test.setTimeout(240_000);
   await page.goto('/');
   await page.locator('#app[data-ready="true"]').waitFor();
@@ -449,11 +556,63 @@ async function waitForIdle(page: Page) {
   }));
 }
 
+async function routeVisibility(page: Page) {
+  return page.evaluate(async () => {
+    const map = window.__historyMap;
+    const card = document.querySelector('.event-sheet:not([hidden]), .maplibregl-popup')?.getBoundingClientRect();
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const clear = (point: { x: number; y: number }) => {
+      const onMap = point.x >= 0 && point.y >= 0 && point.x <= width && point.y <= height;
+      const covered = !!card && point.x >= card.left && point.x <= card.right && point.y >= card.top && point.y <= card.bottom;
+      return onMap && !covered;
+    };
+    const facingCamera = (coord: [number, number]) => {
+      const projected = map.project(coord);
+      if (!Number.isFinite(projected.x) || !Number.isFinite(projected.y)) return false;
+      const back = map.unproject([projected.x, projected.y]);
+      const lngDelta = Math.abs((((back.lng - coord[0]) % 360) + 540) % 360 - 180);
+      return lngDelta < 1.5 && Math.abs(back.lat - coord[1]) < 1.5;
+    };
+    const data = await map.getSource('migration').getData();
+    const samples: { x: number; y: number }[] = [];
+    const heads: { x: number; y: number }[] = [];
+    for (const feature of data.features ?? []) {
+      const role = feature.properties?.role;
+      const geometry = feature.geometry;
+      if (role === 'line' && geometry?.type === 'LineString' && Array.isArray(geometry.coordinates)) {
+        const coordinates = geometry.coordinates as [number, number][];
+        const visible = coordinates.filter((coord) => facingCamera(coord));
+        const projected = visible.map((coord) => map.project(coord));
+        for (let index = 1; index < projected.length; index += 1) {
+          const start = projected[index - 1];
+          const end = projected[index];
+          const steps = Math.max(1, Math.ceil(Math.hypot(end.x - start.x, end.y - start.y) / 12));
+          for (let step = 0; step < steps; step += 1) {
+            const t = step / steps;
+            samples.push({ x: start.x + (end.x - start.x) * t, y: start.y + (end.y - start.y) * t });
+          }
+        }
+      }
+      if (role === 'head' && geometry?.type === 'Point' && Array.isArray(geometry.coordinates)) {
+        const coord = geometry.coordinates as [number, number];
+        if (facingCamera(coord)) heads.push(map.project(coord));
+      }
+    }
+    return {
+      pct: samples.length === 0 ? 0 : samples.filter((point) => clear(point)).length / samples.length,
+      heads: heads.length,
+      headsClear: heads.filter((point) => clear(point)).length,
+    };
+  });
+}
+
 async function expectPopupClearOfControls(page: Page) {
+  await waitForIdle(page);
   const overlap = await page.evaluate(() => {
-    const popup = document.querySelector('.maplibregl-popup')?.getBoundingClientRect();
+    const popup = document.querySelector('.event-sheet:not([hidden]), .maplibregl-popup')?.getBoundingClientRect();
     if (!popup) return ['missing popup'];
-    return ['.zoom', '.key-wrap', '.time'].flatMap((selector) => {
+      return ['.zoom', '.key-wrap', '.time', '.maplibregl-ctrl-attrib'].flatMap((selector) => {
       const control = document.querySelector(selector)?.getBoundingClientRect();
       if (!control || control.width < 2) return [];
       const hit =
@@ -465,7 +624,8 @@ async function expectPopupClearOfControls(page: Page) {
 }
 
 async function expectPopupInside(page: Page) {
-  const box = await page.locator('.maplibregl-popup').boundingBox();
+  await waitForIdle(page);
+  const box = await page.locator('.event-sheet:not([hidden]), .maplibregl-popup').boundingBox();
   const viewport = page.viewportSize();
   if (!box || !viewport) throw new Error('missing popup box');
   expect(box.x).toBeGreaterThanOrEqual(-1);
@@ -501,8 +661,12 @@ async function zoomOf(page: Page) {
   return page.evaluate(() => window.__historyMap.getZoom());
 }
 
+function eventCard(page: Page) {
+  return page.locator('.event-sheet:not([hidden]), .maplibregl-popup');
+}
+
 async function shot(page: Page, fileName: string) {
-  await page.screenshot({ path: path.join(shots, `built_${fileName}.png`) });
+  await page.screenshot({ path: path.join(shots, `r3_${fileName}.png`) });
 }
 
 function isAppAsset(url: string): boolean {

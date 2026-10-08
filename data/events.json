@@ -10,7 +10,7 @@
     "place": "Jebel Irhoud, Morocco",
     "continent": "Africa",
     "summary": "Fossil skulls at Jebel Irhoud are widely dated to about 300,000 years ago and are among the oldest known Homo sapiens. They combine a modern-looking face with a more archaic braincase. The finds place our species in north-west Africa by about 300,000 years ago.",
-    "dateNote": "Approximate. The fossils are widely dated to about 300,000 years ago. The year stored here is the BCE equivalent, 298,050 BCE."
+    "dateNote": "Approximate. The fossils are widely dated to about 300,000 years ago."
   },
   {
     "id": "homo-naledi",
@@ -23,7 +23,7 @@
     "place": "Rising Star cave, South Africa",
     "continent": "Africa",
     "summary": "Homo naledi is a small-brained hominin known from a deep cave system north-west of Johannesburg. The remains are dated to roughly 335,000 to 236,000 years ago, so the later part of that span falls within the last 300,000 years. How the bodies entered the chamber is still debated.",
-    "dateNote": "Approximate. The published age is about 335,000 to 236,000 years ago. The years stored here are the BCE equivalents, 300,000 BCE–234,050 BCE."
+    "dateNote": "Approximate. The published age is about 335,000 to 236,000 years ago."
   },
   {
     "id": "omo-kibish",
@@ -36,7 +36,7 @@
     "place": "Omo Kibish, Ethiopia",
     "continent": "Africa",
     "summary": "Fossils from the Kibish Formation near the Omo River are among the oldest widely accepted Homo sapiens remains in eastern Africa. A 2022 study dated the deposits to at least about 233,000 years ago. They show that people with modern anatomy were in the Rift Valley long before later dispersals.",
-    "dateNote": "Approximate. The deposits are dated to at least about 233,000 years ago. The year stored here is the BCE equivalent, 231,050 BCE."
+    "dateNote": "Approximate. The deposits are dated to at least about 233,000 years ago."
   },
   {
     "id": "herto",
@@ -49,7 +49,7 @@
     "place": "Herto, Middle Awash, Ethiopia",
     "continent": "Africa",
     "summary": "Skulls from Herto in the Afar are widely dated to about 160,000 to 154,000 years ago. They are often classed as Homo sapiens idaltu, an early form of our species. Cut marks on one skull have been read as signs of mortuary practice, though that reading is cautious.",
-    "dateNote": "Approximate. The skulls are widely dated to about 160,000 to 154,000 years ago. The years stored here are the BCE equivalents, 158,050 BCE–152,050 BCE."
+    "dateNote": "Approximate. The skulls are widely dated to about 160,000 to 154,000 years ago."
   },
   {
     "id": "blombos-symbols",
@@ -62,7 +62,7 @@
     "place": "Blombos Cave, South Africa",
     "continent": "Africa",
     "summary": "Blombos Cave has engraved ochre pieces and shell beads dated to roughly 77,000 to 73,000 years ago. The cross-hatched ochre is among the oldest widely accepted marks made as a design. The beads suggest that people were already using ornaments.",
-    "dateNote": "Approximate. The objects are dated to about 77,000 to 73,000 years ago. The years stored here are the BCE equivalents, 75,050 BCE–71,050 BCE."
+    "dateNote": "Approximate. The objects are dated to about 77,000 to 73,000 years ago."
   },
   {
     "id": "apollo-11-stones",
@@ -75,7 +75,7 @@
     "place": "Apollo 11 Cave, Namibia",
     "continent": "Africa",
     "summary": "Seven painted stone slabs from Apollo 11 Cave in southern Namibia are among the oldest known paintings in Africa. They are widely dated to about 25,000 to 27,000 years ago. The images include animals painted on loose stones rather than on the cave wall.",
-    "dateNote": "Approximate. The slabs are widely dated to about 25,000 to 27,000 years ago. The years stored here are the BCE equivalents, 25,050 BCE–23,050 BCE."
+    "dateNote": "Approximate. The slabs are widely dated to about 25,000 to 27,000 years ago."
   },
   {
     "id": "out-of-africa",
@@ -83,44 +83,44 @@
     "type": "history",
     "start": -68050,
     "end": -48050,
-    "lat": 6.0,
-    "lng": 36.0,
+    "lat": 6,
+    "lng": 36,
     "place": "East African Rift",
     "continent": "Africa",
-    "summary": "Genetic and archaeological evidence points to a major dispersal of Homo sapiens out of Africa roughly 70,000 to 50,000 years ago. People moved through the Horn and into southern Asia over many generations. The line is a schematic of that southern route, not a single journey.",
-    "dateNote": "Approximate. The main dispersal is widely placed at about 70,000 to 50,000 years ago. The years stored here are the BCE equivalents, 68,050 BCE–48,050 BCE.",
+    "summary": "Genetic and archaeological evidence points to a major dispersal of Homo sapiens out of Africa roughly 70,000 to 50,000 years ago. People moved through the Horn and into southern Asia over many generations.",
+    "dateNote": "Approximate. The main dispersal is widely placed at about 70,000 to 50,000 years ago.",
     "path": [
       {
-        "lat": 6.0,
-        "lng": 36.0
+        "lat": 6,
+        "lng": 36
       },
       {
         "lat": 11.5,
-        "lng": 42.0
+        "lng": 42
       },
       {
         "lat": 12.6,
         "lng": 43.4
       },
       {
-        "lat": 16.0,
-        "lng": 49.0
+        "lat": 16,
+        "lng": 49
       },
       {
         "lat": 25.5,
         "lng": 56.5
       },
       {
-        "lat": 23.0,
+        "lat": 23,
         "lng": 68.5
       },
       {
-        "lat": 21.0,
-        "lng": 87.0
+        "lat": 21,
+        "lng": 87
       },
       {
-        "lat": 7.0,
-        "lng": 100.0
+        "lat": 7,
+        "lng": 100
       },
       {
         "lat": 1.3,
@@ -138,7 +138,7 @@
     "lng": 10.4,
     "place": "Cameroon highlands",
     "continent": "Africa",
-    "summary": "Speakers of Bantu languages spread from the Cameroon–Nigeria borderlands into central, eastern, and southern Africa. The movement is widely placed from about 1000 BCE into the early centuries CE, and it carried farming and, later, ironworking. The line is a schematic of the main branches, not one migration.",
+    "summary": "Speakers of Bantu languages spread from the Cameroon–Nigeria borderlands into central, eastern, and southern Africa. The movement is widely placed from about 1000 BCE into the early centuries CE, and it carried farming and, later, ironworking.",
     "dateNote": "Approximate. The expansion is widely dated from about 1000 BCE into the early first millennium CE.",
     "path": [
       {
@@ -146,20 +146,20 @@
         "lng": 10.4
       },
       {
-        "lat": 2.0,
-        "lng": 17.0
+        "lat": 2,
+        "lng": 17
       },
       {
         "lat": -1.5,
-        "lng": 29.0
+        "lng": 29
       },
       {
-        "lat": -3.0,
+        "lat": -3,
         "lng": 37.5
       },
       {
-        "lat": -15.0,
-        "lng": 30.0
+        "lat": -15,
+        "lng": 30
       },
       {
         "lat": -25.5,
@@ -278,7 +278,7 @@
     "start": -1500,
     "end": -300,
     "lat": 9.5,
-    "lng": 8.0,
+    "lng": 8,
     "place": "Jos Plateau, Nigeria",
     "continent": "Africa",
     "summary": "The Nok culture of central Nigeria produced distinctive terracotta figures and, later, iron. It is widely dated from about 1500 BCE to the early centuries CE, with iron well established by the mid-first millennium BCE. Many of the sculptures were found in tin mines.",
@@ -395,7 +395,7 @@
     "start": 1235,
     "end": 1255,
     "lat": 11.3,
-    "lng": -8.0,
+    "lng": -8,
     "place": "Upper Niger, Guinea and Mali",
     "continent": "Africa",
     "summary": "Sundiata Keita defeated the Soso king Sumanguru at the battle of Kirina, widely placed in about 1235, and built the Mali Empire. Mali then controlled long-distance trade across the western savanna. The epic told about Sundiata is a later oral tradition.",
@@ -421,10 +421,10 @@
     "start": 1324,
     "end": 1325,
     "lat": 16.77,
-    "lng": -3.0,
+    "lng": -3,
     "place": "Timbuktu and Cairo",
     "continent": "Africa",
-    "summary": "Mansa Musa, ruler of Mali, travelled to Mecca in 1324–1325 and passed through Cairo with a very large supply of gold. Contemporary writers in Egypt described the journey and its effect on the gold market. He also sponsored mosques and learning in Timbuktu. The line is a schematic of that route, not every stop.",
+    "summary": "Mansa Musa, ruler of Mali, travelled to Mecca in 1324–1325 and passed through Cairo with a very large supply of gold. Contemporary writers in Egypt described the journey and its effect on the gold market. He also sponsored mosques and learning in Timbuktu.",
     "dateNote": "The hajj is dated to 1324–1325.",
     "path": [
       {
@@ -433,7 +433,7 @@
       },
       {
         "lat": 16.77,
-        "lng": -3.0
+        "lng": -3
       },
       {
         "lat": 30.04,
@@ -452,7 +452,7 @@
     "start": 1468,
     "end": 1468,
     "lat": 16.77,
-    "lng": -3.0,
+    "lng": -3,
     "place": "Timbuktu, Mali",
     "continent": "Africa",
     "summary": "Sunni Ali of Songhai took Timbuktu in 1468 and expanded a empire along the Niger bend. The city stayed a centre of manuscript learning under Songhai rule. Moroccan forces later defeated Songhai in 1591.",
@@ -790,7 +790,7 @@
     "start": 1377,
     "end": 1377,
     "lat": 11.3,
-    "lng": -8.0,
+    "lng": -8,
     "place": "Upper Niger",
     "continent": "Africa",
     "summary": "Griots have long told the epic of Sundiata, the founder of Mali, blending a thirteenth-century ruler with marvels and prophecy. Ibn Khaldun mentioned Mari Jata in the fourteenth century, long before the epic was written out in full. The historical founding of Mali is a separate historical episode.",
@@ -820,7 +820,7 @@
     "place": "Qesem Cave, Israel",
     "continent": "Asia",
     "summary": "Qesem Cave has repeated hearths and butchered animal bones from the later Middle Pleistocene. The cave's deposits begin earlier than 300,000 years ago and continue to about 200,000 years ago. They are widely cited as evidence of habitual fire use by early humans in the Levant.",
-    "dateNote": "Approximate. The later hearths fall between about 300,000 and 200,000 years ago. The years stored here are the BCE equivalents, 298,050 BCE–198,050 BCE."
+    "dateNote": "Approximate. The later hearths fall between about 300,000 and 200,000 years ago."
   },
   {
     "id": "qafzeh-skhul",
@@ -833,7 +833,7 @@
     "place": "Qafzeh, Israel",
     "continent": "Asia",
     "summary": "Burials at Skhul and Qafzeh show Homo sapiens in the Levant about 120,000 to 90,000 years ago. This early presence outside Africa may not have lasted. A later dispersal, after about 68,000 BCE, is the one that peopled the rest of the world.",
-    "dateNote": "Approximate. The burials are widely dated to about 120,000–90,000 years ago. The years stored here are the BCE equivalents, 118,050 BCE–88,050 BCE."
+    "dateNote": "Approximate. The burials are widely dated to about 120,000–90,000 years ago."
   },
   {
     "id": "toba-eruption",
@@ -846,7 +846,7 @@
     "place": "Lake Toba, Sumatra, Indonesia",
     "continent": "Asia",
     "summary": "The Toba supervolcano in Sumatra erupted about 74,000 years ago, the largest known eruption of the last two million years. Ash from it is found across South Asia. Claims that it almost wiped out humanity are now widely doubted.",
-    "dateNote": "Approximate. The eruption is widely dated to about 74,000 years ago. The year stored here is the BCE equivalent, 72,050 BCE."
+    "dateNote": "Approximate. The eruption is widely dated to about 74,000 years ago."
   },
   {
     "id": "denisova-cave",
@@ -859,7 +859,7 @@
     "place": "Denisova Cave, Russia",
     "continent": "Asia",
     "summary": "A finger bone and teeth from Denisova Cave belonged to a population now called Denisovans, known mainly from ancient DNA. Fossils from the cave span a broad period around 100,000 to 50,000 years ago, and individual dates still differ. People today in Island Southeast Asia and Oceania carry some Denisovan ancestry.",
-    "dateNote": "Approximate. The cave's Denisovan fossils fall broadly between about 100,000 and 50,000 years ago. The years stored here are the BCE equivalents, 98,050 BCE–48,050 BCE."
+    "dateNote": "Approximate. The cave's Denisovan fossils fall broadly between about 100,000 and 50,000 years ago."
   },
   {
     "id": "homo-floresiensis",
@@ -872,7 +872,7 @@
     "place": "Liang Bua, Flores, Indonesia",
     "continent": "Asia",
     "summary": "Remains of a small-bodied hominin, nicknamed the hobbit, were found at Liang Bua on Flores. Revised dating places the bones at about 100,000 to 60,000 years ago, not in the last 12,000 years as first reported. The species shows that several kinds of human lived in Island Southeast Asia.",
-    "dateNote": "Approximate. The revised chronology places the bones at about 100,000–60,000 years ago. The years stored here are the BCE equivalents, 98,050 BCE–58,050 BCE."
+    "dateNote": "Approximate. The revised chronology places the bones at about 100,000–60,000 years ago."
   },
   {
     "id": "sulawesi-cave-art",
@@ -880,12 +880,12 @@
     "type": "history",
     "start": -43550,
     "end": -43550,
-    "lat": -5.0,
+    "lat": -5,
     "lng": 119.7,
     "place": "Leang Tedongnge, Sulawesi, Indonesia",
     "continent": "Asia",
     "summary": "A painting of a warty pig at Leang Tedongnge is dated to at least 45,500 years ago. It is among the oldest known figurative art in the world. Nearby caves in Maros-Pangkep have other paintings of a similar age.",
-    "dateNote": "Approximate. The pig painting is dated to at least about 45,500 years ago. The year stored here is the BCE equivalent, 43,550 BCE."
+    "dateNote": "Approximate. The pig painting is dated to at least about 45,500 years ago."
   },
   {
     "id": "jomon-pottery",
@@ -1037,7 +1037,7 @@
     "start": -1200,
     "end": -1150,
     "lat": 34.76,
-    "lng": 36.0,
+    "lng": 36,
     "place": "Eastern Mediterranean",
     "continent": "Asia",
     "summary": "Around 1200–1150 BCE, palace societies from Greece to the Levant were destroyed or shrank. Ugarit, the Hittite kingdom, and Mycenaean centres fell within a few decades. The causes are still debated, and Egyptian texts mention groups they called the Sea Peoples.",
@@ -1170,7 +1170,7 @@
     "lng": 108.8583,
     "place": "Chang'an, China",
     "continent": "Asia",
-    "summary": "The Han envoy Zhang Qian left Chang'an around 139 BCE, was held by the Xiongnu, and reached Central Asia before returning about 126 BCE. His report opened regular Han contact with the western regions. It is an early dated moment of the Silk Road. The line is a schematic of that route, not every stop.",
+    "summary": "The Han envoy Zhang Qian left Chang'an around 139 BCE, was held by the Xiongnu, and reached Central Asia before returning about 126 BCE. His report opened regular Han contact with the western regions. It is an early dated moment of the Silk Road.",
     "dateNote": "His mission is dated to about 139–126 BCE.",
     "path": [
       {
@@ -1197,7 +1197,7 @@
     "lng": 94.66,
     "place": "Dunhuang, China",
     "continent": "Asia",
-    "summary": "From the Han period into the early centuries CE, caravan routes linked China with Central Asia, Iran, and the Mediterranean. Silk, horses, glass, and ideas moved along them, and Dunhuang became a major gateway. The line is a schematic of the main land route, not a single road.",
+    "summary": "From the Han period into the early centuries CE, caravan routes linked China with Central Asia, Iran, and the Mediterranean. Silk, horses, glass, and ideas moved along them, and Dunhuang became a major gateway.",
     "dateNote": "Approximate. The classic land routes are well attested from the late second century BCE.",
     "path": [
       {
@@ -1431,7 +1431,7 @@
     "lng": 102.84,
     "place": "Karakorum, Mongolia",
     "continent": "Asia",
-    "summary": "Temüjin was proclaimed Chinggis Khan in 1206 and his armies then conquered northern China, Central Asia, Iran, and parts of eastern Europe. The western campaigns reached Hungary in 1241. The line is a schematic of that westward thrust, not every front.",
+    "summary": "Temüjin was proclaimed Chinggis Khan in 1206 and his armies then conquered northern China, Central Asia, Iran, and parts of eastern Europe. The western campaigns reached Hungary in 1241.",
     "dateNote": "Chinggis Khan was acclaimed in 1206. The campaign into Hungary was in 1241, and the empire's unity frayed after 1259.",
     "path": [
       {
@@ -1440,7 +1440,7 @@
       },
       {
         "lat": 47.8,
-        "lng": 91.0
+        "lng": 91
       },
       {
         "lat": 43.8,
@@ -1464,7 +1464,7 @@
       },
       {
         "lat": 47.5,
-        "lng": 19.0
+        "lng": 19
       }
     ]
   },
@@ -1530,7 +1530,7 @@
     "lng": -5.83,
     "place": "Tangier, Morocco",
     "continent": "Africa",
-    "summary": "Ibn Battuta left Tangier in 1325 and travelled for nearly thirty years through Africa, the Middle East, India, Southeast Asia, and China. He dictated an account, the Rihla, after his return. It is a major eyewitness source for the fourteenth-century world. The line is a schematic of that route, not every stop.",
+    "summary": "Ibn Battuta left Tangier in 1325 and travelled for nearly thirty years through Africa, the Middle East, India, Southeast Asia, and China. He dictated an account, the Rihla, after his return. It is a major eyewitness source for the fourteenth-century world.",
     "dateNote": "His travels are dated from 1325 to about 1354.",
     "path": [
       {
@@ -1578,7 +1578,7 @@
     "lng": 118.78,
     "place": "Nanjing, China",
     "continent": "Asia",
-    "summary": "Between 1405 and 1433 the Ming admiral Zheng He led seven fleets into the Indian Ocean, reaching Arabia and the East African coast. The ships carried diplomats, soldiers, and trade goods. The voyages stopped after his death and were not repeated on that scale. The line is a schematic of that route, not every stop.",
+    "summary": "Between 1405 and 1433 the Ming admiral Zheng He led seven fleets into the Indian Ocean, reaching Arabia and the East African coast. The ships carried diplomats, soldiers, and trade goods. The voyages stopped after his death and were not repeated on that scale.",
     "dateNote": "The seven voyages are dated from 1405 to 1433.",
     "path": [
       {
@@ -2116,8 +2116,8 @@
     "type": "myth",
     "start": -139,
     "end": -139,
-    "lat": 32.0,
-    "lng": 117.0,
+    "lat": 32,
+    "lng": 117,
     "place": "China",
     "continent": "Asia",
     "summary": "Chang'e is the goddess who flies to the moon after taking an elixir of immortality. The story is older than any single book, and a famous early telling is in the Huainanzi. That book was presented to the Han court in 139 BCE.",
@@ -2146,7 +2146,7 @@
     "lng": 108.8583,
     "place": "Chang'an to India",
     "continent": "Asia",
-    "summary": "The monk Xuanzang left China in 629, travelled to India, and returned in 645 with Buddhist texts. His own Record of the Western Regions describes the kingdoms he saw. The novel Journey to the West later turned the journey into myth. The line is a schematic of that route, not every stop.",
+    "summary": "The monk Xuanzang left China in 629, travelled to India, and returned in 645 with Buddhist texts. His own Record of the Western Regions describes the kingdoms he saw. The novel Journey to the West later turned the journey into myth.",
     "dateNote": "He departed in 629 and returned in 645.",
     "path": [
       {
@@ -2221,7 +2221,7 @@
     "place": "Bacho Kiro Cave, Bulgaria",
     "continent": "Europe",
     "summary": "Teeth and bone fragments from Bacho Kiro are among the oldest widely accepted Homo sapiens remains in Europe. They are dated to about 45,000 years ago. The people there used ornaments and lived near the last Neanderthals.",
-    "dateNote": "Approximate. The remains are dated to about 45,000 years ago. The years stored here are the BCE equivalents, 43,050 BCE–43,000 BCE."
+    "dateNote": "Approximate. The remains are dated to about 45,000 years ago."
   },
   {
     "id": "neanderthals-end",
@@ -2234,7 +2234,7 @@
     "place": "Vindija Cave, Croatia",
     "continent": "Europe",
     "summary": "Neanderthals disappeared from Europe around 40,000 years ago. Radiocarbon work led by Tom Higham places the last widely dated sites in that window. They left DNA in living people whose ancestors lived outside Africa.",
-    "dateNote": "Approximate. The last European Neanderthals are widely dated to about 40,000 years ago. The year stored here is the BCE equivalent, 38,050 BCE."
+    "dateNote": "Approximate. The last European Neanderthals are widely dated to about 40,000 years ago."
   },
   {
     "id": "lion-man",
@@ -2247,7 +2247,7 @@
     "place": "Hohlenstein-Stadel, Germany",
     "continent": "Europe",
     "summary": "A mammoth-ivory figure with a human body and a lion's head was found in a cave on the Swabian Jura. It is dated to about 40,000 years ago. It is one of the oldest known statues.",
-    "dateNote": "Approximate. The figure is dated to about 40,000 years ago. The year stored here is the BCE equivalent, 38,050 BCE."
+    "dateNote": "Approximate. The figure is dated to about 40,000 years ago."
   },
   {
     "id": "chauvet",
@@ -2260,7 +2260,7 @@
     "place": "Chauvet Cave, France",
     "continent": "Europe",
     "summary": "Chauvet Cave holds paintings of lions, rhinos, and horses dated to about 36,000 to 33,000 years ago. The art is older than Lascaux by many millennia. The cave was sealed for most of later prehistory, which preserved the paintings.",
-    "dateNote": "Approximate. The paintings are widely dated to about 36,000–33,000 years ago. The years stored here are the BCE equivalents, 34,050 BCE–31,050 BCE."
+    "dateNote": "Approximate. The paintings are widely dated to about 36,000–33,000 years ago."
   },
   {
     "id": "willendorf",
@@ -2281,12 +2281,12 @@
     "type": "history",
     "start": -24000,
     "end": -17000,
-    "lat": 62.0,
-    "lng": 15.0,
+    "lat": 62,
+    "lng": 15,
     "place": "Fennoscandian ice sheet",
     "continent": "Europe",
-    "summary": "About 26,000 to 19,000 years ago, ice sheets reached their greatest recent extent across northern Europe and North America. Sea level was far lower, and people lived south of the ice. This pin marks the Fennoscandian sheet; the climate event was global.",
-    "dateNote": "Approximate. The maximum is widely dated to about 26,000–19,000 years ago. The years stored here are the BCE equivalents."
+    "summary": "About 26,000 to 19,000 years ago, ice sheets reached their greatest recent extent across northern Europe and North America. Sea level was far lower, and people lived south of the ice. The Fennoscandian ice sheet covered Scandinavia, and the climate event was global.",
+    "dateNote": "Approximate. The maximum is widely dated to about 26,000–19,000 years ago."
   },
   {
     "id": "lascaux",
@@ -2299,7 +2299,7 @@
     "place": "Lascaux, France",
     "continent": "Europe",
     "summary": "The paintings of horses, bulls, and deer at Lascaux are widely dated to about 17,000 years ago. The cave was found in 1940 and later closed to protect the art. A replica now receives visitors.",
-    "dateNote": "Approximate. The paintings are widely dated to about 17,000 years ago. The year stored here is the BCE equivalent, 15,050 BCE."
+    "dateNote": "Approximate. The paintings are widely dated to about 17,000 years ago."
   },
   {
     "id": "altamira",
@@ -2312,7 +2312,7 @@
     "place": "Altamira, Spain",
     "continent": "Europe",
     "summary": "The bison painted on the ceiling of Altamira are widely dated to the later Magdalenian, around 15,000 to 13,500 years ago. When the cave was found in the nineteenth century, many scholars refused to believe Ice Age people had made them. That doubt did not last.",
-    "dateNote": "Approximate. The famous ceiling is widely dated to about 15,000–13,500 years ago. The years stored here are the BCE equivalents, 13,050 BCE–11,550 BCE."
+    "dateNote": "Approximate. The famous ceiling is widely dated to about 15,000–13,500 years ago."
   },
   {
     "id": "stonehenge",
@@ -2480,7 +2480,7 @@
     "lng": 5.32,
     "place": "Western Norway",
     "continent": "Europe",
-    "summary": "Norse sailors settled Iceland from about 870, Greenland from about 980, and reached Newfoundland around 1000. The site at L'Anse aux Meadows is the archaeological trace of that American landfall. The line is a schematic of the western route.",
+    "summary": "Norse sailors settled Iceland from about 870, Greenland from about 980, and reached Newfoundland around 1000. The site at L'Anse aux Meadows is the archaeological trace of that American landfall.",
     "dateNote": "Approximate. Iceland was settled from about 870, and the Newfoundland site dates to around 1000.",
     "path": [
       {
@@ -2493,7 +2493,7 @@
       },
       {
         "lat": 61.2,
-        "lng": -48.0
+        "lng": -48
       },
       {
         "lat": 51.6,
@@ -2937,7 +2937,7 @@
     "start": 1835,
     "end": 1849,
     "lat": 62.9,
-    "lng": 30.0,
+    "lng": 30,
     "place": "Karelia and Finland",
     "continent": "Europe",
     "summary": "Elias Lönnrot compiled the Kalevala from Finnish and Karelian oral poems and published it in 1835, with a longer edition in 1849. It tells of the singer Väinämöinen and the smith Ilmarinen. The oral poems are older than the book.",
@@ -2962,39 +2962,39 @@
     "type": "history",
     "start": -14000,
     "end": -12000,
-    "lat": 65.0,
-    "lng": -168.0,
+    "lat": 65,
+    "lng": -168,
     "place": "Beringia",
     "continent": "North America",
-    "summary": "People reached the Americas from north-east Asia while sea levels were low, and by about 14,500 years ago they were as far south as Chile. The widely accepted window for this spread is about 16,000 to 14,000 years ago. The line is a schematic through Beringia and down the continents. Earlier sites are still debated.",
-    "dateNote": "Approximate. Widespread settlement is dated to about 16,000–14,000 years ago. The years stored here are the BCE equivalents.",
+    "summary": "People reached the Americas from north-east Asia while sea levels were low, and by about 14,500 years ago they were as far south as Chile. The widely accepted window for this spread is about 16,000 to 14,000 years ago. Earlier sites are still debated.",
+    "dateNote": "Approximate. Widespread settlement is dated to about 16,000–14,000 years ago.",
     "path": [
       {
-        "lat": 66.0,
-        "lng": 170.0
+        "lat": 66,
+        "lng": 170
       },
       {
         "lat": 65.5,
-        "lng": -168.0
+        "lng": -168
       },
       {
         "lat": 64.5,
-        "lng": -155.0
+        "lng": -155
       },
       {
-        "lat": 55.0,
-        "lng": -131.0
+        "lat": 55,
+        "lng": -131
       },
       {
-        "lat": 34.0,
-        "lng": -118.0
+        "lat": 34,
+        "lng": -118
       },
       {
         "lat": 19.4,
         "lng": -99.1
       },
       {
-        "lat": 9.0,
+        "lat": 9,
         "lng": -79.5
       },
       {
@@ -3003,7 +3003,7 @@
       },
       {
         "lat": -13.5,
-        "lng": -72.0
+        "lng": -72
       },
       {
         "lat": -41.5,
@@ -3030,8 +3030,8 @@
     "type": "history",
     "start": -11000,
     "end": -10800,
-    "lat": 32.0,
-    "lng": -102.0,
+    "lat": 32,
+    "lng": -102,
     "place": "North American plains",
     "continent": "North America",
     "summary": "Clovis spear points, fluted and very widespread, date to about 13,000 years ago. They mark a famous early culture of North America, not the first people there. The culture lasted only a few centuries.",
@@ -3199,11 +3199,11 @@
     "type": "history",
     "start": 1000,
     "end": 1300,
-    "lat": 69.0,
-    "lng": -105.0,
+    "lat": 69,
+    "lng": -105,
     "place": "Arctic North America",
     "continent": "North America",
-    "summary": "Thule people, ancestors of the Inuit, spread east from Alaska across the Canadian Arctic to Greenland around 1000–1300. They used dog sleds, umiaks, and toggling harpoons. They replaced or absorbed the earlier Dorset tradition. The line is a schematic of that route, not every stop.",
+    "summary": "Thule people, ancestors of the Inuit, spread east from Alaska across the Canadian Arctic to Greenland around 1000–1300. They used dog sleds, umiaks, and toggling harpoons. They replaced or absorbed the earlier Dorset tradition.",
     "dateNote": "Approximate. The eastward spread is widely dated to about 1000–1300.",
     "path": [
       {
@@ -3247,7 +3247,7 @@
     "lng": -71.98,
     "place": "Cusco, Peru",
     "continent": "South America",
-    "summary": "From the reign of Pachacuti, traditionally beginning in 1438, the Inca state expanded from Cusco into the largest empire of the Americas. It built roads, storehouses, and the estate of Machu Picchu. Spanish forces captured the emperor Atahualpa in 1532. The line is a schematic of that route, not every stop.",
+    "summary": "From the reign of Pachacuti, traditionally beginning in 1438, the Inca state expanded from Cusco into the largest empire of the Americas. It built roads, storehouses, and the estate of Machu Picchu. Spanish forces captured the emperor Atahualpa in 1532.",
     "dateNote": "Pachacuti's reign is traditionally dated from 1438. Atahualpa was captured in 1532.",
     "path": [
       {
@@ -3270,7 +3270,7 @@
     "type": "history",
     "start": 1492,
     "end": 1492,
-    "lat": 24.0,
+    "lat": 24,
     "lng": -74.5,
     "place": "The Bahamas",
     "continent": "North America",
@@ -3282,11 +3282,11 @@
         "lng": -6.89
       },
       {
-        "lat": 28.0,
-        "lng": -16.0
+        "lat": 28,
+        "lng": -16
       },
       {
-        "lat": 24.0,
+        "lat": 24,
         "lng": -74.5
       }
     ]
@@ -3314,7 +3314,7 @@
     "lng": -99.13,
     "place": "Tenochtitlan, Mexico",
     "continent": "North America",
-    "summary": "Hernán Cortés landed on the Mexican coast in 1519 and, with many indigenous allies, reached Tenochtitlan. Disease, siege, and war destroyed the Aztec capital in 1521. Spanish colonial rule of central Mexico followed. The line is a schematic of that route, not every stop.",
+    "summary": "Hernán Cortés landed on the Mexican coast in 1519 and, with many indigenous allies, reached Tenochtitlan. Disease, siege, and war destroyed the Aztec capital in 1521. Spanish colonial rule of central Mexico followed.",
     "dateNote": "Cortés landed in 1519. Tenochtitlan fell on 13 August 1521.",
     "path": [
       {
@@ -3363,7 +3363,7 @@
     "lng": -1.35,
     "place": "Elmina, Ghana",
     "continent": "Africa",
-    "summary": "From the sixteenth century into the nineteenth, European ships carried enslaved Africans across the Atlantic to the Americas. The Trans-Atlantic Slave Trade Database records about 12.5 million people forced onto ships. The trade enriched European and American ports and devastated societies in Africa. The two lines leave West Africa separately, one to the Caribbean and one to Brazil.",
+    "summary": "From the sixteenth century into the nineteenth, European ships carried enslaved Africans across the Atlantic to the Americas. The Trans-Atlantic Slave Trade Database records about 12.5 million people forced onto ships. The trade enriched European and American ports and devastated societies in Africa.",
     "dateNote": "Approximate. A direct trade to the Spanish Caribbean was licensed in 1518, and voyages continued into the 1860s.",
     "path": [
       [
@@ -3372,8 +3372,8 @@
           "lng": -1.35
         },
         {
-          "lat": 4.0,
-          "lng": -25.0
+          "lat": 4,
+          "lng": -25
         },
         {
           "lat": 13.1,
@@ -3382,12 +3382,12 @@
       ],
       [
         {
-          "lat": 5.08,
-          "lng": -1.35
+          "lat": -8.839,
+          "lng": 13.234
         },
         {
-          "lat": -5.0,
-          "lng": -20.0
+          "lat": -12,
+          "lng": -15
         },
         {
           "lat": -12.97,
@@ -3468,10 +3468,10 @@
     "start": 1830,
     "end": 1838,
     "lat": 35.47,
-    "lng": -84.0,
+    "lng": -84,
     "place": "Cherokee country to Indian Territory",
     "continent": "North America",
-    "summary": "The United States Indian Removal Act of 1830 authorised the expulsion of eastern nations to lands west of the Mississippi. In 1838 the army forced the Cherokee west on a journey remembered as the Trail of Tears. Thousands died on the removals. The line is a schematic of that route, not every stop.",
+    "summary": "The United States Indian Removal Act of 1830 authorised the expulsion of eastern nations to lands west of the Mississippi. In 1838 the army forced the Cherokee west on a journey remembered as the Trail of Tears. Thousands died on the removals.",
     "dateNote": "The Act is dated 1830. The Cherokee removal was in 1838.",
     "path": [
       {
@@ -3749,7 +3749,7 @@
     "type": "myth",
     "start": 1550,
     "end": 1558,
-    "lat": 15.0,
+    "lat": 15,
     "lng": -91.15,
     "place": "K'iche' highlands, Guatemala",
     "continent": "North America",
@@ -3815,7 +3815,7 @@
     "start": 1890,
     "end": 1910,
     "lat": 53.25,
-    "lng": -132.0,
+    "lng": -132,
     "place": "Haida Gwaii, Canada",
     "continent": "North America",
     "summary": "Haida, Tlingit, and other Northwest Coast traditions tell how Raven stole the sun, moon, and stars from a box and released them. The stories were oral long before anyone wrote them down. Substantial written versions were recorded by ethnographers around the end of the nineteenth century.",
@@ -3893,7 +3893,7 @@
     "start": 1969,
     "end": 1969,
     "lat": 40.73,
-    "lng": -74.0,
+    "lng": -74,
     "place": "New York, United States",
     "continent": "North America",
     "summary": "On 28 June 1969 patrons of the Stonewall Inn in New York resisted a police raid. Several nights of protest followed. The uprising became a symbol of the movement for gay and transgender rights.",
@@ -3948,8 +3948,8 @@
     "lng": 132.88,
     "place": "Madjedbebe, Australia",
     "continent": "Oceania",
-    "summary": "People had reached Sahul, the Ice Age continent of Australia and New Guinea, by about 50,000 years ago. Excavations at Madjedbebe in Arnhem Land have been dated to about 65,000 years ago, a result that is widely cited and still discussed. The crossing from Island Southeast Asia required boats. The line is a schematic of that route, not every stop.",
-    "dateNote": "Approximate. Settlement by about 50,000 years ago is widely accepted. Madjedbebe has been dated to about 65,000 years ago. The years stored here are the BCE equivalents, 63,050 BCE–48,050 BCE.",
+    "summary": "People had reached Sahul, the Ice Age continent of Australia and New Guinea, by about 50,000 years ago. Excavations at Madjedbebe in Arnhem Land have been dated to about 65,000 years ago, a result that is widely cited and still discussed. The crossing from Island Southeast Asia required boats.",
+    "dateNote": "Approximate. Settlement by about 50,000 years ago is widely accepted. Madjedbebe has been dated to about 65,000 years ago.",
     "path": [
       {
         "lat": -8.57,
@@ -3957,7 +3957,7 @@
       },
       {
         "lat": -9.2,
-        "lng": 131.0
+        "lng": 131
       },
       {
         "lat": -12.48,
@@ -3976,7 +3976,7 @@
     "place": "Kimberley, Australia",
     "continent": "Oceania",
     "summary": "The Kimberley holds vast bodies of rock art, including the elegant Gwion figures. Some of that art is widely placed in the late Ice Age, around 12,000 years ago, and other paintings are much younger or still hard to date. The art belongs to Aboriginal traditions that continue.",
-    "dateNote": "Approximate. Some Kimberley paintings are widely placed around 12,000 years ago, and many dates remain uncertain. The year stored here is the BCE equivalent, 10,050 BCE."
+    "dateNote": "Approximate. Some Kimberley paintings are widely placed around 12,000 years ago, and many dates remain uncertain."
   },
   {
     "id": "austronesian-voyages",
@@ -3985,31 +3985,31 @@
     "start": -3000,
     "end": -1500,
     "lat": 23.5,
-    "lng": 121.0,
+    "lng": 121,
     "place": "Taiwan",
     "continent": "Asia",
-    "summary": "Speakers of Austronesian languages left Taiwan around 3000 BCE and settled the Philippines, Indonesia, and Near Oceania. Archaeology and language both trace this expansion. The line is a schematic of the early voyaging, which later carried people into the remote Pacific and to Madagascar.",
+    "summary": "Speakers of Austronesian languages left Taiwan around 3000 BCE and settled the Philippines, Indonesia, and Near Oceania. Archaeology and language both trace this expansion.",
     "dateNote": "Approximate. The expansion from Taiwan is widely dated to about 3000–1500 BCE.",
     "path": [
       {
         "lat": 23.5,
-        "lng": 121.0
+        "lng": 121
       },
       {
-        "lat": 15.0,
+        "lat": 15,
         "lng": 120.5
       },
       {
-        "lat": 7.0,
+        "lat": 7,
         "lng": 125.5
       },
       {
-        "lat": -1.0,
-        "lng": 121.0
+        "lat": -1,
+        "lng": 121
       },
       {
-        "lat": -5.0,
-        "lng": 147.0
+        "lat": -5,
+        "lng": 147
       }
     ]
   },
@@ -4020,10 +4020,10 @@
     "start": -1100,
     "end": -800,
     "lat": -15.5,
-    "lng": 167.0,
+    "lng": 167,
     "place": "Vanuatu and Tonga",
     "continent": "Oceania",
-    "summary": "People making dentate-stamped Lapita pottery sailed beyond the Solomon Islands into Vanuatu, New Caledonia, Fiji, Tonga, and Samoa. That leap into Remote Oceania is widely dated to about 1100–800 BCE. It was the base from which later Polynesian cultures grew. The line is a schematic of that route, not every stop.",
+    "summary": "People making dentate-stamped Lapita pottery sailed beyond the Solomon Islands into Vanuatu, New Caledonia, Fiji, Tonga, and Samoa. That leap into Remote Oceania is widely dated to about 1100–800 BCE. It was the base from which later Polynesian cultures grew.",
     "dateNote": "Approximate. Lapita in Remote Oceania is widely dated to about 1100–800 BCE.",
     "path": [
       {
@@ -4032,7 +4032,7 @@
       },
       {
         "lat": -15.5,
-        "lng": 167.0
+        "lng": 167
       },
       {
         "lat": -21.14,
@@ -4050,7 +4050,7 @@
     "lng": -171.77,
     "place": "Samoa to the Society Islands and Rapa Nui",
     "continent": "Oceania",
-    "summary": "Polynesian navigators settled the Society Islands, Hawaiʻi, Rapa Nui, and Aotearoa between about 900 and 1300. They sailed double canoes by stars, swells, and birds. The line sketches one eastern route, from Samoa toward Tahiti and Rapa Nui.",
+    "summary": "Polynesian navigators settled the Society Islands, Hawaiʻi, Rapa Nui, and Aotearoa between about 900 and 1300. They sailed double canoes by stars, swells, and birds.",
     "dateNote": "Approximate. Eastern Polynesia was settled between about 900 and 1300.",
     "path": [
       {
@@ -4077,11 +4077,11 @@
     "lng": -155.09,
     "place": "Hawaiʻi island",
     "continent": "Oceania",
-    "summary": "Polynesian voyagers settled the Hawaiian islands around 1000–1200. They brought crops, animals, and a language closely related to Māori and Tahitian. Later Hawaiian kingdoms grew from those founding communities. The line is a schematic of that route, not every stop.",
+    "summary": "Polynesian voyagers settled the Hawaiian islands around 1000–1200. They brought crops, animals, and a language closely related to Māori and Tahitian. Later Hawaiian kingdoms grew from those founding communities.",
     "dateNote": "Approximate. Settlement is widely dated to about 1000–1200.",
     "path": [
       {
-        "lat": -9.0,
+        "lat": -9,
         "lng": -139.5
       },
       {
@@ -4100,7 +4100,7 @@
     "lng": 174.76,
     "place": "Aotearoa New Zealand",
     "continent": "Oceania",
-    "summary": "Polynesian navigators settled Aotearoa New Zealand in the late thirteenth century. Radiocarbon dates and the extinction of the moa cluster around 1250–1300. Māori traditions remember the voyaging canoes that made the crossing. The line is a schematic of that route, not every stop.",
+    "summary": "Polynesian navigators settled Aotearoa New Zealand in the late thirteenth century. Radiocarbon dates and the extinction of the moa cluster around 1250–1300. Māori traditions remember the voyaging canoes that made the crossing.",
     "dateNote": "Approximate. Settlement is widely dated to about 1250–1300.",
     "path": [
       {
@@ -4123,11 +4123,11 @@
     "lng": -109.35,
     "place": "Rapa Nui",
     "continent": "Oceania",
-    "summary": "Rapa Nui, also called Easter Island, was settled by Polynesian voyagers around 1200. Older claims of a much earlier date have not held. The islanders later carved the moai, the great stone figures. The line is a schematic of that route, not every stop.",
+    "summary": "Rapa Nui, also called Easter Island, was settled by Polynesian voyagers around 1200. Older claims of a much earlier date have not held. The islanders later carved the moai, the great stone figures.",
     "dateNote": "Approximate. Current dating places settlement around 1200.",
     "path": [
       {
-        "lat": -9.0,
+        "lat": -9,
         "lng": -139.5
       },
       {
@@ -4159,16 +4159,16 @@
     "lng": 47.52,
     "place": "Madagascar",
     "continent": "Africa",
-    "summary": "Madagascar was settled by people from Island Southeast Asia, with African communities joining them. Linguistic and genetic evidence places the main Austronesian arrival between about 500 and 1000. Malagasy is an Austronesian language with African influences. The line is a schematic of that route, not every stop.",
+    "summary": "Madagascar was settled by people from Island Southeast Asia, with African communities joining them. Linguistic and genetic evidence places the main Austronesian arrival between about 500 and 1000. Malagasy is an Austronesian language with African influences.",
     "dateNote": "Approximate. The Austronesian settlement is widely placed between about 500 and 1000.",
     "path": [
       {
-        "lat": -1.0,
-        "lng": 117.0
+        "lat": -1,
+        "lng": 117
       },
       {
-        "lat": -8.0,
-        "lng": 80.0
+        "lat": -8,
+        "lng": 80
       },
       {
         "lat": -18.93,
@@ -4186,7 +4186,7 @@
     "lng": -149.43,
     "place": "Tahiti and the Pacific",
     "continent": "Oceania",
-    "summary": "James Cook's three voyages between 1768 and 1779 mapped much of the Pacific, including the east coast of Australia and Hawaiʻi. He was killed at Kealakekua Bay in 1779. The voyages opened the ocean to later European colonisation. The line is a schematic of that route, not every stop.",
+    "summary": "James Cook's three voyages between 1768 and 1779 mapped much of the Pacific, including the east coast of Australia and Hawaiʻi. He was killed at Kealakekua Bay in 1779. The voyages opened the ocean to later European colonisation.",
     "dateNote": "The voyages are dated from 1768 to Cook's death on 14 February 1779.",
     "path": [
       {
@@ -4202,7 +4202,7 @@
         "lng": 174.78
       },
       {
-        "lat": -34.0,
+        "lat": -34,
         "lng": 151.21
       },
       {
@@ -4413,7 +4413,7 @@
     "start": 1773,
     "end": 1773,
     "lat": -66.5,
-    "lng": 40.0,
+    "lng": 40,
     "place": "Southern Ocean",
     "continent": "Antarctica",
     "summary": "On 17 January 1773 James Cook's Resolution crossed the Antarctic Circle, the first ship known to have done so. He circumnavigated the ice but did not sight the continent for certain. His voyage disproved the idea of a habitable southern continent reaching into temperate seas.",
@@ -4425,8 +4425,8 @@
     "type": "history",
     "start": 1820,
     "end": 1820,
-    "lat": -69.0,
-    "lng": -1.0,
+    "lat": -69,
+    "lng": -1,
     "place": "Antarctic coast",
     "continent": "Antarctica",
     "summary": "In 1820 several expeditions saw the Antarctic ice coast. The Russian ships of Bellingshausen and Lazarev, and British and American sealers including Bransfield and Palmer, were all in those waters. No single 'first sighting' is undisputed, but the continent was seen that year.",
@@ -4438,7 +4438,7 @@
     "type": "history",
     "start": 1911,
     "end": 1911,
-    "lat": -90.0,
+    "lat": -90,
     "lng": 0.1,
     "place": "South Pole",
     "continent": "Antarctica",
@@ -4451,7 +4451,7 @@
     "type": "history",
     "start": 1912,
     "end": 1912,
-    "lat": -90.0,
+    "lat": -90,
     "lng": 0.2,
     "place": "South Pole",
     "continent": "Antarctica",
@@ -4504,7 +4504,7 @@
     "start": 2002,
     "end": 2002,
     "lat": -65.5,
-    "lng": -61.0,
+    "lng": -61,
     "place": "Larsen B ice shelf",
     "continent": "Antarctica",
     "summary": "In early 2002 the Larsen B ice shelf on the Antarctic Peninsula collapsed over a few weeks. About 3,250 square kilometres of ice broke apart. The collapse followed strong regional warming and became a symbol of Antarctic change.",
@@ -4595,7 +4595,7 @@
     "start": -5000,
     "end": -3000,
     "lat": -13.5,
-    "lng": -72.0,
+    "lng": -72,
     "place": "Andean highlands, Peru",
     "continent": "South America",
     "summary": "People in the Andes domesticated the potato and other highland crops. Archaeological potatoes are widely dated to about 5000–3000 BCE. The crop later spread worldwide after the Spanish conquest.",
@@ -4607,12 +4607,12 @@
     "type": "history",
     "start": -28050,
     "end": -13050,
-    "lat": 48.0,
-    "lng": 70.0,
+    "lat": 48,
+    "lng": 70,
     "place": "Eurasian steppe",
     "continent": "Asia",
     "summary": "Dogs are the first domesticated animal, descended from wolves. The place and the century are still debated, and estimates range from about 15,000 to more than 30,000 years ago. By the end of the Ice Age, dogs were living with people in Eurasia.",
-    "dateNote": "Approximate. Estimates range from about 15,000 to more than 30,000 years ago. The years stored here are the BCE equivalents, 28,050 BCE–13,050 BCE."
+    "dateNote": "Approximate. Estimates range from about 15,000 to more than 30,000 years ago."
   },
   {
     "id": "holocene-start",
@@ -4633,8 +4633,8 @@
     "type": "history",
     "start": -10900,
     "end": -9700,
-    "lat": 52.0,
-    "lng": 5.0,
+    "lat": 52,
+    "lng": 5,
     "place": "North Atlantic",
     "continent": "Europe",
     "summary": "The Younger Dryas was a sharp return of cold lasting from about 12,900 to 11,700 years ago. It interrupted the warming at the end of the Ice Age, and it is recorded in ice cores and lake beds around the North Atlantic. Its cause is still discussed.",

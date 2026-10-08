@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { dateIsApproximate, formatEventDate, formatYearRange, parseDateInput, sentenceCount } from '../src/dates';
+import { dateIsApproximate, formatEventDate, formatYearRange, parseDateInput, roundDisplayYear, sentenceCount } from '../src/dates';
 import { resolvePeriod } from '../src/timeline';
+import type { HistoryEvent } from '../src/types';
+import eventsJson from '../data/events.json';
+
+const events = eventsJson as HistoryEvent[];
 
 const PRESENT = 2026;
 
@@ -55,6 +59,18 @@ describe('formatYearRange', () => {
     expect(formatEventDate(-43550, -43550, 'Approximate. Occupation.')).toBe('approx. 43,500 BCE');
     expect(formatEventDate(-298050, -297000, 'Approximate. A span.')).toBe('approx. 300,000 BCE');
     expect(formatEventDate(-43550, -43000, 'Dated from the layer.')).toBe('43,500–43,000 BCE');
+  });
+
+  it('keeps every displayed year inside the step that contains the stored year', () => {
+    events.forEach((event) => {
+      for (const stored of [event.start, event.end]) {
+        const shown = roundDisplayYear(stored);
+        const period = resolvePeriod(stored, PRESENT);
+        expect(shown, `${event.id} ${stored}`).toBeGreaterThanOrEqual(period.start);
+        expect(shown, `${event.id} ${stored}`).toBeLessThanOrEqual(period.end);
+        expect(shown, event.id).not.toBe(0);
+      }
+    });
   });
 });
 

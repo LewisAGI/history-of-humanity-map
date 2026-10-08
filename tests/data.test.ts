@@ -161,18 +161,29 @@ describe('corrected routes and wording', () => {
     expect(routeLines(lapita.path)[0][0]).toMatchObject({ lat: -1.45, lng: 149.62 });
   });
 
-  it('draws the slave trade as two paths leaving West Africa', () => {
+  it('draws the slave trade from Elmina to the Caribbean and from Luanda to Brazil', () => {
     const slave = events.find((event) => event.id === 'atlantic-slave-trade')!;
     const lines = routeLines(slave.path);
     expect(lines).toHaveLength(2);
-    lines.forEach((line) => {
-      expect(line[0]).toMatchObject({ lat: 5.08, lng: -1.35 });
-    });
+    const starts = lines.map((line) => line[0]);
+    expect(starts).toContainEqual({ lat: 5.08, lng: -1.35 });
+    expect(starts).toContainEqual({ lat: -8.839, lng: 13.234 });
     const ends = lines.map((line) => line[line.length - 1]);
     expect(ends).toContainEqual({ lat: 13.1, lng: -59.62 });
     expect(ends).toContainEqual({ lat: -12.97, lng: -38.5 });
-    expect(slave.summary).toContain('one to the Caribbean and one to Brazil');
+    expect(sentenceCount(slave.summary)).toBeGreaterThanOrEqual(2);
     expect(sentenceCount(slave.summary)).toBeLessThanOrEqual(4);
+  });
+
+  it('keeps history in the text and leaves out the drawing', () => {
+    const banned = /\bthe line\b|\bthe arrow\b|\bschematic\b|\bpin\b/i;
+    events.forEach((event) => {
+      expect(event.summary, event.id).not.toMatch(banned);
+      expect(event.dateNote, event.id).not.toMatch(banned);
+      expect(event.dateNote, event.id).not.toMatch(/stored here/i);
+    });
+    const nazca = events.find((event) => event.id === 'nazca-lines')!;
+    expect(nazca.dateNote).toMatch(/lines are widely dated/i);
   });
 
   it('says the Australian parliament first sat in Melbourne', () => {

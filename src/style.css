@@ -353,7 +353,8 @@ html, body {
   font: 14px/1.45 system-ui, sans-serif;
 }
 
-.event-popup .maplibregl-popup-close-button {
+.event-popup .maplibregl-popup-close-button,
+.sheet-close {
   width: 28px;
   height: 28px;
   font-size: 18px;
@@ -361,6 +362,28 @@ html, body {
   border-radius: 50%;
   top: 6px;
   right: 6px;
+}
+
+.event-sheet {
+  position: absolute;
+  z-index: 4;
+  overflow: auto;
+  background: #f7f4ee;
+  color: var(--ink);
+  border-radius: 16px;
+  padding: 14px 16px 16px;
+  box-shadow: var(--shadow);
+  font: 14px/1.45 system-ui, sans-serif;
+}
+
+.event-sheet[hidden] { display: none; }
+
+.sheet-close {
+  position: absolute;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  line-height: 1;
 }
 
 .event-popup .maplibregl-popup-tip { border-top-color: #f7f4ee; border-bottom-color: #f7f4ee; }

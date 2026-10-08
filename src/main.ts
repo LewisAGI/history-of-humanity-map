@@ -61,10 +61,19 @@ const keyPanel = app.querySelector<HTMLElement>('#key-panel')!;
 let period = resolvePeriod(present, present);
 const memory: Partial<Record<Era, Period>> = { after: period };
 let selected: HistoryEvent | null = null;
+let retainRoute = false;
 
 mapView.onSelect((event) => {
   closePopouts();
   selected = event;
+  retainRoute = false;
+  render();
+});
+
+mapView.onPopupClose(() => {
+  closePopouts();
+  selected = null;
+  retainRoute = true;
   render();
 });
 
@@ -103,10 +112,17 @@ periodButton.addEventListener('click', () => {
 });
 
 document.addEventListener('keydown', (event) => {
-  if (event.key !== 'Escape' || datePopout.hidden) return;
-  datePopout.hidden = true;
-  dateInput.classList.remove('is-invalid');
-  periodButton.setAttribute('aria-expanded', 'false');
+  if (event.key !== 'Escape') return;
+  if (!datePopout.hidden) {
+    datePopout.hidden = true;
+    dateInput.classList.remove('is-invalid');
+    periodButton.setAttribute('aria-expanded', 'false');
+    return;
+  }
+  if (!selected) return;
+  selected = null;
+  retainRoute = true;
+  render();
 });
 
 datePopout.addEventListener('submit', (event) => {
@@ -131,6 +147,7 @@ function applyPeriod(next: Period) {
   period = next;
   memory[next.era] = next;
   selected = null;
+  retainRoute = false;
   render();
 }
 
@@ -156,8 +173,10 @@ function render() {
     button.setAttribute('aria-current', current ? 'true' : 'false');
   });
 
+  const keepRoute = retainRoute && selected === null;
+  retainRoute = false;
   mapView.setEvents(visible);
-  mapView.setSelected(selected);
+  mapView.setSelected(selected, { keepRoute });
 }
 
 function togglePopout(panel: HTMLElement, button: HTMLElement) {

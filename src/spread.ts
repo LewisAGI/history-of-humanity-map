@@ -9,6 +9,9 @@ export const COLOCATION_KM = 20;
  */
 export const SPREAD_SEPARATION_PX = 36;
 
+/** Two pins whose dots overlap on screen are spread, even when they are more than 20 km apart. */
+export const PIN_DIAMETER_PX = 32;
+
 export interface ScreenPosition extends Waypoint {
   offsetX: number;
   offsetY: number;
@@ -77,6 +80,58 @@ export function displayPositions<T extends Waypoint & { id: string }>(events: T[
     });
   });
   return positions;
+}
+
+/**
+ * Extra screen offset for pins whose current screen positions fall within one
+ * pin diameter. Offsets are pixels. The stored coordinates are not moved.
+ * A pair already 36 px apart is left alone.
+ */
+export function spreadOverlaps(
+  points: { id: string; x: number; y: number }[],
+  diameter = PIN_DIAMETER_PX,
+): Map<string, { x: number; y: number }> {
+  const parent = points.map((_, index) => index);
+  const find = (index: number): number => {
+    if (parent[index] !== index) parent[index] = find(parent[index]);
+    return parent[index];
+  };
+  const unite = (a: number, b: number) => {
+    parent[find(a)] = find(b);
+  };
+  for (let i = 0; i < points.length; i += 1) {
+    for (let j = i + 1; j < points.length; j += 1) {
+      if (Math.hypot(points[i].x - points[j].x, points[i].y - points[j].y) <= diameter) unite(i, j);
+    }
+  }
+  const groups = new Map<number, number[]>();
+  points.forEach((_, index) => {
+    const root = find(index);
+    const list = groups.get(root) ?? [];
+    list.push(index);
+    groups.set(root, list);
+  });
+  const offsets = new Map<string, { x: number; y: number }>();
+  groups.forEach((indexes) => {
+    const members = indexes
+      .map((index) => points[index])
+      .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+    if (members.length === 1) {
+      offsets.set(members[0].id, { x: 0, y: 0 });
+      return;
+    }
+    const cx = members.reduce((sum, point) => sum + point.x, 0) / members.length;
+    const cy = members.reduce((sum, point) => sum + point.y, 0) / members.length;
+    const radius = SPREAD_SEPARATION_PX / (2 * Math.sin(Math.PI / members.length));
+    members.forEach((point, order) => {
+      const angle = (2 * Math.PI * order) / members.length;
+      offsets.set(point.id, {
+        x: cx + radius * Math.cos(angle) - point.x,
+        y: cy + radius * Math.sin(angle) - point.y,
+      });
+    });
+  });
+  return offsets;
 }
 
 /** Valid pins keep a placement. Invalid coordinates are skipped, not drawn. */

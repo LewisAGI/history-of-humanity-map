@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { eventOverlapsPeriod, periodsForEra, presentYear } from '../src/timeline';
-import { clampLatitude, displayPositions, distanceKm, isValidLngLat, placementsFor, SPREAD_SEPARATION_PX } from '../src/spread';
+import { clampLatitude, displayPositions, distanceKm, isValidLngLat, placementsFor, spreadOverlaps, SPREAD_SEPARATION_PX } from '../src/spread';
 import type { HistoryEvent } from '../src/types';
 import eventsJson from '../data/events.json';
 
@@ -53,6 +53,24 @@ describe('displayPositions', () => {
     const shown = displayPositions([{ id: 'past-pole', lat: -90.1176, lng: 0 }]);
     expect(shown.get('past-pole')!.lat).toBe(-90);
     expect(isValidLngLat(shown.get('past-pole')!.lat, shown.get('past-pole')!.lng)).toBe(true);
+  });
+});
+
+describe('spreadOverlaps', () => {
+  it('separates pins within one dot and leaves distant pins', () => {
+    const close = spreadOverlaps([
+      { id: 'a', x: 0, y: 0 },
+      { id: 'b', x: 10, y: 0 },
+    ]);
+    const a = close.get('a')!;
+    const b = close.get('b')!;
+    expect(Math.hypot(10 + b.x - a.x, b.y - a.y)).toBeGreaterThanOrEqual(SPREAD_SEPARATION_PX - 0.01);
+    const far = spreadOverlaps([
+      { id: 'a', x: 0, y: 0 },
+      { id: 'b', x: 80, y: 0 },
+    ]);
+    expect(far.get('a')).toEqual({ x: 0, y: 0 });
+    expect(far.get('b')).toEqual({ x: 0, y: 0 });
   });
 });
 

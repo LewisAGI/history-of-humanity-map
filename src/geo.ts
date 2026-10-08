@@ -1,5 +1,19 @@
 import type { Waypoint } from './types';
 
+/** One drawn line, or several lines that leave the same journey (a branching route). */
+export type RoutePath = Waypoint[] | Waypoint[][];
+
+/** Each branch that has at least two points. A single line is one branch. */
+export function routeLines(path: RoutePath | undefined): Waypoint[][] {
+  if (!path || path.length === 0) return [];
+  const branches = isBranchList(path) ? path : [path];
+  return branches.filter((line) => line.length >= 2);
+}
+
+function isBranchList(path: RoutePath): path is Waypoint[][] {
+  return Array.isArray(path[0]);
+}
+
 const EARTH_RADIUS = 1;
 
 export function greatCircle(a: Waypoint, b: Waypoint, segments = 24): Waypoint[] {

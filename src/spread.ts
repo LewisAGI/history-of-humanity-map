@@ -1,10 +1,22 @@
 import type { Waypoint } from './types';
 
-/** Pins closer than this, in the same period, cannot be told apart at maximum zoom. */
+/** Pins closer than this, in the same period, cannot be told apart on screen. */
 export const COLOCATION_KM = 20;
 
-/** Centre-to-centre gap after a co-located group is opened into a ring. */
-export const SPREAD_SEPARATION_KM = 26;
+/**
+ * Centre-to-centre gap, in screen pixels, after a co-located group is opened
+ * into a ring. The stored coordinates are not moved.
+ */
+export const SPREAD_SEPARATION_PX = 36;
+
+export interface ScreenPosition extends Waypoint {
+  offsetX: number;
+  offsetY: number;
+}
+
+export function isValidLngLat(lat: number, lng: number): boolean {
+  return Number.isFinite(lat) && Number.isFinite(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180;
+}
 
 export function distanceKm(a: Waypoint, b: Waypoint): number {
   const earth = 6371;
@@ -17,10 +29,11 @@ export function distanceKm(a: Waypoint, b: Waypoint): number {
 }
 
 /**
- * Co-located pins in one period are drawn on a small ring so each can be clicked.
- * Pins farther apart keep their coordinates. The ring is deterministic (sorted by id).
+ * Co-located pins keep their true coordinates and are drawn on a pixel ring
+ * around that point so each can be clicked at every zoom. The ring is
+ * deterministic (sorted by id).
  */
-export function displayPositions<T extends Waypoint & { id: string }>(events: T[]): Map<string, Waypoint> {
+export function displayPositions<T extends Waypoint & { id: string }>(events: T[]): Map<string, ScreenPosition> {
   const parent = events.map((_, index) => index);
   const find = (index: number): number => {
     if (parent[index] !== index) parent[index] = find(parent[index]);
@@ -43,40 +56,58 @@ export function displayPositions<T extends Waypoint & { id: string }>(events: T[
     groups.set(root, list);
   });
 
-  const positions = new Map<string, Waypoint>();
+  const positions = new Map<string, ScreenPosition>();
   groups.forEach((indexes) => {
     const members = indexes
       .map((index) => events[index])
       .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
     if (members.length === 1) {
-      positions.set(members[0].id, { lat: members[0].lat, lng: members[0].lng });
+      const only = members[0];
+      positions.set(only.id, { ...clamped(only), offsetX: 0, offsetY: 0 });
       return;
     }
-    const lat0 = members.reduce((sum, event) => sum + event.lat, 0) / members.length;
-    const lng0 = meanLongitude(members.map((event) => event.lng));
-    const radius = SPREAD_SEPARATION_KM / (2 * Math.sin(Math.PI / members.length));
+    const radius = SPREAD_SEPARATION_PX / (2 * Math.sin(Math.PI / members.length));
     members.forEach((event, order) => {
       const angle = (2 * Math.PI * order) / members.length;
-      const lat = lat0 + (radius / 110.574) * Math.cos(angle);
-      const cosLat = Math.cos((lat0 * Math.PI) / 180) || 1e-6;
-      const lng = lng0 + (radius / (111.32 * cosLat)) * Math.sin(angle);
-      positions.set(event.id, { lat, lng });
+      positions.set(event.id, {
+        ...clamped(event),
+        offsetX: radius * Math.cos(angle),
+        offsetY: radius * Math.sin(angle),
+      });
     });
   });
   return positions;
 }
 
-function meanLongitude(lngs: number[]): number {
-  const vectors = lngs.map((lng) => toRad(lng));
-  const x = vectors.reduce((sum, λ) => sum + Math.cos(λ), 0);
-  const y = vectors.reduce((sum, λ) => sum + Math.sin(λ), 0);
-  return (toDeg(Math.atan2(y, x)) + 540) % 360 - 180;
+/** Valid pins keep a placement. Invalid coordinates are skipped, not drawn. */
+export function placementsFor<T extends Waypoint & { id: string }>(
+  events: T[],
+): { kept: (T & ScreenPosition)[]; skipped: T[] } {
+  const keptEvents = events.filter((event) => isValidLngLat(event.lat, event.lng));
+  const skipped = events.filter((event) => !isValidLngLat(event.lat, event.lng));
+  const positions = displayPositions(keptEvents);
+  const kept = keptEvents.map((event) => ({ ...event, ...positions.get(event.id)! }));
+  return { kept, skipped };
+}
+
+function clamped(point: Waypoint): Waypoint {
+  return {
+    lat: point.lat >= -90 && point.lat <= 90 ? point.lat : clampLatitude(point.lat),
+    lng: point.lng >= -180 && point.lng <= 180 ? point.lng : clampLongitude(point.lng),
+  };
+}
+
+/** MapLibre rejects latitudes outside -90..90, including a ring pushed past the pole. */
+export function clampLatitude(lat: number): number {
+  if (!Number.isFinite(lat)) return 0;
+  return Math.min(90, Math.max(-90, lat));
+}
+
+function clampLongitude(lng: number): number {
+  if (!Number.isFinite(lng)) return 0;
+  return ((((lng + 180) % 360) + 360) % 360) - 180;
 }
 
 function toRad(degrees: number): number {
   return (degrees * Math.PI) / 180;
-}
-
-function toDeg(radians: number): number {
-  return (radians * 180) / Math.PI;
 }

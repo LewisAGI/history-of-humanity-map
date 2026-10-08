@@ -1,9 +1,14 @@
-import { GeoJSONSource, Map as MapLibreMap, Marker, Popup, type StyleSpecification } from 'maplibre-gl';
+import { GeoJSONSource, Map as MapLibreMap, Marker, Popup, setWorkerUrl, type StyleSpecification } from 'maplibre-gl';
+import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import { formatEventDate } from './dates';
-import { arrivalBearing, pathCoordinates, unwrappedPath } from './geo';
-import { displayPositions } from './spread';
+import { arrivalBearing, pathCoordinates, routeLines, unwrappedPath } from './geo';
+import { placementsFor, type ScreenPosition } from './spread';
 import { LABEL_MIN_ZOOM, visibleLabelIds, type LabelBox } from './labels';
 import type { HistoryEvent } from './types';
+
+// Vite does not emit MapLibre's worker unless the URL is set. Without it the
+// production build 404s and neither land nor route lines draw.
+setWorkerUrl(workerUrl);
 
 const EMPTY: GeoJSON.FeatureCollection = { type: 'FeatureCollection', features: [] };
 
@@ -106,9 +111,21 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   window.__historyMap = map;
 
   function setEvents(events: HistoryEvent[]) {
-    markers.forEach((pin) => pin.marker.remove());
-    const positions = displayPositions(events);
-    markers = events.map((event) => createPin(event, positions.get(event.id) ?? event));
+    const { kept, skipped } = placementsFor(events);
+    skipped.forEach((event) => {
+      console.warn(`Skipping pin ${event.id}: invalid coordinates ${event.lat}, ${event.lng}`);
+    });
+    const next: Pin[] = [];
+    kept.forEach((event) => {
+      try {
+        next.push(createPin(event, event));
+      } catch (error) {
+        console.warn(`Skipping pin ${event.id}`, error);
+      }
+    });
+    const previous = markers;
+    markers = next;
+    previous.forEach((pin) => pin.marker.remove());
     refreshLabels();
     root.dataset.ready = 'true';
   }
@@ -118,13 +135,13 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     markers.forEach((pin) => pin.element.classList.toggle('is-selected', pin.event.id === selectedId));
     drawArrow(event);
     openPopup(event);
-    const framed = event?.path && event.path.length >= 2 ? framePath(event) : false;
+    const framed = event ? framePath(event) : false;
     if (framed) map.once('moveend', () => settlePopup());
     else requestAnimationFrame(() => settlePopup());
     refreshLabels();
   }
 
-  function createPin(event: HistoryEvent, at: { lat: number; lng: number }): Pin {
+  function createPin(event: HistoryEvent, at: ScreenPosition): Pin {
     const element = document.createElement('button');
     element.type = 'button';
     element.className = 'pin';
@@ -140,9 +157,14 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       click.stopPropagation();
       selectHandler(event);
     });
-    const marker = new Marker({ element, anchor: 'center', opacityWhenCovered: 0 })
-      .setLngLat([at.lng, at.lat])
-      .addTo(map);
+    const marker = new Marker({
+      element,
+      anchor: 'center',
+      opacityWhenCovered: 0,
+      offset: [at.offsetX, at.offsetY],
+    });
+    marker.setLngLat([at.lng, at.lat]);
+    marker.addTo(map);
     return { event, element, label, marker, at };
   }
 
@@ -183,24 +205,30 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   function drawArrow(event: HistoryEvent | null) {
     const source = map.getSource('migration') as GeoJSONSource | undefined;
     if (!source) return;
-    if (!event?.path || event.path.length < 2) {
+    const lines = routeLines(event?.path);
+    if (lines.length === 0) {
       source.setData(EMPTY);
       root.dataset.arrow = '';
       return;
     }
-    const features: GeoJSON.Feature[] = pathCoordinates(event.path).map((coordinates) => ({
-      type: 'Feature',
-      properties: { role: 'line' },
-      geometry: { type: 'LineString', coordinates },
-    }));
-    const last = event.path[event.path.length - 1];
-    features.push({
-      type: 'Feature',
-      properties: { role: 'head', bearing: arrivalBearing(event.path) },
-      geometry: { type: 'Point', coordinates: [last.lng, last.lat] },
+    const features: GeoJSON.Feature[] = [];
+    lines.forEach((line) => {
+      pathCoordinates(line).forEach((coordinates) => {
+        features.push({
+          type: 'Feature',
+          properties: { role: 'line' },
+          geometry: { type: 'LineString', coordinates },
+        });
+      });
+      const last = line[line.length - 1];
+      features.push({
+        type: 'Feature',
+        properties: { role: 'head', bearing: arrivalBearing(line) },
+        geometry: { type: 'Point', coordinates: [last.lng, last.lat] },
+      });
     });
     source.setData({ type: 'FeatureCollection', features });
-    root.dataset.arrow = event.id;
+    root.dataset.arrow = event!.id;
   }
 
   function openPopup(event: HistoryEvent | null) {
@@ -213,7 +241,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     const next = new Popup({
       closeButton: true,
       closeOnClick: false,
-      maxWidth: `${Math.min(320, window.innerWidth - 32)}px`,
+      maxWidth: popupMaxWidth(),
       offset: 16,
       className: 'event-popup',
       focusAfterOpen: false,
@@ -246,23 +274,18 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       if (attempt < 6) requestAnimationFrame(() => settlePopup(attempt + 1));
       return;
     }
-    const margin = 8;
-    const bar = root.querySelector('.time')?.getBoundingClientRect();
-    const bottomLimit = Math.min(window.innerHeight - margin, bar ? bar.top - margin : window.innerHeight - margin);
+    const limits = popupLimits();
     let dx = 0;
     let dy = 0;
-    if (rect.right > window.innerWidth - margin) dx = window.innerWidth - margin - rect.right;
-    if (rect.left + dx < margin) dx = margin - rect.left;
-    if (rect.bottom > bottomLimit) dy = bottomLimit - rect.bottom;
-    if (rect.top + dy < margin) dy = margin - rect.top;
+    if (rect.right > limits.right) dx = limits.right - rect.right;
+    if (rect.left + dx < limits.left) dx = limits.left - rect.left;
+    if (rect.bottom > limits.bottom) dy = limits.bottom - rect.bottom;
+    if (rect.top + dy < limits.top) dy = limits.top - rect.top;
+    ({ dx, dy } = clearOfKey(rect, dx, dy, limits));
     element.style.marginLeft = `${dx}px`;
     element.style.marginTop = `${dy}px`;
     const placed = element.getBoundingClientRect();
-    const outside =
-      placed.left < margin - 1 ||
-      placed.right > window.innerWidth - margin + 1 ||
-      placed.top < margin - 1 ||
-      placed.bottom > bottomLimit + 1;
+    const outside = !boxInside(placed, limits) || hitsControls(placed);
     if (outside && attempt < 8) {
       requestAnimationFrame(() => settlePopup(attempt + 1));
       return;
@@ -271,12 +294,10 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   }
 
   function framePath(event: HistoryEvent): boolean {
-    const path = event.path;
-    if (!path || path.length < 2) return false;
-    const line = unwrappedPath(path);
-    if (!line || line.length < 2) return false;
-    const lngs = line.map((coord) => coord[0]);
-    const lats = line.map((coord) => coord[1]);
+    const lines = routeLines(event.path).flatMap((line) => unwrappedPath(line));
+    if (lines.length < 2) return false;
+    const lngs = lines.map((coord) => coord[0]);
+    const lats = lines.map((coord) => coord[1]);
     const minLng = Math.min(...lngs);
     const maxLng = Math.max(...lngs);
     const minLat = Math.min(...lats);
@@ -285,8 +306,13 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     if (span <= 2) return false;
     if (maxLng > 180 || minLng < -180) {
       const centerLng = ((((minLng + maxLng) / 2 + 540) % 360) + 360) % 360 - 180;
-      const zoom = Math.max(0.8, Math.min(3.2, 5.4 - Math.log2(span)));
-      map.easeTo({ center: [centerLng, (minLat + maxLat) / 2], zoom, duration: 800 });
+      const zoom = Math.max(1.75, Math.min(3.2, 5.4 - Math.log2(span)));
+      map.easeTo({
+        center: [centerLng, (minLat + maxLat) / 2],
+        zoom,
+        duration: 800,
+        padding: { top: 48, bottom: 220, left: 56, right: 80 },
+      });
       return true;
     }
     map.fitBounds(
@@ -327,7 +353,80 @@ interface Pin {
   element: HTMLButtonElement;
   label: HTMLElement;
   marker: Marker;
-  at: { lat: number; lng: number };
+  at: ScreenPosition;
+}
+
+interface BoxLimits {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
+
+function popupMaxWidth(): string {
+  const margin = 8;
+  const zoom = visibleRect(document.querySelector('.zoom'));
+  const right = zoom ? zoom.left - margin : window.innerWidth - margin;
+  const width = Math.min(320, Math.max(160, right - margin));
+  return `${Math.floor(width)}px`;
+}
+
+function popupLimits(): BoxLimits {
+  const margin = 8;
+  const zoom = visibleRect(document.querySelector('.zoom'));
+  const time = visibleRect(document.querySelector('.time'));
+  return {
+    left: margin,
+    top: margin,
+    right: Math.min(window.innerWidth - margin, zoom ? zoom.left - margin : window.innerWidth - margin),
+    bottom: Math.min(window.innerHeight - margin, time ? time.top - margin : window.innerHeight - margin),
+  };
+}
+
+function clearOfKey(rect: DOMRect, dx: number, dy: number, limits: BoxLimits): { dx: number; dy: number } {
+  const key = visibleRect(document.querySelector('.key-wrap'));
+  if (!key) return { dx, dy };
+  const gap = 8;
+  const box = shifted(rect, dx, dy);
+  const hit =
+    box.left < key.right + gap && box.right > key.left - gap && box.top < key.bottom + gap && box.bottom > key.top - gap;
+  if (!hit) return { dx, dy };
+  const up = key.top - gap - box.bottom;
+  if (box.top + up >= limits.top) dy += up;
+  else dx += key.right + gap - box.left;
+  if (rect.right + dx > limits.right) dx = limits.right - rect.right;
+  if (rect.left + dx < limits.left) dx = limits.left - rect.left;
+  if (rect.top + dy < limits.top) dy = limits.top - rect.top;
+  if (rect.bottom + dy > limits.bottom) dy = limits.bottom - rect.bottom;
+  return { dx, dy };
+}
+
+function shifted(rect: DOMRect, dx: number, dy: number) {
+  return { left: rect.left + dx, right: rect.right + dx, top: rect.top + dy, bottom: rect.bottom + dy };
+}
+
+function boxInside(rect: DOMRect, limits: BoxLimits): boolean {
+  return (
+    rect.left >= limits.left - 1 &&
+    rect.right <= limits.right + 1 &&
+    rect.top >= limits.top - 1 &&
+    rect.bottom <= limits.bottom + 1
+  );
+}
+
+function hitsControls(rect: DOMRect): boolean {
+  return ['.zoom', '.key-wrap', '.time'].some((selector) => {
+    const control = visibleRect(document.querySelector(selector));
+    if (!control) return false;
+    return rect.left < control.right && rect.right > control.left && rect.top < control.bottom && rect.bottom > control.top;
+  });
+}
+
+function visibleRect(element: Element | null): DOMRect | null {
+  if (!element) return null;
+  const rect = element.getBoundingClientRect();
+  if (rect.width < 2 || rect.height < 2) return null;
+  return rect;
 }
 
 function popupHtml(event: HistoryEvent): string {

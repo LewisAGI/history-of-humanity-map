@@ -47,6 +47,14 @@ describe('formatYearRange', () => {
     expect(dateIsApproximate('Traditional date.')).toBe(false);
     expect(formatEventDate(-300000, -300000, 'Approximate. Widely dated.')).toBe('approx. 300,000 BCE');
     expect(formatEventDate(-753, -753, 'Traditional date.')).toBe('753 BCE');
+    expect(formatEventDate(1066, 1066, 'The battle was in 1066.')).toBe('1066 CE');
+  });
+
+  it('rounds deep-time display without changing the stored precision of later years', () => {
+    expect(formatEventDate(-298050, -298050, 'Approximate. Fossils.')).toBe('approx. 300,000 BCE');
+    expect(formatEventDate(-43550, -43550, 'Approximate. Occupation.')).toBe('approx. 43,500 BCE');
+    expect(formatEventDate(-298050, -297000, 'Approximate. A span.')).toBe('approx. 300,000 BCE');
+    expect(formatEventDate(-43550, -43000, 'Dated from the layer.')).toBe('43,500–43,000 BCE');
   });
 });
 

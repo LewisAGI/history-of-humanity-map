@@ -38,8 +38,11 @@ export interface HistoryEvent {
    * Say which, in this note.
    */
   dateNote: string;
-  /** Migration or movement, drawn as a curved arrow when the pin is selected. */
-  path?: Waypoint[];
+  /**
+   * Migration or movement, drawn as a curved arrow when the pin is selected.
+   * A list of lines is a branching route: each line gets its own arrow.
+   */
+  path?: Waypoint[] | Waypoint[][];
 }
 
 export interface Period {

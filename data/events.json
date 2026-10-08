@@ -3363,25 +3363,37 @@
     "lng": -1.35,
     "place": "Elmina, Ghana",
     "continent": "Africa",
-    "summary": "From the sixteenth century into the nineteenth, European ships carried enslaved Africans across the Atlantic to the Americas. The Trans-Atlantic Slave Trade Database records about 12.5 million people forced onto ships. The trade enriched European and American ports and devastated societies in Africa.",
+    "summary": "From the sixteenth century into the nineteenth, European ships carried enslaved Africans across the Atlantic to the Americas. The Trans-Atlantic Slave Trade Database records about 12.5 million people forced onto ships. The trade enriched European and American ports and devastated societies in Africa. The two lines leave West Africa separately, one to the Caribbean and one to Brazil.",
     "dateNote": "Approximate. A direct trade to the Spanish Caribbean was licensed in 1518, and voyages continued into the 1860s.",
     "path": [
-      {
-        "lat": 5.08,
-        "lng": -1.35
-      },
-      {
-        "lat": 4.0,
-        "lng": -25.0
-      },
-      {
-        "lat": 13.1,
-        "lng": -59.62
-      },
-      {
-        "lat": -12.97,
-        "lng": -38.5
-      }
+      [
+        {
+          "lat": 5.08,
+          "lng": -1.35
+        },
+        {
+          "lat": 4.0,
+          "lng": -25.0
+        },
+        {
+          "lat": 13.1,
+          "lng": -59.62
+        }
+      ],
+      [
+        {
+          "lat": 5.08,
+          "lng": -1.35
+        },
+        {
+          "lat": -5.0,
+          "lng": -20.0
+        },
+        {
+          "lat": -12.97,
+          "lng": -38.5
+        }
+      ]
     ]
   },
   {
@@ -3463,8 +3475,8 @@
     "dateNote": "The Act is dated 1830. The Cherokee removal was in 1838.",
     "path": [
       {
-        "lat": 34.54,
-        "lng": -84.54
+        "lat": 34.541,
+        "lng": -84.909
       },
       {
         "lat": 35.05,
@@ -4015,8 +4027,8 @@
     "dateNote": "Approximate. Lapita in Remote Oceania is widely dated to about 1100–800 BCE.",
     "path": [
       {
-        "lat": -6.0,
-        "lng": 147.0
+        "lat": -1.45,
+        "lng": 149.62
       },
       {
         "lat": -15.5,
@@ -4261,7 +4273,7 @@
     "lng": 151.223,
     "place": "Centennial Park, Sydney",
     "continent": "Oceania",
-    "summary": "On 1 January 1901 the Commonwealth of Australia was proclaimed at Centennial Park in Sydney, joining the six colonies. Indigenous Australians were excluded from the new political settlement. The capital later moved to Melbourne and then to Canberra.",
+    "summary": "On 1 January 1901 the Commonwealth of Australia was proclaimed at Centennial Park in Sydney, joining the six colonies. Indigenous Australians were excluded from the new political settlement. Parliament first sat in Melbourne; Canberra became the capital in 1927.",
     "dateNote": "Federation took effect on 1 January 1901."
   },
   {

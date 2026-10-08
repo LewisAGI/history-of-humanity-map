@@ -5,8 +5,11 @@ declare global {
     __historyMap: {
       getZoom: () => number;
       getProjection: () => { type: string };
+      isMoving: () => boolean;
+      isSourceLoaded: (id: string) => boolean;
       jumpTo: (options: { center: [number, number]; zoom: number }) => void;
       once: (type: string, listener: () => void) => void;
+      queryRenderedFeatures: (options: { layers: string[] }) => unknown[];
     };
   }
 }
@@ -14,9 +17,71 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const shots = path.join('test-results', 'screenshots');
+const APP_ORIGIN = 'http://127.0.0.1:4173';
+
+/** 1911 is inside 1900–1949 (26 events, including Scott). 1960 is inside 1950–1999 (39). */
+const PINS_1900 = 26;
+const PINS_1950 = 39;
+
+const ROUTES: { id: string; date: string }[] = [
+  { id: 'out-of-africa', date: '68050 BCE' },
+  { id: 'bantu-expansion', date: '1000 BCE' },
+  { id: 'mansa-musa', date: '1324' },
+  { id: 'zhang-qian', date: '139 BCE' },
+  { id: 'silk-road', date: '130 BCE' },
+  { id: 'mongol-conquests', date: '1206' },
+  { id: 'ibn-battuta', date: '1325' },
+  { id: 'zheng-he', date: '1405' },
+  { id: 'xuanzang', date: '629' },
+  { id: 'viking-voyages', date: '870' },
+  { id: 'peopling-of-the-americas', date: '14000 BCE' },
+  { id: 'thule-migration', date: '1000' },
+  { id: 'inca-expansion', date: '1438' },
+  { id: 'columbus-1492', date: '1492' },
+  { id: 'cortes', date: '1519' },
+  { id: 'atlantic-slave-trade', date: '1518' },
+  { id: 'trail-of-tears', date: '1830' },
+  { id: 'madjedbebe', date: '63050 BCE' },
+  { id: 'austronesian-voyages', date: '3000 BCE' },
+  { id: 'lapita', date: '1100 BCE' },
+  { id: 'polynesian-voyages', date: '900' },
+  { id: 'hawaii-settlement', date: '1000' },
+  { id: 'aotearoa-settlement', date: '1250' },
+  { id: 'rapa-nui', date: '1200' },
+  { id: 'madagascar-settlement', date: '500' },
+  { id: 'cook-pacific', date: '1768' },
+];
+
+let faults: string[] = [];
 
 test.beforeAll(() => {
   fs.mkdirSync(shots, { recursive: true });
+});
+
+test.beforeEach(async ({ page }) => {
+  faults = [];
+  page.on('pageerror', (error) => faults.push(`pageerror: ${error.message}`));
+  page.on('console', (message) => {
+    if (message.type() !== 'error') return;
+    const text = message.text();
+    if (ignorableConsole(text)) return;
+    faults.push(`console: ${text}`);
+  });
+  page.on('response', (response) => {
+    if (response.status() < 400) return;
+    const url = response.url();
+    if (!isAppAsset(url)) return;
+    faults.push(`http ${response.status()}: ${url}`);
+  });
+  page.on('requestfailed', (request) => {
+    const url = request.url();
+    if (!isAppAsset(url)) return;
+    faults.push(`failed: ${url} ${request.failure()?.errorText ?? ''}`);
+  });
+});
+
+test.afterEach(() => {
+  expect(faults, faults.join('\n')).toEqual([]);
 });
 
 test('timeline, globe, pins, and labels', async ({ page }, testInfo) => {
@@ -169,14 +234,26 @@ test('timeline, globe, pins, and labels', async ({ page }, testInfo) => {
   await expect(page.locator('#date-popout')).toBeHidden();
 });
 
-test('pins render when basemap tiles are blocked', async ({ page }) => {
-  await page.route(/gibs\.earthdata\.nasa\.gov/, (route) => route.abort());
+test('pins render when basemap tiles are blocked', async ({ page }, testInfo) => {
+  await page.route(/gibs\.earthdata\.nasa\.gov/, (route) => route.abort('internetdisconnected'));
   await page.goto('/');
   await page.locator('#app[data-ready="true"]').waitFor({ timeout: 20_000 });
   await expect.poll(async () => page.locator('.pin').count()).toBeGreaterThan(0);
   await expect.poll(() => page.evaluate(() => window.__historyMap.getProjection().type)).toBe('globe');
-  const covered = page.locator('.pin').first();
-  await expect(covered).toBeVisible();
+  await expect.poll(() => renderedCount(page, 'land')).toBeGreaterThan(0);
+  await shot(page, `${testInfo.project.name}_land_tiles_blocked`);
+});
+
+test('production build loads the maplibre worker', async ({ page }) => {
+  const workerStatuses: number[] = [];
+  page.on('response', (response) => {
+    if (/worker/i.test(response.url())) workerStatuses.push(response.status());
+  });
+  await page.goto('/');
+  await page.locator('#app[data-ready="true"]').waitFor();
+  await expect.poll(() => page.evaluate(() => window.__historyMap.isSourceLoaded('land'))).toBe(true);
+  await expect.poll(() => renderedCount(page, 'land')).toBeGreaterThan(0);
+  expect(workerStatuses.some((status) => status === 200)).toBe(true);
 });
 
 test('covered pins do not take clicks or labels', async ({ page }, testInfo) => {
@@ -220,10 +297,12 @@ test('popup stays inside the viewport', async ({ page }, testInfo) => {
     },
     { zoom, shift },
   );
+  await waitForIdle(page);
   await page.locator('.pin[data-id="lucy-discovery"]').click();
   await expect(page.locator('#app')).toHaveAttribute('data-popup', 'in');
   await expectPopupInside(page);
-  await shot(page, `${testInfo.project.name}_popup_in_view`);
+  await expectPopupClearOfControls(page);
+  await shot(page, `${testInfo.project.name}_popup_clear`);
 });
 
 test('co-located pins can both be reached', async ({ page }, testInfo) => {
@@ -245,7 +324,39 @@ test('co-located pins can both be reached', async ({ page }, testInfo) => {
   expect(gap).toBeGreaterThan(18);
   await war.click();
   await expect(page.locator('.maplibregl-popup')).toContainText('Trojan War');
+  await troy.click();
+  await expect(page.locator('.maplibregl-popup')).toContainText('Bronze Age Troy');
   await shot(page, `${testInfo.project.name}_offset_pins`);
+});
+
+test('visiting 1911 then 1960 shows each period pin count', async ({ page }, testInfo) => {
+  await page.goto('/');
+  await page.locator('#app[data-ready="true"]').waitFor();
+  await openDate(page, '1911');
+  await expect(page.locator('#period-button')).toHaveText('1900–1949 CE');
+  await expect.poll(() => page.locator('.pin').count()).toBe(PINS_1900);
+  await expect(page.locator('.pin[data-id="scott-pole"]')).toHaveCount(1);
+  await expect(page.locator('.pin[data-id="amundsen-pole"]')).toHaveCount(1);
+  await page.evaluate(() => {
+    window.__historyMap.jumpTo({ center: [0.2, -78], zoom: 3 });
+  });
+  await waitForIdle(page);
+  await expect(page.locator('.pin[data-id="scott-pole"]')).toBeVisible();
+  await shot(page, `${testInfo.project.name}_scott_1911`);
+
+  await openDate(page, '1960');
+  await expect(page.locator('#period-button')).toHaveText('1950–1999 CE');
+  await expect.poll(() => page.locator('.pin').count()).toBe(PINS_1950);
+  await expect(page.locator('.pin[data-id="scott-pole"]')).toHaveCount(0);
+  await page.evaluate((count) => {
+    const note = document.createElement('p');
+    note.id = 'shot-note';
+    note.textContent = `${count} pins`;
+    note.style.cssText =
+      'position:fixed;z-index:8;top:16px;left:50%;transform:translateX(-50%);margin:0;padding:6px 12px;border-radius:999px;background:#f7f4ee;color:#1c1916;font:600 14px/1.2 Georgia,serif';
+    document.body.appendChild(note);
+  }, PINS_1950);
+  await shot(page, `${testInfo.project.name}_1960_after_1911`);
 });
 
 test('movement arrows draw for the slave trade, Zheng He, and Cook', async ({ page }, testInfo) => {
@@ -253,10 +364,13 @@ test('movement arrows draw for the slave trade, Zheng He, and Cook', async ({ pa
   await page.locator('#app[data-ready="true"]').waitFor();
   const name = testInfo.project.name;
   await showArrow(page, '1700', 'atlantic-slave-trade');
+  await expect.poll(() => renderedCount(page, 'migration-line')).toBeGreaterThanOrEqual(2);
+  await expect.poll(() => renderedCount(page, 'migration-head')).toBeGreaterThanOrEqual(2);
   await shot(page, `${name}_arrow_slave_trade`);
   await showArrow(page, '1410', 'zheng-he');
   await shot(page, `${name}_arrow_zheng_he`);
   await showArrow(page, '1770', 'cook-pacific');
+  expect(await zoomOf(page)).toBeGreaterThanOrEqual(1.6);
   await shot(page, `${name}_arrow_cook`);
   await openDate(page, '13000 BCE');
   await page.evaluate(() => {
@@ -270,12 +384,57 @@ test('movement arrows draw for the slave trade, Zheng He, and Cook', async ({ pa
   await shot(page, `${name}_antimeridian_arrow`);
 });
 
+test('every migration route draws a line', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'checked once on the built desktop map');
+  test.setTimeout(180_000);
+  await page.goto('/');
+  await page.locator('#app[data-ready="true"]').waitFor();
+  expect(ROUTES).toHaveLength(26);
+  for (const route of ROUTES) {
+    await showArrow(page, route.date, route.id);
+    const lines = await renderedCount(page, 'migration-line');
+    expect(lines, route.id).toBeGreaterThan(0);
+    if (route.id === 'atlantic-slave-trade') {
+      expect(await renderedCount(page, 'migration-head'), route.id).toBeGreaterThanOrEqual(2);
+    }
+  }
+});
+
 async function showArrow(page: Page, date: string, id: string) {
   await openDate(page, date);
   await centerOn(page, id);
   await page.locator(`.pin[data-id="${id}"]`).click();
   await expect(page.locator('#app')).toHaveAttribute('data-arrow', id);
   await expect(page.locator('#app')).toHaveAttribute('data-popup', 'in');
+  await waitForIdle(page);
+  await expect.poll(() => renderedCount(page, 'migration-line')).toBeGreaterThan(0);
+}
+
+async function renderedCount(page: Page, layer: string) {
+  return page.evaluate((layerId) => window.__historyMap.queryRenderedFeatures({ layers: [layerId] }).length, layer);
+}
+
+async function waitForIdle(page: Page) {
+  await page.evaluate(() => new Promise<void>((resolve) => {
+    const map = window.__historyMap;
+    if (!map.isMoving()) resolve();
+    else map.once('idle', () => resolve());
+  }));
+}
+
+async function expectPopupClearOfControls(page: Page) {
+  const overlap = await page.evaluate(() => {
+    const popup = document.querySelector('.maplibregl-popup')?.getBoundingClientRect();
+    if (!popup) return ['missing popup'];
+    return ['.zoom', '.key-wrap', '.time'].flatMap((selector) => {
+      const control = document.querySelector(selector)?.getBoundingClientRect();
+      if (!control || control.width < 2) return [];
+      const hit =
+        popup.left < control.right && popup.right > control.left && popup.top < control.bottom && popup.bottom > control.top;
+      return hit ? [selector] : [];
+    });
+  });
+  expect(overlap).toEqual([]);
 }
 
 async function expectPopupInside(page: Page) {
@@ -313,7 +472,21 @@ async function zoomOf(page: Page) {
 }
 
 async function shot(page: Page, fileName: string) {
-  await page.screenshot({ path: path.join(shots, `${fileName}.png`) });
+  await page.screenshot({ path: path.join(shots, `built_${fileName}.png`) });
+}
+
+function isAppAsset(url: string): boolean {
+  try {
+    return new URL(url).origin === APP_ORIGIN;
+  } catch {
+    return false;
+  }
+}
+
+function ignorableConsole(text: string): boolean {
+  if (/Worker failed to load/i.test(text)) return false;
+  if (/gibs\.earthdata\.nasa\.gov/i.test(text)) return true;
+  return /^Failed to load resource: the server responded with a status of \d+/i.test(text);
 }
 
 async function expectNoHorizontalScroll(page: Page) {

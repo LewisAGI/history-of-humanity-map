@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { sentenceCount } from '../src/dates';
+import { routeLines } from '../src/geo';
 import { ERA_BOUNDARY, TIMELINE_START, eventOverlapsPeriod, presentYear, resolvePeriod } from '../src/timeline';
-import { CONTINENTS, type Continent, type HistoryEvent } from '../src/types';
+import { CONTINENTS, type Continent, type HistoryEvent, type Waypoint } from '../src/types';
 import eventsJson from '../data/events.json';
 
 const events = eventsJson as HistoryEvent[];
@@ -63,12 +64,16 @@ describe('event data', () => {
         expect(event.dateNote, event.id).toMatch(/Traditional date|Earliest written source/);
       }
       if (event.path) {
-        expect(event.path.length, event.id).toBeGreaterThanOrEqual(2);
-        event.path.forEach((point) => {
-          expect(point.lat).toBeGreaterThanOrEqual(-90);
-          expect(point.lat).toBeLessThanOrEqual(90);
-          expect(point.lng).toBeGreaterThanOrEqual(-180);
-          expect(point.lng).toBeLessThanOrEqual(180);
+        const lines = pathBranches(event.path);
+        expect(lines.length, event.id).toBeGreaterThanOrEqual(1);
+        lines.forEach((line) => {
+          expect(line.length, event.id).toBeGreaterThanOrEqual(2);
+          line.forEach((point) => {
+            expect(point.lat).toBeGreaterThanOrEqual(-90);
+            expect(point.lat).toBeLessThanOrEqual(90);
+            expect(point.lng).toBeGreaterThanOrEqual(-180);
+            expect(point.lng).toBeLessThanOrEqual(180);
+          });
         });
       }
     });
@@ -139,12 +144,40 @@ describe('event data', () => {
     MIGRATIONS.forEach((id) => {
       const event = events.find((item) => item.id === id);
       expect(event, id).toBeTruthy();
-      expect(event?.path?.length).toBeGreaterThanOrEqual(2);
+      expect(routeLines(event?.path).length).toBeGreaterThanOrEqual(1);
     });
     const spanning = events.find((event) => event.start < ERA_BOUNDARY && event.end >= ERA_BOUNDARY);
     expect(spanning).toBeTruthy();
     expect(eventOverlapsPeriod(spanning!, resolvePeriod(ERA_BOUNDARY - 1, present))).toBe(true);
     expect(eventOverlapsPeriod(spanning!, resolvePeriod(ERA_BOUNDARY, present))).toBe(true);
+  });
+});
+
+describe('corrected routes and wording', () => {
+  it('starts the Trail of Tears at New Echota and Lapita in the Bismarck Archipelago', () => {
+    const tears = events.find((event) => event.id === 'trail-of-tears')!;
+    expect(routeLines(tears.path)[0][0]).toMatchObject({ lat: 34.541, lng: -84.909 });
+    const lapita = events.find((event) => event.id === 'lapita')!;
+    expect(routeLines(lapita.path)[0][0]).toMatchObject({ lat: -1.45, lng: 149.62 });
+  });
+
+  it('draws the slave trade as two paths leaving West Africa', () => {
+    const slave = events.find((event) => event.id === 'atlantic-slave-trade')!;
+    const lines = routeLines(slave.path);
+    expect(lines).toHaveLength(2);
+    lines.forEach((line) => {
+      expect(line[0]).toMatchObject({ lat: 5.08, lng: -1.35 });
+    });
+    const ends = lines.map((line) => line[line.length - 1]);
+    expect(ends).toContainEqual({ lat: 13.1, lng: -59.62 });
+    expect(ends).toContainEqual({ lat: -12.97, lng: -38.5 });
+    expect(slave.summary).toContain('one to the Caribbean and one to Brazil');
+    expect(sentenceCount(slave.summary)).toBeLessThanOrEqual(4);
+  });
+
+  it('says the Australian parliament first sat in Melbourne', () => {
+    const federation = events.find((event) => event.id === 'australian-federation')!;
+    expect(federation.summary).toContain('Parliament first sat in Melbourne; Canberra became the capital in 1927.');
   });
 });
 
@@ -182,6 +215,11 @@ function yearsAgo(text: string): number[] {
     found.push(Number(match[1].replaceAll(',', '')));
   }
   return found;
+}
+
+function pathBranches(path: HistoryEvent['path']): Waypoint[][] {
+  if (!path || path.length === 0) return [];
+  return Array.isArray(path[0]) ? (path as Waypoint[][]) : [path as Waypoint[]];
 }
 
 function eraBin(start: number): string {

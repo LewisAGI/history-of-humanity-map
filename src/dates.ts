@@ -38,10 +38,26 @@ export function formatYearRange(start: number, end: number): string {
   return `${formatYear(start)} – ${formatYear(end)}`;
 }
 
-/** Prefixes "approx." when the dating note says the year is approximate. */
+/**
+ * Prefixes "approx." when the dating note says the year is approximate.
+ * Deep-time years are rounded for display only. Filtering still uses the stored year.
+ * 100,000 years and older round to the nearest 10,000. 10,000 and older round to the nearest 500.
+ */
 export function formatEventDate(start: number, end: number, dateNote: string): string {
-  const range = formatYearRange(start, end);
+  const shownStart = roundDisplayYear(start);
+  const shownEnd = roundDisplayYear(end);
+  const range = shownStart === shownEnd ? formatYear(shownStart) : formatYearRange(shownStart, shownEnd);
   return dateIsApproximate(dateNote) ? `approx. ${range}` : range;
+}
+
+function roundDisplayYear(year: number): number {
+  const negative = year < 0;
+  const magnitude = Math.abs(year);
+  let rounded = magnitude;
+  if (magnitude >= 100_000) rounded = Math.round(magnitude / 10_000) * 10_000;
+  else if (magnitude >= 10_000) rounded = Math.round(magnitude / 500) * 500;
+  if (rounded === 0) return negative ? -1 : 1;
+  return negative ? -rounded : rounded;
 }
 
 export function dateIsApproximate(dateNote: string): boolean {

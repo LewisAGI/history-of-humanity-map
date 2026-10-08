@@ -24,16 +24,38 @@ export function greatCircle(a: Waypoint, b: Waypoint, segments = 24): Waypoint[]
   return points;
 }
 
+/**
+ * One continuous line. Longitudes are unwrapped (they may leave -180..180)
+ * so a globe can draw across the antimeridian without a gap.
+ */
 export function pathCoordinates(path: Waypoint[], segments = 24): [number, number][][] {
   const coords: [number, number][] = [];
+  let offset = 0;
+  let previous: number | null = null;
   for (let i = 0; i < path.length - 1; i += 1) {
     const segment = greatCircle(path[i], path[i + 1], segments);
     segment.forEach((point, index) => {
       if (i > 0 && index === 0) return;
-      coords.push([point.lng, point.lat]);
+      let lng = point.lng + offset;
+      if (previous !== null) {
+        while (lng - previous > 180) lng -= 360;
+        while (lng - previous < -180) lng += 360;
+        offset += lng - (point.lng + offset);
+      }
+      coords.push([lng, point.lat]);
+      previous = lng;
     });
   }
-  return splitAntimeridian(coords);
+  return coords.length >= 2 ? [coords] : [];
+}
+
+/** Bearing at the arrival end of the drawn curve, clockwise from north. */
+export function arrivalBearing(path: Waypoint[]): number {
+  const line = pathCoordinates(path)[0];
+  if (!line || line.length < 2) return 0;
+  const before = line[line.length - 2];
+  const end = line[line.length - 1];
+  return bearing({ lng: before[0], lat: before[1] }, { lng: end[0], lat: end[1] });
 }
 
 /** Initial bearing in degrees, clockwise from north, for an arrowhead. */

@@ -102,6 +102,13 @@ periodButton.addEventListener('click', () => {
   if (!datePopout.hidden) dateInput.focus();
 });
 
+document.addEventListener('keydown', (event) => {
+  if (event.key !== 'Escape' || datePopout.hidden) return;
+  datePopout.hidden = true;
+  dateInput.classList.remove('is-invalid');
+  periodButton.setAttribute('aria-expanded', 'false');
+});
+
 datePopout.addEventListener('submit', (event) => {
   event.preventDefault();
   const year = parseDateInput(dateInput.value);
@@ -166,6 +173,7 @@ function closePopouts() {
   keyPanel.hidden = true;
   eraButton.setAttribute('aria-expanded', 'false');
   keyButton.setAttribute('aria-expanded', 'false');
+  periodButton.setAttribute('aria-expanded', 'false');
 }
 
 function iconPlus() {

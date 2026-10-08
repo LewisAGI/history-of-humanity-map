@@ -30,6 +30,10 @@ An event is shown in the selected period when the two closed intervals overlap (
 
 Before civilisation runs from 300,000 BCE through 3001 BCE in 5,000-year steps. After civilisation runs from 3000 BCE through the present year in 50-year steps (1066 falls in 1050–1099). The slider covers whichever era is selected, so both eras use its full width.
 
+## Licence
+
+The code and the event text are under the MIT licence (see `LICENSE`). The globe uses NASA Blue Marble imagery (public domain) and Natural Earth land polygons (public domain).
+
 ## Deploy
 
 Cloudflare Pages, project `history-of-humanity-map`. Pushes to `main` deploy production. Pushes to any other branch deploy a preview on that branch and do not publish production. The workflow reads the `CF_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID` secrets.

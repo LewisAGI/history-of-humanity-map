@@ -1,6 +1,7 @@
-import maplibregl, { type GeoJSONSource, type Map as MapLibreMap, type Marker, type Popup } from 'maplibre-gl';
+import { GeoJSONSource, Map as MapLibreMap, Marker, Popup, type StyleSpecification } from 'maplibre-gl';
 import { formatEventDate } from './dates';
-import { bearing, pathCoordinates } from './geo';
+import { arrivalBearing, pathCoordinates } from './geo';
+import { displayPositions } from './spread';
 import { LABEL_MIN_ZOOM, visibleLabelIds, type LabelBox } from './labels';
 import type { HistoryEvent } from './types';
 
@@ -17,7 +18,7 @@ export interface MapView {
 }
 
 export function createMap(container: HTMLElement, root: HTMLElement): MapView {
-  const map = new maplibregl.Map({
+  const map = new MapLibreMap({
     container,
     style: mapStyle(),
     center: [18, 12],
@@ -34,7 +35,10 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   });
 
   const ready = new Promise<void>((resolve) => {
-    map.on('load', () => {
+    let started = false;
+    const setup = () => {
+      if (started) return;
+      started = true;
       map.setProjection({ type: 'globe' });
       map.setSky({
         'sky-color': '#12171c',
@@ -75,7 +79,9 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
         },
       });
       resolve();
-    });
+    };
+    map.on('style.load', setup);
+    if (map.isStyleLoaded()) setup();
   });
 
   let selectHandler: (event: HistoryEvent | null) => void = () => {};
@@ -94,12 +100,15 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     refreshLabels();
     moveHandler();
   });
+  map.on('render', () => refreshLabels());
+  map.on('idle', () => refreshLabels());
 
   window.__historyMap = map;
 
   function setEvents(events: HistoryEvent[]) {
     markers.forEach((pin) => pin.marker.remove());
-    markers = events.map((event) => createPin(event));
+    const positions = displayPositions(events);
+    markers = events.map((event) => createPin(event, positions.get(event.id) ?? event));
     refreshLabels();
     root.dataset.ready = 'true';
   }
@@ -109,11 +118,13 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     markers.forEach((pin) => pin.element.classList.toggle('is-selected', pin.event.id === selectedId));
     drawArrow(event);
     openPopup(event);
-    if (event?.path && event.path.length >= 2) framePath(event);
+    const framed = event?.path && event.path.length >= 2 ? framePath(event) : false;
+    if (framed) map.once('moveend', () => settlePopup());
+    else requestAnimationFrame(() => settlePopup());
     refreshLabels();
   }
 
-  function createPin(event: HistoryEvent): Pin {
+  function createPin(event: HistoryEvent, at: { lat: number; lng: number }): Pin {
     const element = document.createElement('button');
     element.type = 'button';
     element.className = 'pin';
@@ -129,10 +140,10 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       click.stopPropagation();
       selectHandler(event);
     });
-    const marker = new maplibregl.Marker({ element, anchor: 'center' })
-      .setLngLat([event.lng, event.lat])
+    const marker = new Marker({ element, anchor: 'center', opacityWhenCovered: 0 })
+      .setLngLat([at.lng, at.lat])
       .addTo(map);
-    return { event, element, label, marker };
+    return { event, element, label, marker, at };
   }
 
   function refreshLabels() {
@@ -143,6 +154,10 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     }
     const boxes: LabelBox[] = [];
     markers.forEach((pin) => {
+      if (pin.element.classList.contains('maplibregl-marker-covered')) {
+        pin.label.classList.remove('is-on');
+        return;
+      }
       if (pin.element.offsetParent === null && pin.element.getClientRects().length === 0) {
         pin.label.classList.remove('is-on');
         return;
@@ -179,10 +194,9 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       geometry: { type: 'LineString', coordinates },
     }));
     const last = event.path[event.path.length - 1];
-    const prev = event.path[event.path.length - 2];
     features.push({
       type: 'Feature',
-      properties: { role: 'head', bearing: bearing(prev, last) },
+      properties: { role: 'head', bearing: arrivalBearing(event.path) },
       geometry: { type: 'Point', coordinates: [last.lng, last.lat] },
     });
     source.setData({ type: 'FeatureCollection', features });
@@ -190,12 +204,13 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   }
 
   function openPopup(event: HistoryEvent | null) {
+    root.dataset.popup = '';
     suppressClose = true;
     popup?.remove();
     popup = null;
     suppressClose = false;
     if (!event) return;
-    popup = new maplibregl.Popup({
+    const next = new Popup({
       closeButton: true,
       closeOnClick: false,
       maxWidth: `${Math.min(320, window.innerWidth - 32)}px`,
@@ -203,26 +218,81 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       className: 'event-popup',
       focusAfterOpen: false,
     })
-      .setLngLat([event.lng, event.lat])
+      .setLngLat(pinLngLat(event))
       .setHTML(popupHtml(event))
       .addTo(map);
-    popup.on('close', () => {
+    popup = next;
+    next.on('close', () => {
       if (suppressClose) return;
       if (selectedId === event.id) selectHandler(null);
     });
   }
 
-  function framePath(event: HistoryEvent) {
+  function pinLngLat(event: HistoryEvent): [number, number] {
+    const pin = markers.find((item) => item.event.id === event.id);
+    return pin ? [pin.at.lng, pin.at.lat] : [event.lng, event.lat];
+  }
+
+  function settlePopup(attempt = 0) {
+    const element = popup?.getElement();
+    if (!element) {
+      root.dataset.popup = '';
+      return;
+    }
+    element.style.marginLeft = '0px';
+    element.style.marginTop = '0px';
+    const rect = element.getBoundingClientRect();
+    if (rect.width < 2 || rect.height < 2) {
+      if (attempt < 6) requestAnimationFrame(() => settlePopup(attempt + 1));
+      return;
+    }
+    const margin = 8;
+    const bar = root.querySelector('.time')?.getBoundingClientRect();
+    const bottomLimit = Math.min(window.innerHeight - margin, bar ? bar.top - margin : window.innerHeight - margin);
+    let dx = 0;
+    let dy = 0;
+    if (rect.right > window.innerWidth - margin) dx = window.innerWidth - margin - rect.right;
+    if (rect.left + dx < margin) dx = margin - rect.left;
+    if (rect.bottom > bottomLimit) dy = bottomLimit - rect.bottom;
+    if (rect.top + dy < margin) dy = margin - rect.top;
+    element.style.marginLeft = `${dx}px`;
+    element.style.marginTop = `${dy}px`;
+    const placed = element.getBoundingClientRect();
+    const outside =
+      placed.left < margin - 1 ||
+      placed.right > window.innerWidth - margin + 1 ||
+      placed.top < margin - 1 ||
+      placed.bottom > bottomLimit + 1;
+    if (outside && attempt < 8) {
+      requestAnimationFrame(() => settlePopup(attempt + 1));
+      return;
+    }
+    root.dataset.popup = outside ? '' : 'in';
+  }
+
+  function framePath(event: HistoryEvent): boolean {
     const path = event.path;
-    if (!path || path.length < 2) return;
-    const lngs = path.map((point) => point.lng);
-    const lats = path.map((point) => point.lat);
-    const span = Math.max(...lngs) - Math.min(...lngs);
-    if (span <= 2 || span >= 180) return;
+    if (!path || path.length < 2) return false;
+    const line = pathCoordinates(path)[0];
+    if (!line || line.length < 2) return false;
+    const lngs = line.map((coord) => coord[0]);
+    const lats = line.map((coord) => coord[1]);
+    const minLng = Math.min(...lngs);
+    const maxLng = Math.max(...lngs);
+    const minLat = Math.min(...lats);
+    const maxLat = Math.max(...lats);
+    const span = Math.max(maxLng - minLng, maxLat - minLat);
+    if (span <= 2) return false;
+    if (maxLng > 180 || minLng < -180) {
+      const centerLng = ((((minLng + maxLng) / 2 + 540) % 360) + 360) % 360 - 180;
+      const zoom = Math.max(0.8, Math.min(3.2, 5.4 - Math.log2(span)));
+      map.easeTo({ center: [centerLng, (minLat + maxLat) / 2], zoom, duration: 800 });
+      return true;
+    }
     map.fitBounds(
       [
-        [Math.min(...lngs), Math.min(...lats)],
-        [Math.max(...lngs), Math.max(...lats)],
+        [minLng, minLat],
+        [maxLng, maxLat],
       ],
       {
         padding: { top: 72, bottom: 150, left: 48, right: 72 },
@@ -230,6 +300,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
         duration: 800,
       },
     );
+    return true;
   }
 
   return {
@@ -256,6 +327,7 @@ interface Pin {
   element: HTMLButtonElement;
   label: HTMLElement;
   marker: Marker;
+  at: { lat: number; lng: number };
 }
 
 function popupHtml(event: HistoryEvent): string {
@@ -298,7 +370,7 @@ function addArrowImage(map: MapLibreMap) {
   if (!map.hasImage('migration-arrow')) map.addImage('migration-arrow', image);
 }
 
-function mapStyle(): maplibregl.StyleSpecification {
+function mapStyle(): StyleSpecification {
   return {
     version: 8,
     sources: {

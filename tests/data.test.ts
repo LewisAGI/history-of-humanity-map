@@ -14,6 +14,23 @@ const MIGRATIONS = [
   'austronesian-voyages',
   'silk-road',
   'mongol-conquests',
+  'thule-migration',
+  'atlantic-slave-trade',
+  'trail-of-tears',
+  'zheng-he',
+  'ibn-battuta',
+  'xuanzang',
+  'cook-pacific',
+  'madagascar-settlement',
+  'zhang-qian',
+  'mansa-musa',
+  'lapita',
+  'madjedbebe',
+  'hawaii-settlement',
+  'aotearoa-settlement',
+  'rapa-nui',
+  'inca-expansion',
+  'cortes',
 ];
 
 describe('event data', () => {
@@ -130,6 +147,42 @@ describe('event data', () => {
     expect(eventOverlapsPeriod(spanning!, resolvePeriod(ERA_BOUNDARY, present))).toBe(true);
   });
 });
+
+describe('years ago are stored as BCE', () => {
+  it('keeps every years-ago figure within 300 years of the stored span', () => {
+    events.forEach((event) => {
+      const figures = yearsAgo(event.summary + ' ' + event.dateNote);
+      if (figures.length === 0) return;
+      figures.forEach((bp) => {
+        const year = 1950 - bp;
+        if (year < TIMELINE_START) {
+          expect(event.start, event.id).toBe(TIMELINE_START);
+          return;
+        }
+        const gap = year < event.start ? event.start - year : year > event.end ? year - event.end : 0;
+        expect(gap, `${event.id} ${bp} years ago`).toBeLessThanOrEqual(300);
+      });
+      const earliest = 1950 - Math.max(...figures);
+      const expectedStart = Math.max(earliest, TIMELINE_START);
+      expect(Math.abs(event.start - expectedStart), event.id).toBeLessThanOrEqual(300);
+    });
+  });
+});
+
+/** Numbers that the wording treats as "years ago", including both ends of a range. */
+function yearsAgo(text: string): number[] {
+  const range = /(\d{1,3}(?:,\d{3})+|\d+)\s*(?:to|–|-|and)\s*(?:more than\s+|about\s+|around\s+|roughly\s+|at least\s+)?(\d{1,3}(?:,\d{3})+|\d+)\s+years ago/gi;
+  const found: number[] = [];
+  const stripped = text.replace(range, (_match, start: string, end: string) => {
+    found.push(Number(start.replaceAll(',', '')), Number(end.replaceAll(',', '')));
+    return ' ';
+  });
+  const single = /(\d{1,3}(?:,\d{3})+|\d+)\s+years ago/gi;
+  for (const match of stripped.matchAll(single)) {
+    found.push(Number(match[1].replaceAll(',', '')));
+  }
+  return found;
+}
 
 function eraBin(start: number): string {
   if (start < -50000) return '300,000–50,000 BCE';

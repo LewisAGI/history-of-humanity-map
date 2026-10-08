@@ -32,9 +32,18 @@ html, body {
   inset: 0;
 }
 
-.maplibregl-ctrl-bottom-right {
+#map .maplibregl-ctrl-bottom-right {
   bottom: calc(118px + env(safe-area-inset-bottom));
   right: 8px;
+}
+
+#map .maplibregl-popup {
+  z-index: 3;
+}
+
+#map .maplibregl-marker-covered {
+  opacity: 0 !important;
+  pointer-events: none;
 }
 
 .maplibregl-ctrl-attrib {

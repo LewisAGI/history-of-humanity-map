@@ -1,0 +1,58 @@
+import { describe, expect, it } from 'vitest';
+import { dateIsApproximate, formatEventDate, formatYearRange, parseDateInput, sentenceCount } from '../src/dates';
+import { resolvePeriod } from '../src/timeline';
+
+const PRESENT = 2026;
+
+describe('parseDateInput', () => {
+  it('accepts the brief examples', () => {
+    expect(parseDateInput('1066')).toBe(1066);
+    expect(parseDateInput('1066 AD')).toBe(1066);
+    expect(parseDateInput('1066AD')).toBe(1066);
+    expect(parseDateInput('1066 CE')).toBe(1066);
+    expect(parseDateInput('500 BC')).toBe(-500);
+    expect(parseDateInput('500 BCE')).toBe(-500);
+    expect(parseDateInput('-500')).toBe(-500);
+    expect(parseDateInput('120000 BCE')).toBe(-120000);
+    expect(parseDateInput('120,000 BCE')).toBe(-120000);
+  });
+
+  it('ignores case and extra space', () => {
+    expect(parseDateInput('  500   bce  ')).toBe(-500);
+    expect(parseDateInput('1066 ad')).toBe(1066);
+  });
+
+  it('rejects empty, zero, and unknown text', () => {
+    expect(parseDateInput('')).toBeNull();
+    expect(parseDateInput('0')).toBeNull();
+    expect(parseDateInput('0 CE')).toBeNull();
+    expect(parseDateInput('yesterday')).toBeNull();
+    expect(parseDateInput('1066 BCE AD')).toBeNull();
+  });
+});
+
+describe('formatYearRange', () => {
+  it('formats the off-boundary example as the containing period', () => {
+    const period = resolvePeriod(parseDateInput('1066')!, PRESENT);
+    expect(formatYearRange(period.start, period.end)).toBe('1050–1099 CE');
+  });
+
+  it('formats deep BCE ranges with grouping', () => {
+    const period = resolvePeriod(parseDateInput('120000 BCE')!, PRESENT);
+    expect(formatYearRange(period.start, period.end)).toBe('120,000–115,001 BCE');
+  });
+
+  it('prefixes approx. only when the note says the date is approximate', () => {
+    expect(dateIsApproximate('Approximate. Fossils are widely dated to about 300,000 years ago.')).toBe(true);
+    expect(dateIsApproximate('Traditional date.')).toBe(false);
+    expect(formatEventDate(-300000, -300000, 'Approximate. Widely dated.')).toBe('approx. 300,000 BCE');
+    expect(formatEventDate(-753, -753, 'Traditional date.')).toBe('753 BCE');
+  });
+});
+
+describe('sentenceCount', () => {
+  it('counts sentences', () => {
+    expect(sentenceCount('One. Two.')).toBe(2);
+    expect(sentenceCount('One. Two! Three?')).toBe(3);
+  });
+});

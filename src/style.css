@@ -613,16 +613,16 @@ html, body {
   #tools-button {
     display: grid;
     position: absolute;
-    top: -2px;
+    top: 0;
     right: 0;
-    width: 36px;
+    width: 40px;
     height: 36px;
     background: transparent;
     border-color: transparent;
     box-shadow: none;
     backdrop-filter: none;
   }
-  .thumb-band { margin-right: 38px; }
+  .thumb-band { margin: 0; }
   .time-row { gap: 0; }
   .time-row .icon-button { width: 40px; }
 }

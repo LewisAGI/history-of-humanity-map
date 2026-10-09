@@ -3,7 +3,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { defineConfig, devices } from '@playwright/test';
 
-/** The test workflow installs Chromium only. WebKit is added when that browser can launch. */
+/** The Pages workflow installs Chromium only. WebKit projects are added when that browser can launch. */
 function webkitInstalled(): boolean {
   const root = process.env.PLAYWRIGHT_BROWSERS_PATH || path.join(os.homedir(), '.cache', 'ms-playwright');
   let present = false;
@@ -37,10 +37,17 @@ export default defineConfig({
   projects: [
     {
       name: 'desktop',
+      testIgnore: /matrix\.spec\.ts/,
       use: { viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 },
     },
     {
+      name: 'matrix-chromium',
+      testMatch: /matrix\.spec\.ts/,
+      use: { browserName: 'chromium', viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 },
+    },
+    {
       name: 'iphone',
+      testIgnore: /matrix\.spec\.ts/,
       use: {
         browserName: 'chromium',
         userAgent: devices['iPhone 13'].userAgent,
@@ -52,6 +59,7 @@ export default defineConfig({
     },
     {
       name: 'landscape',
+      testIgnore: /matrix\.spec\.ts/,
       use: {
         browserName: 'chromium',
         userAgent: devices['iPhone 15 landscape'].userAgent,
@@ -65,9 +73,19 @@ export default defineConfig({
       ? [
           {
             name: 'landscape-webkit',
+            testIgnore: /matrix\.spec\.ts/,
             use: {
               ...devices['iPhone 15 landscape'],
               browserName: 'webkit' as const,
+              deviceScaleFactor: 1,
+            },
+          },
+          {
+            name: 'matrix-webkit',
+            testMatch: /matrix\.spec\.ts/,
+            use: {
+              browserName: 'webkit' as const,
+              viewport: { width: 1440, height: 900 },
               deviceScaleFactor: 1,
             },
           },

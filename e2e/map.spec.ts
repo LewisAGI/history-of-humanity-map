@@ -11,6 +11,8 @@ declare global {
       isSourceLoaded: (id: string) => boolean;
       jumpTo: (options: { center: [number, number]; zoom: number }) => void;
       once: (type: string, listener: () => void) => void;
+      on: (type: string, listener: () => void) => void;
+      getCenter: () => { lng: number; lat: number };
       project: (lngLat: [number, number]) => { x: number; y: number };
       getSource: (id: string) => { getData: () => Promise<{ features?: { properties?: { role?: string }; geometry?: { type?: string; coordinates?: unknown } }[] }> };
       unproject: (point: [number, number]) => { lng: number; lat: number };
@@ -279,16 +281,24 @@ test('covered pins do not take clicks or labels', async ({ page }, testInfo) => 
   await page.evaluate(() => {
     window.__historyMap.jumpTo({ center: [-0.21, 5.56], zoom: 1.35 });
   });
-  await page.waitForTimeout(500);
   await page.waitForFunction(() => document.querySelectorAll('.pin.maplibregl-marker-covered').length > 0);
-  const faulty = await page.evaluate(() =>
+  await expect.poll(async () =>
+    page.evaluate(() =>
+      [...document.querySelectorAll<HTMLElement>('.pin.maplibregl-marker-covered')].filter((pin) => {
+        const style = getComputedStyle(pin);
+        const labelOn = pin.querySelector('.pin-label')?.classList.contains('is-on') ?? false;
+        return style.opacity !== '0' || style.pointerEvents !== 'none' || labelOn;
+      }).length,
+    ),
+  ).toBe(0);
+  const hitCovered = await page.evaluate(() =>
     [...document.querySelectorAll<HTMLElement>('.pin.maplibregl-marker-covered')].filter((pin) => {
-      const style = getComputedStyle(pin);
-      const labelOn = pin.querySelector('.pin-label')?.classList.contains('is-on') ?? false;
-      return style.opacity !== '0' || style.pointerEvents !== 'none' || labelOn;
+      const rect = pin.getBoundingClientRect();
+      const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+      return hit === pin || pin.contains(hit);
     }).map((pin) => pin.dataset.id),
   );
-  expect(faulty).toEqual([]);
+  expect(hitCovered).toEqual([]);
   await page.locator('.pin[data-id="ghana-independence"]').click();
   await expect(eventCard(page)).toContainText('Independence of Ghana');
   await expect(eventCard(page)).not.toContainText('Moruroa');
@@ -780,7 +790,10 @@ async function routeVisibility(page: Page) {
 
 function usesSheet(page: Page): boolean {
   const size = page.viewportSize();
-  return (size?.width ?? 1000) <= 600 || (size?.height ?? 1000) <= 500;
+  const width = size?.width ?? 1000;
+  const height = size?.height ?? 1000;
+  if (height > width) return true;
+  return height <= 620;
 }
 
 async function expectPopupClearOfControls(page: Page) {

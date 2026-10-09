@@ -81,6 +81,11 @@ html, body {
   gap: 8px;
 }
 
+.zoom.is-hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .key-wrap {
   position: absolute;
   left: calc(12px + env(safe-area-inset-left));
@@ -362,13 +367,13 @@ html, body {
 
 .event-popup .maplibregl-popup-close-button,
 .sheet-close {
-  width: 28px;
-  height: 28px;
+  width: 44px;
+  height: 44px;
   font-size: 18px;
   color: var(--ink);
   border-radius: 50%;
-  top: 6px;
-  right: 6px;
+  top: 4px;
+  right: 4px;
 }
 
 .event-sheet {
@@ -407,7 +412,7 @@ html, body {
 .event-popup .maplibregl-popup-tip { border-top-color: #f7f4ee; border-bottom-color: #f7f4ee; }
 
 .popup-title {
-  margin: 0 24px 6px 0;
+  margin: 0 36px 6px 0;
   font: 600 18px/1.25 "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif;
 }
 

@@ -68,10 +68,22 @@ describe('formatYearRange', () => {
       const event = events.find((item) => item.id === id)!;
       return formatEventDate(event.start, event.end, event.dateNote);
     };
-    expect(shown('lascaux')).toBe('approx. 15,000 BCE');
-    expect(shown('kimberley-rock-art')).toBe('approx. 10,000 BCE');
-    expect(shown('apollo-11-stones')).toBe('approx. 25,000–23,000 BCE');
-    expect(shown('blombos-symbols')).toBe('approx. 75,000–71,000 BCE');
+    expect(shown('lascaux')).toBe('approx. 15,500 BCE');
+    expect(shown('kimberley-rock-art')).toBe('approx. 10,500 BCE');
+    expect(shown('apollo-11-stones')).toBe('approx. 25,500–23,000 BCE');
+    expect(shown('blombos-symbols')).toBe('approx. 75,500–71,000 BCE');
+  });
+
+  it('keeps a rounded deep-time year inside the step that contains the stored year', () => {
+    events.forEach((event) => {
+      for (const stored of [event.start, event.end]) {
+        if (Math.abs(stored) < 10_000) continue;
+        const shown = roundDisplayYear(stored);
+        const period = resolvePeriod(stored, PRESENT);
+        expect(shown, `${event.id} ${stored}`).toBeGreaterThanOrEqual(period.start);
+        expect(shown, `${event.id} ${stored}`).toBeLessThanOrEqual(period.end);
+      }
+    });
   });
 
   it('keeps every displayed year within 500 years or 2 percent of the stored year', () => {

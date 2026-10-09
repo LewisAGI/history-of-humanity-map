@@ -176,7 +176,7 @@ describe('corrected routes and wording', () => {
   });
 
   it('keeps history in the text and leaves out the drawing', () => {
-    const banned = /\bthe line\b|\bthe arrow\b|\bschematic\b|\bpin\b|marked separately|separate historical|\bseparately\b|elsewhere on/i;
+    const banned = /\bthe line\b|\bthe arrow\b|\bschematic\b|\bpin\b|marked separately|separate historical|\bseparately\b|elsewhere on|separate event|separate tradition|this map|the timeline|timescale/i;
     events.forEach((event) => {
       expect(event.summary, event.id).not.toMatch(banned);
       expect(event.dateNote, event.id).not.toMatch(banned);
@@ -190,6 +190,18 @@ describe('corrected routes and wording', () => {
     expect(sundiata.summary).toContain('Sundiata founded Mali after the battle of Kirina, about 1235.');
     const troy = events.find((event) => event.id === 'troy-bronze-age')!;
     expect(troy.summary).toContain('Archaeology does not confirm the Homeric war.');
+    const moriori = events.find((event) => event.id === 'chatham-moriori')!;
+    expect(moriori.summary).toContain('In 1835 Māori groups from Taranaki invaded and killed or enslaved many Moriori.');
+    const knossos = events.find((event) => event.id === 'knossos')!;
+    expect(knossos.summary).toContain('Later Greek myth placed the Minotaur in the palace.');
+    const flood = events.find((event) => event.id === 'genesis-flood')!;
+    expect(flood.summary).toContain('Related flood stories are older in Mesopotamia.');
+    const lucy = events.find((event) => event.id === 'lucy-discovery')!;
+    expect(lucy.summary).toContain('The fossil itself is about 3.2 million years old.');
+    const naledi = events.find((event) => event.id === 'homo-naledi')!;
+    expect(naledi.summary).toContain('The remains are dated to roughly 335,000 to 236,000 years ago.');
+    const qafzeh = events.find((event) => event.id === 'qafzeh-skhul')!;
+    expect(qafzeh.summary).toContain('A later dispersal peopled the rest of the world.');
   });
 
   it('says the Australian parliament first sat in Melbourne', () => {

@@ -2,6 +2,8 @@
  * Historical signed years: -500 is 500 BCE, 1066 is 1066 CE. There is no year 0.
  */
 
+import { resolvePeriod } from './timeline';
+
 export function parseDateInput(raw: string): number | null {
   const text = raw.trim().replace(/,/g, '').replace(/\s+/g, ' ');
   if (!text) return null;
@@ -51,7 +53,13 @@ export function formatEventDate(start: number, end: number, dateNote: string): s
   return dateIsApproximate(dateNote) ? `approx. ${range}` : range;
 }
 
-/** Rounded year used on the card. Years under 10,000 stay exact. */
+/**
+ * Rounded year used on the card. Years under 10,000 stay exact.
+ * From 10,000 years the card uses the nearest 500, then stays inside the
+ * timeline step that contains the stored year. 15,000 BCE is the first year
+ * of the next step after Lascaux's 20,000–15,001 BCE step, so Lascaux shows
+ * 15,500 BCE.
+ */
 export function roundDisplayYear(year: number): number {
   if (year === 0) return 1;
   const magnitude = Math.abs(year);
@@ -59,7 +67,25 @@ export function roundDisplayYear(year: number): number {
   const negative = year < 0;
   let rounded = Math.round(magnitude / 500) * 500;
   if (rounded === 0) rounded = 500;
-  return negative ? -rounded : rounded;
+  let shown = negative ? -rounded : rounded;
+  const period = resolvePeriod(year);
+  if (shown < period.start || shown > period.end) shown = nearestGridInPeriod(year, period);
+  return shown === 0 ? (year < 0 ? -500 : 500) : shown;
+}
+
+function nearestGridInPeriod(stored: number, period: { start: number; end: number }): number {
+  const first = Math.ceil(period.start / 500) * 500;
+  let best = period.start;
+  let bestDist = Infinity;
+  for (let candidate = first; candidate <= period.end; candidate += 500) {
+    if (candidate === 0) continue;
+    const dist = Math.abs(candidate - stored);
+    if (dist < bestDist) {
+      best = candidate;
+      bestDist = dist;
+    }
+  }
+  return bestDist === Infinity ? (stored < 0 ? period.start : period.end) : best;
 }
 
 export function dateIsApproximate(dateNote: string): boolean {

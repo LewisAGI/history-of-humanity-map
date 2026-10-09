@@ -22,7 +22,7 @@
     "lng": 27.7092,
     "place": "Rising Star cave, South Africa",
     "continent": "Africa",
-    "summary": "Homo naledi is a small-brained hominin known from a deep cave system north-west of Johannesburg. The remains are dated to roughly 335,000 to 236,000 years ago, so the later part of that span falls within the last 300,000 years. How the bodies entered the chamber is still debated.",
+    "summary": "Homo naledi is a small-brained hominin known from a deep cave system north-west of Johannesburg. The remains are dated to roughly 335,000 to 236,000 years ago. How the bodies entered the chamber is still debated.",
     "dateNote": "Approximate. The published age is about 335,000 to 236,000 years ago."
   },
   {
@@ -702,8 +702,8 @@
     "lng": 40.58,
     "place": "Hadar, Ethiopia",
     "continent": "Africa",
-    "summary": "In 1974 a team at Hadar found a partial skeleton of Australopithecus afarensis, nicknamed Lucy. The fossil itself is about 3.2 million years old, far older than the last 300,000 years. The discovery changed the public picture of early human ancestors.",
-    "dateNote": "The skeleton was found on 24 November 1974. The fossil is much older than 300,000 BCE."
+    "summary": "In 1974 a team at Hadar found a partial skeleton of Australopithecus afarensis, nicknamed Lucy. The fossil itself is about 3.2 million years old. The discovery changed the public picture of early human ancestors.",
+    "dateNote": "The skeleton was found on 24 November 1974. The fossil is about 3.2 million years old."
   },
   {
     "id": "mandela-1994",
@@ -832,7 +832,7 @@
     "lng": 35.3,
     "place": "Qafzeh, Israel",
     "continent": "Asia",
-    "summary": "Burials at Skhul and Qafzeh show Homo sapiens in the Levant about 120,000 to 90,000 years ago. This early presence outside Africa may not have lasted. A later dispersal, after about 68,000 BCE, is the one that peopled the rest of the world.",
+    "summary": "Burials at Skhul and Qafzeh show Homo sapiens in the Levant about 120,000 to 90,000 years ago. This early presence outside Africa may not have lasted. A later dispersal peopled the rest of the world.",
     "dateNote": "Approximate. The burials are widely dated to about 120,000–90,000 years ago."
   },
   {
@@ -2337,7 +2337,7 @@
     "lng": 25.16,
     "place": "Knossos, Crete",
     "continent": "Europe",
-    "summary": "Knossos was the largest palace of Minoan Crete, with courtyards, storerooms, and colourful frescoes. The first palaces rose around 1900 BCE. Later Greek myth placed the Minotaur here, which is a separate tradition from the archaeology.",
+    "summary": "Knossos was the largest palace of Minoan Crete, with courtyards, storerooms, and colourful frescoes. The first palaces rose around 1900 BCE. Later Greek myth placed the Minotaur in the palace.",
     "dateNote": "Approximate. The first palace phase is widely dated to about 1900 BCE."
   },
   {
@@ -2953,7 +2953,7 @@
     "lng": 35.23,
     "place": "Ancient Israel",
     "continent": "Asia",
-    "summary": "Genesis tells of Noah, who survives a flood that covers the world. Related flood stories are older in Mesopotamia, and those are separate traditions. The biblical text as we have it was written down in the first millennium BCE.",
+    "summary": "Genesis tells of Noah, who survives a flood that covers the world. Related flood stories are older in Mesopotamia. The biblical text as we have it was written down in the first millennium BCE.",
     "dateNote": "Earliest written source. The written Genesis flood is widely placed in the first millennium BCE. Mesopotamian flood poems are older and are not this text."
   },
   {
@@ -4559,7 +4559,7 @@
     "lng": -176.55,
     "place": "Rēkohu, Chatham Islands",
     "continent": "Oceania",
-    "summary": "Polynesian voyagers settled Rēkohu, the Chatham Islands, around 1500 and became the Moriori. They lived by a code that limited warfare. In 1835 Māori groups from Taranaki invaded and killed or enslaved many Moriori, a later and separate event.",
+    "summary": "Polynesian voyagers settled Rēkohu, the Chatham Islands, around 1500 and became the Moriori. They lived by a code that limited warfare. In 1835 Māori groups from Taranaki invaded and killed or enslaved many Moriori.",
     "dateNote": "Approximate. Settlement is widely dated to about 1500."
   },
   {

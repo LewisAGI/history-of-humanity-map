@@ -99,7 +99,6 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   let ignoreMapClick = false;
   let selectedId: string | null = null;
   let anchorObserver: MutationObserver | null = null;
-  let pinClearAttempts = 0;
   let userCamera = false;
   let popupAnchor: 'top' | 'bottom' = 'bottom';
   const sheet = document.createElement('div');
@@ -155,10 +154,17 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       placeSheet();
       markSheet();
     }
-    keepSelectedPinClear();
   });
   window.addEventListener('resize', () => {
-    if (!sheet.hidden) placeSheet();
+    const event = markers.find((pin) => pin.event.id === selectedId)?.event ?? null;
+    if (!event) {
+      restoreKey();
+      restoreAttribution();
+      restoreZoom();
+      return;
+    }
+    openPopup(event);
+    frameSelection(event);
   });
 
   window.__historyMap = map;
@@ -187,11 +193,11 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   function setSelected(event: HistoryEvent | null, options?: { keepRoute?: boolean }) {
     selectedId = event?.id ?? null;
     userCamera = false;
-    pinClearAttempts = 0;
     markers.forEach((pin) => pin.element.classList.toggle('is-selected', pin.event.id === selectedId));
     if (event) drawArrow(event);
     else if (!options?.keepRoute) drawArrow(null);
     openPopup(event);
+    if (!event) clearFramePadding();
     const framed = event ? frameSelection(event) : false;
     if (framed) map.once('moveend', () => finishPopup());
     else requestAnimationFrame(() => finishPopup());
@@ -203,7 +209,6 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       placeSheet();
       markSheet();
     } else settlePopup();
-    keepSelectedPinClear();
   }
 
   function createPin(event: HistoryEvent, at: ScreenPosition): Pin {
@@ -312,6 +317,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     sheet.innerHTML = '';
     restoreKey();
     restoreAttribution();
+    restoreZoom();
     if (!event) return;
     if (useSheet()) {
       showSheet(event);
@@ -382,31 +388,26 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   function placeSheet() {
     const margin = 12;
     const gap = 8;
-    const landscape = window.innerWidth > window.innerHeight && window.innerHeight <= 500;
-    if (landscape) {
+    const side = window.innerWidth > window.innerHeight;
+    if (side) {
       parkKey();
       parkAttribution();
+      restoreZoom();
     } else {
       restoreKey();
       restoreAttribution();
+      restoreZoom();
     }
     const wordmark = visibleRect(document.querySelector('.wordmark'));
     const time = visibleRect(document.querySelector('.time'));
-    const zoom = visibleRect(document.querySelector('.zoom'));
     const key = visibleRect(document.querySelector('.key-wrap'));
     const attrib = visibleRect(document.querySelector('.maplibregl-ctrl-attrib'));
-    const floors = (landscape ? [time?.top] : [time?.top, key?.top, attrib?.top]).filter(
-      (value): value is number => value != null,
-    );
-    const controlTop = floors.length > 0 ? Math.min(...floors) : window.innerHeight - 128;
     const top = Math.round((wordmark ? wordmark.bottom : 40) + gap);
-    const bottomEdge = Math.round(controlTop - gap);
-    const zoomBottom = (zoom ? zoom.bottom : 56) + gap;
-    const band = bottomEdge - zoomBottom;
-    if (landscape || band < 160) {
-      const width = landscape
-        ? Math.min(360, Math.floor(window.innerWidth * 0.42))
-        : Math.max(180, Math.floor((zoom ? zoom.left : window.innerWidth - 56) - gap - margin));
+    if (side) {
+      const floors = [time?.top].filter((value): value is number => value != null);
+      const controlTop = floors.length > 0 ? Math.min(...floors) : window.innerHeight - 128;
+      const bottomEdge = Math.round(controlTop - gap);
+      const width = Math.min(360, Math.floor(window.innerWidth * 0.42));
       const height = Math.max(1, bottomEdge - top);
       sheet.style.left = `${margin}px`;
       sheet.style.right = 'auto';
@@ -418,9 +419,11 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       sheet.style.maxHeight = `${height}px`;
       return;
     }
+    const floors = [time?.top, key?.top, attrib?.top].filter((value): value is number => value != null);
+    const controlTop = floors.length > 0 ? Math.min(...floors) : window.innerHeight - 128;
     const bottom = Math.max(margin, window.innerHeight - controlTop + gap);
-    const available = window.innerHeight - bottom - zoomBottom;
-    const maxHeight = Math.min(window.innerHeight * 0.42, available);
+    const available = window.innerHeight - bottom - top;
+    const maxHeight = Math.min(window.innerHeight * 0.4, Math.max(1, available));
     sheet.style.left = `${margin}px`;
     sheet.style.right = `${margin}px`;
     sheet.style.top = 'auto';
@@ -429,6 +432,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     sheet.style.height = 'auto';
     sheet.style.maxWidth = 'none';
     sheet.style.maxHeight = `${Math.floor(maxHeight)}px`;
+    raiseZoomAboveSheet();
   }
 
   function parkKey() {
@@ -473,6 +477,41 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     wrap.style.bottom = 'auto';
     wrap.style.right = '12px';
     wrap.style.left = 'auto';
+  }
+
+  function restoreZoom() {
+    const zoomEl = document.querySelector<HTMLElement>('.zoom');
+    if (!zoomEl) return;
+    zoomEl.classList.remove('is-raised', 'is-hidden');
+    zoomEl.style.top = '';
+    zoomEl.style.bottom = '';
+    zoomEl.style.transform = '';
+  }
+
+  /** A bottom sheet on a short portrait phone runs through the zoom column. Lift it clear. */
+  function raiseZoomAboveSheet() {
+    const zoomEl = document.querySelector<HTMLElement>('.zoom');
+    const sheetBox = visibleRect(sheet);
+    if (!zoomEl || !sheetBox) return;
+    const zoom = zoomEl.getBoundingClientRect();
+    const overlaps = zoom.top < sheetBox.bottom - 4 && zoom.bottom > sheetBox.top + 4;
+    if (!overlaps || zoom.height < 2) return;
+    const wordmark = visibleRect(document.querySelector('.wordmark'));
+    const topLimit = (wordmark ? wordmark.bottom : 40) + 8;
+    const nextTop = sheetBox.top - 8 - zoom.height;
+    if (nextTop < topLimit) {
+      zoomEl.classList.add('is-hidden');
+      zoomEl.classList.remove('is-raised');
+      zoomEl.style.transform = 'none';
+      zoomEl.style.top = '-200px';
+      zoomEl.style.bottom = 'auto';
+      return;
+    }
+    zoomEl.classList.remove('is-hidden');
+    zoomEl.classList.add('is-raised');
+    zoomEl.style.transform = 'none';
+    zoomEl.style.top = `${Math.round(nextTop)}px`;
+    zoomEl.style.bottom = 'auto';
   }
 
   function restoreAttribution() {
@@ -536,6 +575,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     if (rect.bottom > limits.bottom) dy = limits.bottom - rect.bottom;
     if (rect.top + dy < limits.top) dy = limits.top - rect.top;
     ({ dx, dy } = clearOfKey(rect, dx, dy, limits));
+    ({ dx, dy } = clearOfSelection(rect, dx, dy, limits));
     element.style.marginLeft = `${dx}px`;
     element.style.marginTop = `${dy}px`;
     const placed = element.getBoundingClientRect();
@@ -548,18 +588,24 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   }
 
   function frameSelection(event: HistoryEvent): boolean {
-    if (routeLines(event.path).length === 0) return framePolar(event);
+    if (routeLines(event.path).length === 0) return framePoint(event);
     return framePath(event);
   }
 
-  function framePolar(event: HistoryEvent): boolean {
-    if (Math.abs(event.lat) < 80) return false;
-    clearFramePadding();
+  /**
+   * One ease onto the visible face. No follow-up pans. Zoom never drops below minZoom.
+   * A pole is the camera target: the globe can sit on ±90 at minZoom, so the pin
+   * lands on the padding centre instead of a hundred pixels toward the sheet.
+   */
+  function framePoint(event: HistoryEvent): boolean {
+    const padding = framePadding();
+    const minZoom = map.getMinZoom();
+    const polar = Math.abs(event.lat) >= 80;
     map.easeTo({
-      center: [event.lng, clampCenterLat(event.lat)],
-      zoom: Math.min(map.getZoom(), 1.8),
-      padding: framePadding(),
-      duration: 700,
+      center: [wrapLng(event.lng), polar ? event.lat : clampCenterLat(event.lat)],
+      zoom: polar ? minZoom : Math.max(minZoom, map.getZoom()),
+      padding,
+      duration: 500,
     });
     return true;
   }
@@ -574,17 +620,19 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     const minLat = Math.min(...lats);
     const maxLat = Math.max(...lats);
     const span = Math.max(maxLng - minLng, maxLat - minLat);
-    if (span <= 2) return framePolar(event);
-    clearFramePadding();
+    if (span <= 2) return framePoint(event);
     const padding = framePadding();
     const midLat = (minLat + maxLat) / 2;
     if (useSheet() && Math.abs(midLat) > 60 && maxLng <= 180 && minLng >= -180) {
       const shrunk = (maxLng - minLng) * Math.cos((Math.abs(midLat) * Math.PI) / 180);
-      // A short landscape globe hides a polar arrowhead above about zoom 1.6.
-      const highLatCap = window.innerHeight <= 500 ? 1.5 : 2.2;
+      // Sit the camera on the poleward end so its arrowhead is the padding centre.
+      // A midpoint at this latitude leaves that head above the screen.
+      const centerLat = Math.max(-82, Math.min(82, midLat > 0 ? maxLat : minLat));
+      const polar = Math.log2(Math.max(0.2, Math.cos((Math.abs(centerLat) * Math.PI) / 180)));
+      const fitted = zoomForSpan(Math.max(shrunk, 6), Math.max(maxLat - minLat, 4), padding, 2.2);
       map.easeTo({
-        center: [wrapLng((minLng + maxLng) / 2), Math.max(-70, Math.min(70, midLat))],
-        zoom: zoomForSpan(Math.max(shrunk, 6), Math.max(maxLat - minLat, 4), padding, highLatCap),
+        center: [wrapLng((minLng + maxLng) / 2), centerLat],
+        zoom: Math.max(map.getMinZoom(), Math.min(1.35, fitted + polar)),
         padding,
         duration: 800,
       });
@@ -593,39 +641,123 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     if (maxLng > 180 || minLng < -180) {
       const centerLng = ((((minLng + maxLng) / 2 + 540) % 360) + 360) % 360 - 180;
       const centerLat = Math.max(-70, Math.min(70, (minLat + maxLat) / 2));
+      // A southern arrowhead needs the extra bottom inset. Other crossings,
+      // such as Cook, lose their northern half off the top of a short phone if
+      // the vanishing point sits that high.
+      const heads = routeLines(event.path).map((line) => line[line.length - 1].lat);
+      const southernHead = heads.some((lat) => lat <= minLat + 8);
+      const fitted = framePadding(southernHead ? 112 : 16);
       map.easeTo({
         center: [centerLng, centerLat],
-        zoom: zoomForSpan(maxLng - minLng, maxLat - minLat, padding, useSheet() ? 1.35 : 3.2),
+        zoom: zoomForSpan(maxLng - minLng, maxLat - minLat, fitted, useSheet() ? 1.35 : 3.2),
         duration: 800,
-        padding,
+        padding: fitted,
       });
       return true;
     }
     const sheetBox = sheet.hidden ? null : visibleRect(sheet);
-    if (sheetBox && sheetBox.right < window.innerWidth - 80) {
+    if (sheetBox) {
       map.easeTo({
-        center: [(minLng + maxLng) / 2, Math.max(-70, Math.min(70, midLat))],
-        zoom: zoomForSpan(maxLng - minLng, maxLat - minLat, padding, 2.4),
+        center: [wrapLng((minLng + maxLng) / 2), Math.max(-70, Math.min(70, midLat))],
+        zoom: zoomForSpan(maxLng - minLng, maxLat - minLat, padding, 2.2),
         padding,
-        duration: 800,
+        duration: 600,
       });
       return true;
     }
-    map.fitBounds(
-      [
-        [minLng, minLat],
-        [maxLng, maxLat],
-      ],
-      { padding, maxZoom: useSheet() ? 2.4 : 3.2, duration: 800 },
-    );
+    // easeTo keeps the padding on this one move. fitBounds bakes padding into
+    // the centre and then drops it, so a later route inherits a stale inset.
+    map.easeTo({
+      center: [wrapLng((minLng + maxLng) / 2), Math.max(-70, Math.min(70, midLat))],
+      zoom: zoomForSpan(maxLng - minLng, maxLat - minLat, padding, useSheet() ? 2.4 : 3.2),
+      padding,
+      duration: 800,
+    });
     return true;
+  }
+
+  /**
+   * Keep the desktop card off the selected pin, the arrowheads, and the route.
+   * A corner is used only when the anchored card covers the line. No camera move.
+   */
+  function clearOfSelection(
+    rect: DOMRect,
+    dx: number,
+    dy: number,
+    limits: BoxLimits,
+  ): { dx: number; dy: number } {
+    const pin = document.querySelector('.pin.is-selected')?.getBoundingClientRect();
+    const samples: { x: number; y: number }[] = [];
+    const heads: { x: number; y: number }[] = [];
+    map.queryRenderedFeatures({ layers: ['migration-line', 'migration-head'] }).forEach((feature) => {
+      const geometry = feature.geometry;
+      if (geometry.type === 'Point') {
+        const [lng, lat] = geometry.coordinates;
+        const point = map.project([lng, lat]);
+        heads.push({ x: point.x, y: point.y });
+        return;
+      }
+      if (geometry.type !== 'LineString') return;
+      const coordinates = geometry.coordinates;
+      for (let index = 1; index < coordinates.length; index += 1) {
+        const start = coordinates[index - 1];
+        const end = coordinates[index];
+        const steps = Math.max(1, Math.ceil(Math.hypot(end[0] - start[0], end[1] - start[1]) / 4));
+        for (let step = 0; step <= steps; step += 1) {
+          const t = step / steps;
+          const point = map.project([start[0] + (end[0] - start[0]) * t, start[1] + (end[1] - start[1]) * t]);
+          samples.push({ x: point.x, y: point.y });
+        }
+      }
+    });
+    const attrib = visibleRect(document.querySelector('.maplibregl-ctrl-attrib'));
+    const blocked = (box: { left: number; right: number; top: number; bottom: number }) => {
+      const pinHit =
+        !!pin &&
+        pin.width > 2 &&
+        box.left < pin.right + 6 &&
+        box.right > pin.left - 6 &&
+        box.top < pin.bottom + 6 &&
+        box.bottom > pin.top - 6;
+      if (pinHit) return true;
+      if (heads.some((point) => point.x >= box.left && point.x <= box.right && point.y >= box.top && point.y <= box.bottom)) return true;
+      if (hitsControls(box as DOMRect)) return true;
+      return !!attrib && box.left < attrib.right && box.right > attrib.left && box.top < attrib.bottom && box.bottom > attrib.top;
+    };
+    const covered = (box: { left: number; right: number; top: number; bottom: number }) =>
+      samples.reduce((count, point) => count + (point.x >= box.left && point.x <= box.right && point.y >= box.top && point.y <= box.bottom ? 1 : 0), 0);
+    const inside = (box: { left: number; right: number; top: number; bottom: number }) =>
+      box.left >= limits.left - 1 && box.right <= limits.right + 1 && box.top >= limits.top - 1 && box.bottom <= limits.bottom + 1;
+    const current = shifted(rect, dx, dy);
+    if (inside(current) && !blocked(current) && covered(current) === 0) return { dx, dy };
+    const width = rect.width;
+    const height = rect.height;
+    const spots = [
+      { dx, dy },
+      { dx: limits.left - rect.left, dy: limits.top - rect.top },
+      { dx: limits.right - width - rect.left, dy: limits.top - rect.top },
+      { dx: limits.left - rect.left, dy: limits.bottom - height - rect.top },
+      { dx: limits.right - width - rect.left, dy: limits.bottom - height - rect.top },
+    ];
+    if (pin && pin.width > 2) {
+      spots.push({ dx: dx + (pin.left - 10 - (rect.right + dx)), dy });
+      spots.push({ dx: dx + (pin.right + 10 - (rect.left + dx)), dy });
+    }
+    let best = { dx, dy, score: covered(current) + (blocked(current) || !inside(current) ? 100000 : 0) };
+    for (const spot of spots) {
+      const box = shifted(rect, spot.dx, spot.dy);
+      if (!inside(box) || blocked(box)) continue;
+      const score = covered(box);
+      if (score < best.score) best = { dx: spot.dx, dy: spot.dy, score };
+    }
+    return { dx: best.dx, dy: best.dy };
   }
 
   function clearFramePadding() {
     map.setPadding({ top: 0, bottom: 0, left: 0, right: 0 });
   }
 
-  function framePadding(): { top: number; bottom: number; left: number; right: number } {
+  function framePadding(bottomExtra = 64): { top: number; bottom: number; left: number; right: number } {
     const zoom = visibleRect(document.querySelector('.zoom'));
     const time = visibleRect(document.querySelector('.time'));
     const wordmark = visibleRect(document.querySelector('.wordmark'));
@@ -645,7 +777,8 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
         top,
         left: 24,
         right: (zoom?.width ?? 44) + 24,
-        bottom: Math.max(16, window.innerHeight - sheetBox.top + 16),
+        // Extra inset so an arrowhead on the padding edge clears the sheet.
+        bottom: Math.max(16, window.innerHeight - sheetBox.top + bottomExtra),
       };
     }
     const bottom = time ? Math.max(150, window.innerHeight - time.top + 24) : 150;
@@ -693,46 +826,6 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     });
   }
 
-  function keepSelectedPinClear() {
-    if (!selectedId) return;
-    const pin = markers.find((item) => item.event.id === selectedId);
-    if (!pin || routeLines(pin.event.path).length > 0) return;
-    const rect = pin.element.getBoundingClientRect();
-    if (rect.width < 2) return;
-    const limit = obstacleTop();
-    const onScreen = rect.top >= 0 && rect.bottom <= window.innerHeight && rect.left >= 0 && rect.right <= window.innerWidth;
-    if (onScreen && rect.bottom <= limit - 8) {
-      pinClearAttempts = 0;
-      return;
-    }
-    if (pinClearAttempts >= 4) return;
-    pinClearAttempts += 1;
-    const dy = Math.max(12, rect.bottom - (limit - 16));
-    const center = map.project(map.getCenter());
-    const next = map.unproject([center.x, center.y + dy]);
-    const before = map.getCenter();
-    const stuck = Math.abs(next.lat - before.lat) < 0.08 && Math.abs(next.lng - before.lng) < 0.08;
-    if (stuck) {
-      if (map.getZoom() > 1.25) {
-        clearFramePadding();
-        map.easeTo({
-          center: [pin.at.lng, clampCenterLat(pin.at.lat)],
-          zoom: Math.max(1.15, map.getZoom() - 0.55),
-          padding: framePadding(),
-          duration: 400,
-        });
-      }
-      return;
-    }
-    map.easeTo({ center: [next.lng, next.lat], duration: 400 });
-  }
-
-  function obstacleTop(): number {
-    const time = visibleRect(document.querySelector('.time'));
-    const sheetBox = sheet.hidden ? null : visibleRect(sheet);
-    return Math.min(time?.top ?? window.innerHeight, sheetBox?.top ?? window.innerHeight);
-  }
-
   return {
     zoomIn: () => {
       userCamera = true;
@@ -776,8 +869,10 @@ interface BoxLimits {
   bottom: number;
 }
 
+/** Portrait always uses the bottom sheet. Short landscape uses the side sheet. */
 function useSheet(): boolean {
-  return window.innerWidth <= 600 || window.innerHeight <= 500;
+  if (window.innerHeight > window.innerWidth) return true;
+  return window.innerHeight <= 620;
 }
 
 function clampCenterLat(lat: number): number {
@@ -842,8 +937,10 @@ function boxInside(rect: DOMRect, limits: BoxLimits): boolean {
 
 function hitsControls(rect: DOMRect): boolean {
   return ['.zoom', '.key-wrap', '.time', '.wordmark'].some((selector) => {
-    const control = visibleRect(document.querySelector(selector));
-    if (!control) return false;
+    const element = document.querySelector(selector);
+    if (element?.classList.contains('is-hidden')) return false;
+    const control = visibleRect(element);
+    if (!control || control.bottom < 0) return false;
     return rect.left < control.right && rect.right > control.left && rect.top < control.bottom && rect.bottom > control.top;
   });
 }

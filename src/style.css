@@ -1,0 +1,533 @@
+:root {
+  color-scheme: dark;
+  --glass: rgba(14, 18, 26, 0.92);
+  --glass-line: rgba(255, 255, 255, 0.16);
+  --ink: #f4f7fb;
+  --muted: #d5dde6;
+  --history: #c5362b;
+  --myth: #e2b31a;
+  --shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  position: fixed;
+  inset: 0;
+  /* Same night as the globe sky. A canvas hole is this colour in a straight
+     cut; the round limb of the globe is not. */
+  background: #070b12;
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+#app {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+#map {
+  position: absolute;
+  inset: 0;
+}
+
+#map .maplibregl-ctrl-bottom-right {
+  bottom: calc(118px + env(safe-area-inset-bottom));
+  right: 8px;
+}
+
+#map .maplibregl-popup {
+  z-index: 3;
+}
+
+#map .maplibregl-marker-covered {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+.maplibregl-ctrl-attrib {
+  font-size: 10px;
+  color: var(--ink);
+  background: var(--glass);
+  border-radius: 8px;
+  backdrop-filter: blur(12px);
+}
+
+.maplibregl-ctrl-attrib a,
+.maplibregl-ctrl-attrib button {
+  color: var(--ink);
+}
+
+.maplibregl-ctrl-attrib-button {
+  filter: invert(1);
+}
+
+.maplibregl-marker { z-index: 1; }
+
+.wordmark {
+  position: absolute;
+  z-index: 4;
+  top: calc(12px + env(safe-area-inset-top));
+  left: calc(12px + env(safe-area-inset-left));
+  margin: 0;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(14, 18, 26, 0.78);
+  color: var(--ink);
+  border: 1px solid var(--glass-line);
+  box-shadow: none;
+  backdrop-filter: blur(14px);
+  font: 600 14px/1.2 "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif;
+  pointer-events: none;
+}
+
+.zoom, .key-wrap, .time { z-index: 5; }
+
+.zoom {
+  position: absolute;
+  right: calc(12px + env(safe-area-inset-right));
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.zoom.is-hidden,
+.time.is-covered,
+.key-wrap.is-covered,
+.maplibregl-ctrl-bottom-right.is-covered {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.key-wrap {
+  position: absolute;
+  left: calc(12px + env(safe-area-inset-left));
+  bottom: calc(128px + env(safe-area-inset-bottom));
+}
+
+.time {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  padding: 8px 8px 6px;
+  border-radius: 22px;
+  background: var(--glass);
+  color: var(--ink);
+  border: 1px solid var(--glass-line);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+}
+
+.thumb-band {
+  position: relative;
+  height: 22px;
+  margin: 0 4px 2px;
+}
+
+.thumb-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translateX(-50%);
+  max-width: calc(100% - 8px);
+  padding: 1px 8px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: var(--ink);
+  font: 650 12px/1.35 system-ui, sans-serif;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.time-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+}
+
+.ruler {
+  position: relative;
+  flex: 1;
+  min-width: 36px;
+  height: 44px;
+}
+
+.ticks {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  bottom: 8px;
+  height: 14px;
+  pointer-events: none;
+}
+
+.ticks::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.tick {
+  position: absolute;
+  bottom: 0;
+  width: 1px;
+  height: 7px;
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.tick.is-major {
+  height: 13px;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.icon-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  cursor: pointer;
+  color: var(--ink);
+  background: rgba(14, 18, 26, 0.72);
+  border: 1px solid var(--glass-line);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+  flex: none;
+}
+
+.time-row .icon-button {
+  box-shadow: none;
+  background: transparent;
+  border-color: transparent;
+  backdrop-filter: none;
+}
+
+.icon-button svg { width: 22px; height: 22px; display: block; }
+
+.icon-button:disabled { opacity: 0.35; cursor: default; }
+
+.icon-button[aria-pressed="true"] {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.popout {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 8px;
+  left: auto;
+  background: var(--glass);
+  color: var(--ink);
+  border: 1px solid var(--glass-line);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+  padding: 6px;
+}
+
+.key-wrap .popout {
+  left: 0;
+  right: auto;
+  min-width: 0;
+  display: flex;
+  gap: 6px;
+  padding: 8px;
+}
+
+.popout[hidden],
+.key-wrap .popout[hidden] {
+  display: none;
+}
+
+.key-wrap.is-parked .popout {
+  bottom: auto;
+  top: calc(100% + 8px);
+  left: auto;
+  right: 0;
+}
+
+.era-option {
+  display: block;
+  width: 220px;
+  max-width: calc(100vw - 48px);
+  text-align: left;
+  box-shadow: none;
+  background: transparent;
+  color: var(--ink);
+  border: 0;
+  border-radius: 10px;
+  padding: 11px 12px;
+  font: 600 14px/1.2 system-ui, sans-serif;
+  cursor: pointer;
+}
+
+.era-option[aria-current="true"] { background: rgba(255, 255, 255, 0.1); }
+
+#date-input {
+  width: min(240px, calc(100vw - 64px));
+  font-size: 16px;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  background: transparent;
+  color: var(--ink);
+  padding: 10px 8px;
+  border-radius: 0;
+}
+
+#date-input:focus { outline: none; border-bottom-color: var(--ink); }
+
+#date-input.is-invalid { animation: shake 0.35s linear; }
+
+@keyframes shake {
+  25% { transform: translateX(-3px); }
+  50% { transform: translateX(3px); }
+  75% { transform: translateX(-2px); }
+}
+
+.key-row {
+  display: grid;
+  place-items: center;
+  margin: 0;
+  width: 36px;
+  height: 36px;
+}
+
+.swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #f7f4ee;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.72);
+}
+
+.swatch.history { background: var(--history); }
+.swatch.myth { background: var(--myth); }
+
+#slider {
+  -webkit-appearance: none;
+  appearance: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+#slider::-webkit-slider-runnable-track {
+  height: 100%;
+  background: transparent;
+}
+
+#slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  background: transparent;
+  border: 0;
+}
+
+#slider::-moz-range-track {
+  height: 100%;
+  background: transparent;
+  border: 0;
+}
+
+#slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: transparent;
+  border: 0;
+}
+
+[data-tip] { position: relative; }
+
+[data-tip]:hover::after,
+[data-tip]:focus-visible::after {
+  content: attr(data-tip);
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  bottom: calc(100% + 6px);
+  transform: translateX(-50%);
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #12161c;
+  font: 600 11px/1.2 system-ui, sans-serif;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.zoom [data-tip]:hover::after,
+.zoom [data-tip]:focus-visible::after {
+  left: auto;
+  right: calc(100% + 8px);
+  bottom: 50%;
+  transform: translateY(50%);
+}
+
+.key-wrap [data-tip]:hover::after,
+.key-wrap [data-tip]:focus-visible::after {
+  left: calc(100% + 8px);
+  right: auto;
+  bottom: 50%;
+  transform: translateY(50%);
+}
+
+.pin {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid #f7f4ee;
+  box-shadow:
+    0 0 0 2px rgba(0, 0, 0, 0.72),
+    0 1px 6px rgba(0, 0, 0, 0.85);
+}
+
+.pin[data-type="history"] .dot { background: var(--history); }
+.pin[data-type="myth"] .dot { background: var(--myth); }
+
+.pin.is-selected .dot {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.pin-label {
+  display: none;
+  position: absolute;
+  top: calc(100% - 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 148px;
+  padding: 1px 4px;
+  color: #f7f4ee;
+  font: 600 11px/1.25 system-ui, sans-serif;
+  text-align: center;
+  text-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.9),
+    0 0 2px rgba(0, 0, 0, 0.9);
+  pointer-events: none;
+}
+
+.pin-label.is-on { display: block; }
+
+.event-popup .maplibregl-popup-content {
+  background: var(--glass);
+  color: var(--ink);
+  border: 1px solid var(--glass-line);
+  border-radius: 16px;
+  padding: 14px 16px 16px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+  font: 14px/1.45 system-ui, sans-serif;
+}
+
+.event-popup .maplibregl-popup-close-button,
+.sheet-close {
+  width: 44px;
+  height: 44px;
+  font-size: 18px;
+  color: var(--ink);
+  border-radius: 50%;
+  top: 4px;
+  right: 4px;
+}
+
+.event-popup .maplibregl-popup-close-button:hover {
+  background: transparent;
+  color: var(--ink);
+}
+
+.event-sheet {
+  position: absolute;
+  z-index: 4;
+  /* The card itself must not scroll. overflow:auto here makes Chromium
+     present a transparent rectangle of the WebGL canvas, so the page
+     background shows as a black block on the globe. */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: var(--glass);
+  color: var(--ink);
+  border: 1px solid var(--glass-line);
+  border-radius: 16px;
+  padding: 14px 16px 16px;
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+  font: 14px/1.45 system-ui, sans-serif;
+}
+
+.event-sheet[hidden] { display: none; }
+
+.event-sheet.is-covering { z-index: 6; }
+
+.sheet-body {
+  overflow: auto;
+  min-height: 0;
+  overscroll-behavior: contain;
+}
+
+.sheet-close {
+  position: absolute;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.event-popup .maplibregl-popup-tip {
+  border-top-color: rgba(14, 18, 26, 0.92);
+  border-bottom-color: rgba(14, 18, 26, 0.92);
+}
+
+.popup-title {
+  margin: 0 36px 6px 0;
+  font: 600 18px/1.25 "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif;
+}
+
+.popup-date { margin: 0; font-weight: 700; font-size: 13px; }
+.popup-place { margin: 2px 0 8px; color: var(--muted); font-size: 13px; }
+.popup-summary { margin: 0; }
+.popup-note { margin: 8px 0 0; color: var(--muted); font-size: 12px; }
+
+.icon-button:focus-visible,
+.thumb-label:focus-visible,
+.era-option:focus-visible,
+#date-input:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+@media (max-width: 700px) {
+  .wordmark { font-size: 13px; padding: 7px 10px; }
+  .key-wrap { bottom: calc(124px + env(safe-area-inset-bottom)); }
+  .thumb-label { font-size: 11px; }
+}

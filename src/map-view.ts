@@ -310,6 +310,8 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     suppressClose = false;
     sheet.hidden = true;
     sheet.innerHTML = '';
+    restoreKey();
+    restoreAttribution();
     if (!event) return;
     if (useSheet()) {
       showSheet(event);
@@ -380,18 +382,27 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   function placeSheet() {
     const margin = 12;
     const gap = 8;
+    const landscape = window.innerWidth > window.innerHeight && window.innerHeight <= 500;
+    if (landscape) {
+      parkKey();
+      parkAttribution();
+    } else {
+      restoreKey();
+      restoreAttribution();
+    }
     const wordmark = visibleRect(document.querySelector('.wordmark'));
     const time = visibleRect(document.querySelector('.time'));
     const zoom = visibleRect(document.querySelector('.zoom'));
     const key = visibleRect(document.querySelector('.key-wrap'));
     const attrib = visibleRect(document.querySelector('.maplibregl-ctrl-attrib'));
-    const floors = [time?.top, key?.top, attrib?.top].filter((value): value is number => value != null);
+    const floors = (landscape ? [time?.top] : [time?.top, key?.top, attrib?.top]).filter(
+      (value): value is number => value != null,
+    );
     const controlTop = floors.length > 0 ? Math.min(...floors) : window.innerHeight - 128;
     const top = Math.round((wordmark ? wordmark.bottom : 40) + gap);
     const bottomEdge = Math.round(controlTop - gap);
     const zoomBottom = (zoom ? zoom.bottom : 56) + gap;
     const band = bottomEdge - zoomBottom;
-    const landscape = window.innerWidth > window.innerHeight && window.innerHeight <= 500;
     if (landscape || band < 160) {
       const width = landscape
         ? Math.min(360, Math.floor(window.innerWidth * 0.42))
@@ -418,6 +429,67 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     sheet.style.height = 'auto';
     sheet.style.maxWidth = 'none';
     sheet.style.maxHeight = `${Math.floor(maxHeight)}px`;
+  }
+
+  function parkKey() {
+    const keyEl = document.querySelector<HTMLElement>('.key-wrap');
+    const wordmark = visibleRect(document.querySelector('.wordmark'));
+    if (!keyEl) return;
+    const top = Math.round((wordmark ? wordmark.bottom : 40) + 8);
+    keyEl.classList.add('is-parked');
+    keyEl.style.left = 'auto';
+    keyEl.style.right = '12px';
+    keyEl.style.bottom = 'auto';
+    keyEl.style.top = `${top}px`;
+  }
+
+  function restoreKey() {
+    const keyEl = document.querySelector<HTMLElement>('.key-wrap');
+    if (!keyEl) return;
+    keyEl.classList.remove('is-parked');
+    keyEl.style.left = '';
+    keyEl.style.right = '';
+    keyEl.style.top = '';
+    keyEl.style.bottom = '';
+  }
+
+  /**
+   * A full attribution chip covers either a southern or a northern arrowhead
+   * on a short landscape globe. Collapse it to the info button and park that
+   * button above the key, in the band framing already keeps clear.
+   */
+  function parkAttribution() {
+    const wrap = document.querySelector<HTMLElement>('.maplibregl-ctrl-bottom-right');
+    const attrib = wrap?.querySelector<HTMLElement>('.maplibregl-ctrl-attrib');
+    if (!wrap || !attrib || attrib.dataset.parked === '1') return;
+    attrib.dataset.wasCompact = attrib.classList.contains('maplibregl-compact') ? '1' : '0';
+    attrib.dataset.parked = '1';
+    attrib.classList.add('maplibregl-compact');
+    attrib.classList.remove('maplibregl-compact-show');
+    if (attrib instanceof HTMLDetailsElement) attrib.open = false;
+    attrib.style.margin = '0';
+    wrap.classList.add('is-parked');
+    wrap.style.top = '12px';
+    wrap.style.bottom = 'auto';
+    wrap.style.right = '12px';
+    wrap.style.left = 'auto';
+  }
+
+  function restoreAttribution() {
+    const wrap = document.querySelector<HTMLElement>('.maplibregl-ctrl-bottom-right');
+    const attrib = wrap?.querySelector<HTMLElement>('.maplibregl-ctrl-attrib');
+    if (!wrap || !attrib || attrib.dataset.parked !== '1') return;
+    wrap.classList.remove('is-parked');
+    wrap.style.top = '';
+    wrap.style.bottom = '';
+    wrap.style.right = '';
+    wrap.style.left = '';
+    attrib.style.margin = '';
+    attrib.classList.remove('maplibregl-compact-show');
+    if (attrib.dataset.wasCompact === '1') attrib.classList.add('maplibregl-compact');
+    else attrib.classList.remove('maplibregl-compact');
+    delete attrib.dataset.parked;
+    delete attrib.dataset.wasCompact;
   }
 
   function markSheet() {
@@ -508,9 +580,11 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     const midLat = (minLat + maxLat) / 2;
     if (useSheet() && Math.abs(midLat) > 60 && maxLng <= 180 && minLng >= -180) {
       const shrunk = (maxLng - minLng) * Math.cos((Math.abs(midLat) * Math.PI) / 180);
+      // A short landscape globe hides a polar arrowhead above about zoom 1.6.
+      const highLatCap = window.innerHeight <= 500 ? 1.5 : 2.2;
       map.easeTo({
         center: [wrapLng((minLng + maxLng) / 2), Math.max(-70, Math.min(70, midLat))],
-        zoom: zoomForSpan(Math.max(shrunk, 6), Math.max(maxLat - minLat, 4), padding, 2.2),
+        zoom: zoomForSpan(Math.max(shrunk, 6), Math.max(maxLat - minLat, 4), padding, highLatCap),
         padding,
         duration: 800,
       });
@@ -524,6 +598,16 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
         zoom: zoomForSpan(maxLng - minLng, maxLat - minLat, padding, useSheet() ? 1.35 : 3.2),
         duration: 800,
         padding,
+      });
+      return true;
+    }
+    const sheetBox = sheet.hidden ? null : visibleRect(sheet);
+    if (sheetBox && sheetBox.right < window.innerWidth - 80) {
+      map.easeTo({
+        center: [(minLng + maxLng) / 2, Math.max(-70, Math.min(70, midLat))],
+        zoom: zoomForSpan(maxLng - minLng, maxLat - minLat, padding, 2.4),
+        padding,
+        duration: 800,
       });
       return true;
     }

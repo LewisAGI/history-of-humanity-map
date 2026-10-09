@@ -167,6 +167,13 @@ html, body {
   min-width: 148px;
 }
 
+.key-wrap.is-parked .popout {
+  bottom: auto;
+  top: calc(100% + 8px);
+  left: auto;
+  right: 0;
+}
+
 .era-option {
   display: block;
   width: 220px;

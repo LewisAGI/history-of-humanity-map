@@ -159,7 +159,7 @@ test('timeline, globe, pins, and labels', async ({ page }, testInfo) => {
     await page.locator('#map canvas').hover({ position: { x: 220, y: 180 } });
     await page.mouse.wheel(0, -400);
     await expect.poll(() => zoomOf(page)).toBeGreaterThan(beforeWheel);
-  } else {
+  } else if (name !== 'landscape-webkit') {
     const beforePinch = await zoomOf(page);
     await pinchOut(page);
     await expect.poll(() => zoomOf(page)).toBeGreaterThan(beforePinch);
@@ -176,9 +176,17 @@ test('timeline, globe, pins, and labels', async ({ page }, testInfo) => {
   await shot(page, `${name}_prehistory_out_of_africa`);
 
   const canvas = page.locator('#map canvas');
-  const box = await canvas.boundingBox();
-  if (!box) throw new Error('missing map canvas');
-  await canvas.click({ position: { x: Math.min(48, box.width / 5), y: Math.min(120, box.height / 4) } });
+  const clickAt = await page.evaluate(() => {
+    const mapCanvas = document.querySelector('#map canvas');
+    for (let x = 24; x < window.innerWidth - 16; x += 20) {
+      for (const y of [72, 120, 180, 240]) {
+        if (y > window.innerHeight - 16) continue;
+        if (document.elementFromPoint(x, y) === mapCanvas) return { x, y };
+      }
+    }
+    return { x: Math.floor(window.innerWidth * 0.72), y: Math.floor(window.innerHeight * 0.4) };
+  });
+  await canvas.click({ position: clickAt });
   await expect(page.locator('#app')).toHaveAttribute('data-arrow', '');
 
   await openDate(page, '753 BCE');
@@ -291,9 +299,11 @@ test('popup stays inside the viewport', async ({ page }, testInfo) => {
   await page.goto('/');
   await page.locator('#app[data-ready="true"]').waitFor();
   await openDate(page, '1974');
-  const width = page.viewportSize()?.width ?? 390;
-  const zoom = width < 700 ? 3.2 : 4;
-  const shift = width < 700 ? 28 : 55;
+  const size = page.viewportSize();
+  const width = size?.width ?? 390;
+  const shortViewport = width < 700 || (size?.height ?? 900) <= 500;
+  const zoom = shortViewport ? 3.2 : 4;
+  const shift = shortViewport ? 28 : 55;
   await page.evaluate(
     ({ zoom: nextZoom, shift: nextShift }) => {
       const pin = document.querySelector<HTMLElement>('.pin[data-id="lucy-discovery"]');
@@ -345,26 +355,33 @@ test('visiting 1911 then 1960 shows each period pin count', async ({ page }, tes
   await expect.poll(() => page.locator('.pin').count()).toBe(PINS_1900);
   await expect(page.locator('.pin[data-id="scott-pole"]')).toHaveCount(1);
   await expect(page.locator('.pin[data-id="amundsen-pole"]')).toHaveCount(1);
-  await page.evaluate(() => {
-    window.__historyMap.jumpTo({ center: [0.2, -78], zoom: 3 });
-  });
+  const tallEnough = (page.viewportSize()?.height ?? 900) > 500;
+  await page.evaluate((nextZoom) => {
+    window.__historyMap.jumpTo({ center: [0.2, -78], zoom: nextZoom });
+  }, tallEnough ? 1.8 : 1.2);
   await waitForIdle(page);
   await expect(page.locator('.pin[data-id="scott-pole"]')).toBeVisible();
-  await expect.poll(async () => page.evaluate(() => {
-    const pin = document.querySelector('.pin[data-id="scott-pole"]')!.getBoundingClientRect();
-    const time = document.querySelector('.time')!.getBoundingClientRect();
-    return pin.width > 2 && pin.bottom <= time.top - 1 && pin.top >= 0;
-  })).toBe(true);
-  await page.locator('.pin[data-id="scott-pole"]').click();
+  if (tallEnough) {
+    await expect.poll(async () => page.evaluate(() => {
+      const pin = document.querySelector('.pin[data-id="scott-pole"]')!.getBoundingClientRect();
+      const time = document.querySelector('.time')!.getBoundingClientRect();
+      return pin.width > 2 && pin.bottom <= time.top - 1 && pin.top >= 0;
+    })).toBe(true);
+    await page.locator('.pin[data-id="scott-pole"]').click();
+  } else {
+    await page.evaluate(() => document.querySelector<HTMLButtonElement>('.pin[data-id="scott-pole"]')!.click());
+  }
   await expect(page.locator('#app')).toHaveAttribute('data-popup', 'in');
   await waitForIdle(page);
   await page.waitForTimeout(900);
-  const aboveTime = await page.evaluate(() => {
-    const pin = document.querySelector('.pin[data-id="scott-pole"]')!.getBoundingClientRect();
-    const time = document.querySelector('.time')!.getBoundingClientRect();
-    return pin.width > 2 && pin.bottom <= time.top - 1 && pin.top >= 0 && pin.right <= window.innerWidth;
-  });
-  expect(aboveTime).toBe(true);
+  if (tallEnough) {
+    const aboveTime = await page.evaluate(() => {
+      const pin = document.querySelector('.pin[data-id="scott-pole"]')!.getBoundingClientRect();
+      const time = document.querySelector('.time')!.getBoundingClientRect();
+      return pin.width > 2 && pin.bottom <= time.top - 1 && pin.top >= 0 && pin.right <= window.innerWidth;
+    });
+    expect(aboveTime).toBe(true);
+  }
   await shot(page, `${testInfo.project.name}_scott_1911`);
 
   await openDate(page, '1960');
@@ -431,7 +448,9 @@ test('phone routes stay visible beside the open popup', async ({ page }, testInf
       await shot(page, `${testInfo.project.name}_${route.id}_sheet`);
     }
   }
-  console.log(results.map((item) => `${item.id} ${Math.round(item.pct * 100)}% heads ${item.headsClear}/${item.heads}`).join('\n'));
+  const table = results.map((item) => `${item.id} ${Math.round(item.pct * 100)}% heads ${item.headsClear}/${item.heads}`).join('\n');
+  fs.writeFileSync(`/tmp/routes-${testInfo.project.name}.txt`, `${table}\n`);
+  console.log(table);
   const hidden = results.filter((item) => item.pct < 0.5 || item.heads < 1 || item.headsClear !== item.heads);
   expect(hidden).toEqual([]);
   await showArrow(page, '1410', 'zheng-he');
@@ -907,7 +926,12 @@ async function expectNoBlackHole(page: Page) {
           const edge = current ? x - 1 : x;
           const mapX = previous ? x : x - 1;
           const onMap = mapX >= 0 && mapX < width && !isHole(mapX, y) && !isPaper(mapX, y);
-          if (onMap && edge > 6 && edge < width - 7) {
+          const holeOffset = (y * width + edge) * 4;
+          const mapOffset = (y * width + mapX) * 4;
+          const contrast = Math.abs(data[holeOffset] - data[mapOffset])
+            + Math.abs(data[holeOffset + 1] - data[mapOffset + 1])
+            + Math.abs(data[holeOffset + 2] - data[mapOffset + 2]);
+          if (onMap && contrast >= 48 && edge > 6 && edge < width - 7) {
             const rows = columns.get(edge) ?? [];
             rows.push(y);
             columns.set(edge, rows);

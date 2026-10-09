@@ -3,14 +3,19 @@ import os from 'node:os';
 import path from 'node:path';
 import { defineConfig, devices } from '@playwright/test';
 
-/** The test workflow installs Chromium only. WebKit is added when that browser is already present. */
+/** The test workflow installs Chromium only. WebKit is added when that browser can launch. */
 function webkitInstalled(): boolean {
   const root = process.env.PLAYWRIGHT_BROWSERS_PATH || path.join(os.homedir(), '.cache', 'ms-playwright');
+  let present = false;
   try {
-    return readdirSync(root).some((name) => name.startsWith('webkit-'));
+    present = readdirSync(root).some((name) => name.startsWith('webkit-'));
   } catch {
-    return existsSync(root);
+    return false;
   }
+  if (!present) return false;
+  return (
+    existsSync('/usr/lib/x86_64-linux-gnu/libxslt.so.1') || existsSync('/lib/x86_64-linux-gnu/libxslt.so.1')
+  );
 }
 
 export default defineConfig({

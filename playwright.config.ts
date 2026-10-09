@@ -1,4 +1,17 @@
+import { existsSync, readdirSync } from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { defineConfig, devices } from '@playwright/test';
+
+/** The test workflow installs Chromium only. WebKit is added when that browser is already present. */
+function webkitInstalled(): boolean {
+  const root = process.env.PLAYWRIGHT_BROWSERS_PATH || path.join(os.homedir(), '.cache', 'ms-playwright');
+  try {
+    return readdirSync(root).some((name) => name.startsWith('webkit-'));
+  } catch {
+    return existsSync(root);
+  }
+}
 
 export default defineConfig({
   testDir: 'e2e',
@@ -32,5 +45,28 @@ export default defineConfig({
         isMobile: true,
       },
     },
+    {
+      name: 'landscape',
+      use: {
+        browserName: 'chromium',
+        userAgent: devices['iPhone 15 landscape'].userAgent,
+        viewport: { width: 844, height: 390 },
+        deviceScaleFactor: 1,
+        hasTouch: true,
+        isMobile: true,
+      },
+    },
+    ...(webkitInstalled()
+      ? [
+          {
+            name: 'landscape-webkit',
+            use: {
+              ...devices['iPhone 15 landscape'],
+              browserName: 'webkit' as const,
+              deviceScaleFactor: 1,
+            },
+          },
+        ]
+      : []),
   ],
 });

@@ -100,7 +100,8 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   let selectedId: string | null = null;
   let anchorObserver: MutationObserver | null = null;
   let pinClearAttempts = 0;
-  let poleClearAttempts = 0;
+  let userCamera = false;
+  let popupAnchor: 'top' | 'bottom' = 'bottom';
   const sheet = document.createElement('div');
   sheet.className = 'event-sheet';
   sheet.hidden = true;
@@ -123,6 +124,29 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     layoutPinOffsets();
   });
   map.on('render', () => refreshLabels());
+  map.on('movestart', (event) => {
+    if (event.originalEvent) userCamera = true;
+  });
+  map.on('moveend', () => {
+    if (!popup) {
+      userCamera = false;
+      return;
+    }
+    const event = markers.find((pin) => pin.event.id === selectedId)?.event;
+    const point = map.project(popup.getLngLat());
+    const width = map.getContainer().clientWidth;
+    const height = map.getContainer().clientHeight;
+    const onScreen = point.x >= 0 && point.y >= 0 && point.x <= width && point.y <= height;
+    if (!onScreen) {
+      if (userCamera) requestPopupClose();
+      userCamera = false;
+      return;
+    }
+    userCamera = false;
+    const anchor = point.y > height / 2 ? 'bottom' : 'top';
+    if (event && anchor !== popupAnchor) mountDesktopPopup(event, anchor);
+    settlePopup();
+  });
   map.on('idle', () => {
     refreshLabels();
     layoutPinOffsets();
@@ -132,7 +156,9 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       markSheet();
     }
     keepSelectedPinClear();
-    keepPolePinsClear();
+  });
+  window.addEventListener('resize', () => {
+    if (!sheet.hidden) placeSheet();
   });
 
   window.__historyMap = map;
@@ -160,6 +186,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
 
   function setSelected(event: HistoryEvent | null, options?: { keepRoute?: boolean }) {
     selectedId = event?.id ?? null;
+    userCamera = false;
     pinClearAttempts = 0;
     markers.forEach((pin) => pin.element.classList.toggle('is-selected', pin.event.id === selectedId));
     if (event) drawArrow(event);
@@ -191,6 +218,9 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     element.innerHTML = `<span class="dot"></span><span class="pin-label"></span>`;
     const label = element.querySelector('.pin-label') as HTMLElement;
     label.textContent = event.title;
+    // Scott and Amundsen share the pole. Shift the labels apart so both can show.
+    if (event.id === 'scott-pole') label.style.transform = 'translateX(calc(-50% - 78px))';
+    if (event.id === 'amundsen-pole') label.style.transform = 'translateX(calc(-50% + 78px))';
     element.addEventListener('click', (click) => {
       click.stopPropagation();
       selectHandler(event);
@@ -285,9 +315,19 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       showSheet(event);
       return;
     }
-    const lngLat = pinLngLat(event);
-    const point = map.project(lngLat);
+    const point = map.project(pinLngLat(event));
     const anchor = point.y > map.getContainer().clientHeight / 2 ? 'bottom' : 'top';
+    mountDesktopPopup(event, anchor);
+  }
+
+  function mountDesktopPopup(event: HistoryEvent, anchor: 'top' | 'bottom') {
+    anchorObserver?.disconnect();
+    anchorObserver = null;
+    suppressClose = true;
+    popup?.remove();
+    popup = null;
+    suppressClose = false;
+    popupAnchor = anchor;
     const next = new Popup({
       anchor,
       closeButton: true,
@@ -297,7 +337,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       className: 'event-popup',
       focusAfterOpen: false,
     })
-      .setLngLat(lngLat)
+      .setLngLat(pinLngLat(event))
       .setHTML(popupHtml(event))
       .addTo(map);
     popup = next;
@@ -340,22 +380,43 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   function placeSheet() {
     const margin = 12;
     const gap = 8;
+    const wordmark = visibleRect(document.querySelector('.wordmark'));
     const time = visibleRect(document.querySelector('.time'));
     const zoom = visibleRect(document.querySelector('.zoom'));
     const key = visibleRect(document.querySelector('.key-wrap'));
     const attrib = visibleRect(document.querySelector('.maplibregl-ctrl-attrib'));
-    const controlTops = [time?.top, key?.top, attrib?.top].filter((value): value is number => value != null);
-    const controlTop = controlTops.length > 0 ? Math.min(...controlTops) : window.innerHeight - 128;
+    const floors = [time?.top, key?.top, attrib?.top].filter((value): value is number => value != null);
+    const controlTop = floors.length > 0 ? Math.min(...floors) : window.innerHeight - 128;
+    const top = Math.round((wordmark ? wordmark.bottom : 40) + gap);
+    const bottomEdge = Math.round(controlTop - gap);
+    const zoomBottom = (zoom ? zoom.bottom : 56) + gap;
+    const band = bottomEdge - zoomBottom;
+    const landscape = window.innerWidth > window.innerHeight && window.innerHeight <= 500;
+    if (landscape || band < 160) {
+      const width = landscape
+        ? Math.min(360, Math.floor(window.innerWidth * 0.42))
+        : Math.max(180, Math.floor((zoom ? zoom.left : window.innerWidth - 56) - gap - margin));
+      const height = Math.max(1, bottomEdge - top);
+      sheet.style.left = `${margin}px`;
+      sheet.style.right = 'auto';
+      sheet.style.top = `${top}px`;
+      sheet.style.bottom = 'auto';
+      sheet.style.width = `${width}px`;
+      sheet.style.maxWidth = 'none';
+      sheet.style.height = `${height}px`;
+      sheet.style.maxHeight = `${height}px`;
+      return;
+    }
     const bottom = Math.max(margin, window.innerHeight - controlTop + gap);
-    const topLimit = (zoom ? zoom.bottom : 56) + gap;
-    const available = Math.max(96, window.innerHeight - bottom - topLimit);
+    const available = window.innerHeight - bottom - zoomBottom;
     const maxHeight = Math.min(window.innerHeight * 0.42, available);
     sheet.style.left = `${margin}px`;
     sheet.style.right = `${margin}px`;
     sheet.style.top = 'auto';
-    sheet.style.width = 'auto';
-    sheet.style.maxWidth = 'none';
     sheet.style.bottom = `${bottom}px`;
+    sheet.style.width = 'auto';
+    sheet.style.height = 'auto';
+    sheet.style.maxWidth = 'none';
     sheet.style.maxHeight = `${Math.floor(maxHeight)}px`;
   }
 
@@ -457,15 +518,9 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     }
     if (maxLng > 180 || minLng < -180) {
       const centerLng = ((((minLng + maxLng) / 2 + 540) % 360) + 360) % 360 - 180;
-      const heads = routeLines(event.path).map((line) => line[line.length - 1]);
-      const centerLat = useSheet()
-        ? heads.reduce((sum, head) => sum + head.lat, 0) / heads.length
-        : (minLat + maxLat) / 2;
-      const center = useSheet()
-        ? [heads.reduce((sum, head) => sum + head.lng, 0) / heads.length, centerLat]
-        : [centerLng, centerLat];
+      const centerLat = Math.max(-70, Math.min(70, (minLat + maxLat) / 2));
       map.easeTo({
-        center: center as [number, number],
+        center: [centerLng, centerLat],
         zoom: zoomForSpan(maxLng - minLng, maxLat - minLat, padding, useSheet() ? 1.35 : 3.2),
         duration: 800,
         padding,
@@ -489,10 +544,21 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   function framePadding(): { top: number; bottom: number; left: number; right: number } {
     const zoom = visibleRect(document.querySelector('.zoom'));
     const time = visibleRect(document.querySelector('.time'));
+    const wordmark = visibleRect(document.querySelector('.wordmark'));
     const sheetBox = sheet.hidden ? null : visibleRect(sheet);
+    const top = Math.max(56, (wordmark ? wordmark.bottom : 40) + 16);
     if (useSheet() && sheetBox) {
+      const side = sheetBox.right < window.innerWidth - 80;
+      if (side) {
+        return {
+          top,
+          left: sheetBox.right + 16,
+          right: (zoom?.width ?? 44) + 24,
+          bottom: time ? Math.max(16, window.innerHeight - time.top + 16) : 120,
+        };
+      }
       return {
-        top: 56,
+        top,
         left: 24,
         right: (zoom?.width ?? 44) + 24,
         bottom: Math.max(16, window.innerHeight - sheetBox.top + 16),
@@ -543,37 +609,6 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     });
   }
 
-  function keepPolePinsClear() {
-    const poles = markers.filter((pin) => pin.at.lat <= -85);
-    if (poles.length === 0 || poleClearAttempts >= 3) return;
-    const lookingSouth = map.getCenter().lat <= -60 || poles.some((pin) => pin.event.id === selectedId);
-    if (!lookingSouth) return;
-    const time = visibleRect(document.querySelector('.time'));
-    const blocked = poles.some((pin) => pinBlocked(pin.element, time));
-    if (!blocked) {
-      poleClearAttempts = 0;
-      return;
-    }
-    poleClearAttempts += 1;
-    const pin = poles[0];
-    clearFramePadding();
-    map.easeTo({
-      center: [pin.at.lng, clampCenterLat(pin.at.lat)],
-      zoom: Math.min(map.getZoom(), 1.45),
-      padding: framePadding(),
-      duration: 450,
-    });
-  }
-
-  function pinBlocked(element: HTMLElement, time: DOMRect | null): boolean {
-    const rect = element.getBoundingClientRect();
-    if (element.classList.contains('maplibregl-marker-covered')) return true;
-    if (rect.width < 2) return true;
-    if (rect.top < 0 || rect.bottom > window.innerHeight || rect.left < 0 || rect.right > window.innerWidth) return true;
-    if (!time) return false;
-    return rect.bottom > time.top - 4 && rect.right > time.left && rect.left < time.right;
-  }
-
   function keepSelectedPinClear() {
     if (!selectedId) return;
     const pin = markers.find((item) => item.event.id === selectedId);
@@ -615,8 +650,14 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   }
 
   return {
-    zoomIn: () => map.zoomIn({ duration: 200 }),
-    zoomOut: () => map.zoomOut({ duration: 200 }),
+    zoomIn: () => {
+      userCamera = true;
+      map.zoomIn({ duration: 200 });
+    },
+    zoomOut: () => {
+      userCamera = true;
+      map.zoomOut({ duration: 200 });
+    },
     getZoom: () => map.getZoom(),
     setEvents: (events) => {
       void ready.then(() => setEvents(events));
@@ -652,7 +693,7 @@ interface BoxLimits {
 }
 
 function useSheet(): boolean {
-  return window.innerWidth <= 600;
+  return window.innerWidth <= 600 || window.innerHeight <= 500;
 }
 
 function clampCenterLat(lat: number): number {
@@ -675,9 +716,10 @@ function popupLimits(): BoxLimits {
   const margin = 8;
   const zoom = visibleRect(document.querySelector('.zoom'));
   const time = visibleRect(document.querySelector('.time'));
+  const wordmark = visibleRect(document.querySelector('.wordmark'));
   return {
     left: margin,
-    top: margin,
+    top: Math.max(margin, wordmark ? wordmark.bottom + margin : margin),
     right: Math.min(window.innerWidth - margin, zoom ? zoom.left - margin : window.innerWidth - margin),
     bottom: Math.min(window.innerHeight - margin, time ? time.top - margin : window.innerHeight - margin),
   };
@@ -715,7 +757,7 @@ function boxInside(rect: DOMRect, limits: BoxLimits): boolean {
 }
 
 function hitsControls(rect: DOMRect): boolean {
-  return ['.zoom', '.key-wrap', '.time'].some((selector) => {
+  return ['.zoom', '.key-wrap', '.time', '.wordmark'].some((selector) => {
     const control = visibleRect(document.querySelector(selector));
     if (!control) return false;
     return rect.left < control.right && rect.right > control.left && rect.top < control.bottom && rect.bottom > control.top;

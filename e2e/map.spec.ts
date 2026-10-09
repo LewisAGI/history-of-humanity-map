@@ -393,7 +393,8 @@ test('movement arrows draw for the slave trade, Zheng He, and Cook', async ({ pa
   await showArrow(page, '1410', 'zheng-he');
   await shot(page, `${name}_arrow_zheng_he`);
   await showArrow(page, '1770', 'cook-pacific');
-  if ((page.viewportSize()?.width ?? 0) > 600) {
+  const framed = page.viewportSize();
+  if ((framed?.width ?? 0) > 600 && (framed?.height ?? 0) > 500) {
     expect(await zoomOf(page)).toBeGreaterThanOrEqual(1.6);
   }
   await shot(page, `${name}_arrow_cook`);
@@ -410,7 +411,10 @@ test('movement arrows draw for the slave trade, Zheng He, and Cook', async ({ pa
 });
 
 test('phone routes stay visible beside the open popup', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'iphone', 'the sheet is the 390 layout');
+  test.skip(
+    !['iphone', 'landscape', 'landscape-webkit'].includes(testInfo.project.name),
+    'the sheet is the short-viewport layout',
+  );
   test.setTimeout(240_000);
   await page.goto('/');
   await page.locator('#app[data-ready="true"]').waitFor();
@@ -451,7 +455,11 @@ test('Qesem Cave stays on screen', async ({ page }, testInfo) => {
   await page.waitForTimeout(1000);
   await expectPopupInside(page);
   await expectPopupClearOfControls(page);
-  if ((page.viewportSize()?.width ?? 0) <= 600) await expectSheetReadable(page, 'qesem-fire');
+  if (usesSheet(page)) {
+    await expect(page.locator('.event-sheet:not([hidden])')).toBeVisible();
+    await expect(page.locator('.maplibregl-popup')).toHaveCount(0);
+    await expectSheetReadable(page, 'qesem-fire');
+  }
   await shot(page, `${testInfo.project.name}_qesem`);
 });
 
@@ -469,7 +477,11 @@ test('Tiananmen stays on screen', async ({ page }, testInfo) => {
   await page.waitForTimeout(1000);
   await expectPopupInside(page);
   await expectPopupClearOfControls(page);
-  if ((page.viewportSize()?.width ?? 0) <= 600) await expectSheetReadable(page, 'tiananmen-1989');
+  if (usesSheet(page)) {
+    await expect(page.locator('.event-sheet:not([hidden])')).toBeVisible();
+    await expect(page.locator('.maplibregl-popup')).toHaveCount(0);
+    await expectSheetReadable(page, 'tiananmen-1989');
+  }
   await shot(page, `${testInfo.project.name}_tiananmen`);
 });
 
@@ -495,6 +507,103 @@ test('Trail of Tears and Sequoyah can both be reached', async ({ page }, testInf
   await trail.click();
   await expect(eventCard(page)).toContainText('Indian Removal');
   await shot(page, `${testInfo.project.name}_trail_sequoyah`);
+});
+
+test('zooming in on Antarctica in 1911 stays zoomed in', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'one viewport is enough to catch the pole lock');
+  await page.goto('/');
+  await page.locator('#app[data-ready="true"]').waitFor();
+  await openDate(page, '1911');
+  await page.evaluate(() => {
+    window.__historyMap.jumpTo({ center: [60, -72], zoom: 1.6 });
+  });
+  await waitForIdle(page);
+  for (let i = 0; i < 4; i += 1) {
+    await page.getByRole('button', { name: 'Zoom in' }).click();
+    await waitForIdle(page);
+  }
+  await expect.poll(() => zoomOf(page)).toBeGreaterThanOrEqual(5);
+  await page.waitForTimeout(800);
+  expect(await zoomOf(page)).toBeGreaterThanOrEqual(5);
+  await shot(page, `${testInfo.project.name}_1911_zoomed`);
+});
+
+test('Scott and Amundsen labels can both show', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'the pole labels are not a phone layout');
+  await page.goto('/');
+  await page.locator('#app[data-ready="true"]').waitFor();
+  await openDate(page, '1911');
+  await page.evaluate(() => {
+    window.__historyMap.jumpTo({ center: [0.15, -78], zoom: 2.2 });
+  });
+  await waitForIdle(page);
+  await expect(page.locator('.pin[data-id="scott-pole"] .pin-label')).toHaveClass(/is-on/);
+  await expect(page.locator('.pin[data-id="amundsen-pole"] .pin-label')).toHaveClass(/is-on/);
+});
+
+test('a desktop popup stays under the wordmark after zoom', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'desktop popups are the floating card');
+  await page.goto('/');
+  await page.locator('#app[data-ready="true"]').waitFor();
+  await openDate(page, '1066');
+  await centerOn(page, 'hastings');
+  await page.locator('.pin[data-id="hastings"]').click();
+  await expect(page.locator('#app')).toHaveAttribute('data-popup', 'in');
+  for (let i = 0; i < 3; i += 1) {
+    await page.getByRole('button', { name: 'Zoom in' }).click();
+    await waitForIdle(page);
+  }
+  await expectPopupClearOfControls(page);
+  const placed = await page.evaluate(() => {
+    const pin = document.querySelector('.pin[data-id="hastings"]')!.getBoundingClientRect();
+    const popup = document.querySelector('.maplibregl-popup')!.getBoundingClientRect();
+    const style = getComputedStyle(document.querySelector('.maplibregl-popup')!);
+    const near =
+      popup.top < pin.bottom + 36 &&
+      popup.bottom > pin.top - 36 &&
+      popup.left < pin.right + 80 &&
+      popup.right > pin.left - 80;
+    return {
+      near,
+      marginTop: Math.abs(parseFloat(style.marginTop) || 0),
+      marginLeft: Math.abs(parseFloat(style.marginLeft) || 0),
+    };
+  });
+  expect(placed.near).toBe(true);
+  expect(placed.marginTop).toBeLessThanOrEqual(48);
+  expect(placed.marginLeft).toBeLessThanOrEqual(48);
+});
+
+test('the sheet close button stays clear of zoom on a short phone', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'iphone', 'the short viewports reuse the phone browser');
+  for (const viewport of [
+    { width: 375, height: 553 },
+    { width: 320, height: 568 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/');
+    await page.locator('#app[data-ready="true"]').waitFor();
+    await openDate(page, '1405');
+    await centerOn(page, 'zheng-he', 2);
+    await page.locator('.pin[data-id="zheng-he"]').click();
+    await expect(page.locator('.event-sheet:not([hidden])')).toBeVisible();
+    await expect(page.locator('#app')).toHaveAttribute('data-popup', 'in');
+    await expectSheetReadable(page, `zheng-he-${viewport.width}`);
+    const hit = await page.evaluate(() => {
+      const close = document.querySelector('.sheet-close');
+      if (!close) return 'missing';
+      const rect = close.getBoundingClientRect();
+      const target = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+      return target?.closest('.sheet-close') ? 'sheet-close' : target?.id || target?.className || 'other';
+    });
+    expect(hit, `${viewport.width}x${viewport.height}`).toBe('sheet-close');
+    await expectPopupClearOfControls(page);
+    await shot(page, `${testInfo.project.name}_${viewport.width}x${viewport.height}_sheet`);
+    const before = await zoomOf(page);
+    await page.locator('.sheet-close').click();
+    await expect(page.locator('.event-sheet:not([hidden])')).toHaveCount(0);
+    expect(await zoomOf(page)).toBeGreaterThan(before - 0.05);
+  }
 });
 
 test('escape closes the popup and keeps the route', async ({ page }) => {
@@ -570,14 +679,21 @@ async function waitForIdle(page: Page) {
 async function routeVisibility(page: Page) {
   return page.evaluate(async () => {
     const map = window.__historyMap;
-    const card = document.querySelector('.event-sheet:not([hidden]), .maplibregl-popup')?.getBoundingClientRect();
     const width = window.innerWidth;
     const height = window.innerHeight;
-    const clear = (point: { x: number; y: number }) => {
-      const onMap = point.x >= 0 && point.y >= 0 && point.x <= width && point.y <= height;
-      const covered = !!card && point.x >= card.left && point.x <= card.right && point.y >= card.top && point.y <= card.bottom;
-      return onMap && !covered;
-    };
+    const obstacles = [
+      '.event-sheet:not([hidden])',
+      '.maplibregl-popup',
+      '.time',
+      '.zoom',
+      '.key-wrap',
+      '.maplibregl-ctrl-attrib',
+      '.wordmark',
+    ]
+      .map((selector) => document.querySelector(selector)?.getBoundingClientRect())
+      .filter((rect): rect is DOMRect => !!rect && rect.width > 2 && rect.height > 2);
+    const blocked = (point: { x: number; y: number }) =>
+      obstacles.some((rect) => point.x >= rect.left && point.x <= rect.right && point.y >= rect.top && point.y <= rect.bottom);
     const facingCamera = (coord: [number, number]) => {
       const projected = map.project(coord);
       if (!Number.isFinite(projected.x) || !Number.isFinite(projected.y)) return false;
@@ -585,37 +701,67 @@ async function routeVisibility(page: Page) {
       const lngDelta = Math.abs((((back.lng - coord[0]) % 360) + 540) % 360 - 180);
       return lngDelta < 1.5 && Math.abs(back.lat - coord[1]) < 1.5;
     };
+    const onScreen = (point: { x: number; y: number }) =>
+      point.x >= 0 && point.y >= 0 && point.x <= width && point.y <= height;
+    const rendered = (point: { x: number; y: number }, layer: string) =>
+      map.queryRenderedFeatures(
+        [
+          [point.x - 10, point.y - 10],
+          [point.x + 10, point.y + 10],
+        ],
+        { layers: [layer] },
+      ).length > 0;
+    const visiblePoint = (coord: [number, number], layer: string) => {
+      if (!facingCamera(coord)) return false;
+      const point = map.project(coord);
+      if (!onScreen(point) || blocked(point)) return false;
+      return rendered(point, layer);
+    };
+    const densify = (coordinates: [number, number][]) => {
+      const samples: [number, number][] = [];
+      if (coordinates.length === 0) return samples;
+      samples.push(coordinates[0]);
+      for (let index = 1; index < coordinates.length; index += 1) {
+        const start = coordinates[index - 1];
+        const end = coordinates[index];
+        const steps = Math.max(1, Math.ceil(Math.hypot(end[0] - start[0], end[1] - start[1]) / 1.5));
+        for (let step = 1; step <= steps; step += 1) {
+          const t = step / steps;
+          samples.push([start[0] + (end[0] - start[0]) * t, start[1] + (end[1] - start[1]) * t]);
+        }
+      }
+      return samples;
+    };
     const data = await map.getSource('migration').getData();
-    const samples: { x: number; y: number }[] = [];
-    const heads: { x: number; y: number }[] = [];
+    let total = 0;
+    let shown = 0;
+    let heads = 0;
+    let headsClear = 0;
     for (const feature of data.features ?? []) {
       const role = feature.properties?.role;
       const geometry = feature.geometry;
       if (role === 'line' && geometry?.type === 'LineString' && Array.isArray(geometry.coordinates)) {
-        const coordinates = geometry.coordinates as [number, number][];
-        const visible = coordinates.filter((coord) => facingCamera(coord));
-        const projected = visible.map((coord) => map.project(coord));
-        for (let index = 1; index < projected.length; index += 1) {
-          const start = projected[index - 1];
-          const end = projected[index];
-          const steps = Math.max(1, Math.ceil(Math.hypot(end.x - start.x, end.y - start.y) / 12));
-          for (let step = 0; step < steps; step += 1) {
-            const t = step / steps;
-            samples.push({ x: start.x + (end.x - start.x) * t, y: start.y + (end.y - start.y) * t });
-          }
+        for (const coord of densify(geometry.coordinates as [number, number][])) {
+          total += 1;
+          if (visiblePoint(coord, 'migration-line')) shown += 1;
         }
       }
       if (role === 'head' && geometry?.type === 'Point' && Array.isArray(geometry.coordinates)) {
-        const coord = geometry.coordinates as [number, number];
-        if (facingCamera(coord)) heads.push(map.project(coord));
+        heads += 1;
+        if (visiblePoint(geometry.coordinates as [number, number], 'migration-head')) headsClear += 1;
       }
     }
     return {
-      pct: samples.length === 0 ? 0 : samples.filter((point) => clear(point)).length / samples.length,
-      heads: heads.length,
-      headsClear: heads.filter((point) => clear(point)).length,
+      pct: total === 0 ? 0 : shown / total,
+      heads,
+      headsClear,
     };
   });
+}
+
+function usesSheet(page: Page): boolean {
+  const size = page.viewportSize();
+  return (size?.width ?? 1000) <= 600 || (size?.height ?? 1000) <= 500;
 }
 
 async function expectPopupClearOfControls(page: Page) {
@@ -623,7 +769,7 @@ async function expectPopupClearOfControls(page: Page) {
   const overlap = await page.evaluate(() => {
     const popup = document.querySelector('.event-sheet:not([hidden]), .maplibregl-popup')?.getBoundingClientRect();
     if (!popup) return ['missing popup'];
-      return ['.zoom', '.key-wrap', '.time', '.maplibregl-ctrl-attrib'].flatMap((selector) => {
+      return ['.zoom', '.key-wrap', '.time', '.maplibregl-ctrl-attrib', '.wordmark'].flatMap((selector) => {
       const control = document.querySelector(selector)?.getBoundingClientRect();
       if (!control || control.width < 2) return [];
       const hit =
@@ -681,27 +827,39 @@ async function expectSheetReadable(page: Page, id: string) {
     const sheet = document.querySelector<HTMLElement>('.event-sheet:not([hidden])');
     const body = sheet?.querySelector<HTMLElement>('.sheet-body');
     const title = sheet?.querySelector<HTMLElement>('.popup-title');
-    const note = sheet?.querySelector<HTMLElement>('.popup-note') ?? sheet?.querySelector<HTMLElement>('.popup-summary');
-    if (!sheet || !body || !title || !note) return null;
-    body.scrollTop = body.scrollHeight;
+    const summary = sheet?.querySelector<HTMLElement>('.popup-summary');
+    const note = sheet?.querySelector<HTMLElement>('.popup-note') ?? summary;
+    if (!sheet || !body || !title || !note || !summary) return null;
     const sheetRect = sheet.getBoundingClientRect();
+    const summaryRect = summary.getBoundingClientRect();
+    const summaryVisible = summaryRect.top >= sheetRect.top + 4 && summaryRect.top <= sheetRect.bottom - 8;
+    body.scrollTop = body.scrollHeight;
     const noteRect = note.getBoundingClientRect();
     const endVisible = noteRect.bottom <= sheetRect.bottom + 1 && noteRect.bottom > sheetRect.top + 4;
     body.scrollTop = 0;
     return {
+      left: sheetRect.left,
+      right: sheetRect.right,
       width: sheetRect.width,
       viewport: window.innerWidth,
       titleLines: title.getClientRects().length,
       bodyOverflow: getComputedStyle(body).overflowY,
       sheetOverflow: getComputedStyle(sheet).overflowY,
       noteVisible: endVisible,
+      summaryVisible,
       scrollHeight: body.scrollHeight,
       clientHeight: body.clientHeight,
     };
   });
   expect(info, id).not.toBeNull();
   if (!info) return;
-  expect(info.width, id).toBeGreaterThanOrEqual(info.viewport - 32);
+  const fullWidth = info.left <= 16 && info.right >= info.viewport - 16;
+  if (fullWidth) expect(info.width, id).toBeGreaterThanOrEqual(info.viewport - 32);
+  else {
+    expect(info.left, id).toBeLessThanOrEqual(16);
+    expect(info.width, id).toBeGreaterThanOrEqual(180);
+    expect(info.summaryVisible, id).toBe(true);
+  }
   expect(info.titleLines, id).toBeGreaterThan(0);
   expect(info.titleLines, id).toBeLessThanOrEqual(3);
   expect(info.bodyOverflow, id).toMatch(/auto|scroll/);
@@ -786,7 +944,7 @@ async function waitForPainted(page: Page) {
 
 async function shot(page: Page, fileName: string) {
   await waitForPainted(page);
-  await page.screenshot({ path: path.join(shots, `r4_${fileName}.png`) });
+  await page.screenshot({ path: path.join(shots, `r5_${fileName}.png`) });
   await expectNoBlackHole(page);
 }
 

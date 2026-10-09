@@ -54,21 +54,34 @@ describe('formatYearRange', () => {
     expect(formatEventDate(1066, 1066, 'The battle was in 1066.')).toBe('1066 CE');
   });
 
-  it('rounds deep-time display without changing the stored precision of later years', () => {
-    expect(formatEventDate(-298050, -298050, 'Approximate. Fossils.')).toBe('approx. 300,000 BCE');
+  it('rounds deep-time display to the nearest 500 years', () => {
+    expect(formatEventDate(-298050, -298050, 'Approximate. Fossils.')).toBe('approx. 298,000 BCE');
     expect(formatEventDate(-43550, -43550, 'Approximate. Occupation.')).toBe('approx. 43,500 BCE');
-    expect(formatEventDate(-298050, -297000, 'Approximate. A span.')).toBe('approx. 300,000 BCE');
+    expect(formatEventDate(-298050, -297000, 'Approximate. A span.')).toBe('approx. 298,000–297,000 BCE');
     expect(formatEventDate(-43550, -43000, 'Dated from the layer.')).toBe('43,500–43,000 BCE');
+    expect(formatEventDate(-753, -753, 'Traditional date.')).toBe('753 BCE');
+    expect(formatEventDate(1066, 1066, 'The battle was in 1066.')).toBe('1066 CE');
   });
 
-  it('keeps every displayed year inside the step that contains the stored year', () => {
+  it('shows Lascaux, Kimberley, Apollo 11 Cave, and Blombos on the card’s own scale', () => {
+    const shown = (id: string) => {
+      const event = events.find((item) => item.id === id)!;
+      return formatEventDate(event.start, event.end, event.dateNote);
+    };
+    expect(shown('lascaux')).toBe('approx. 15,000 BCE');
+    expect(shown('kimberley-rock-art')).toBe('approx. 10,000 BCE');
+    expect(shown('apollo-11-stones')).toBe('approx. 25,000–23,000 BCE');
+    expect(shown('blombos-symbols')).toBe('approx. 75,000–71,000 BCE');
+  });
+
+  it('keeps every displayed year within 500 years or 2 percent of the stored year', () => {
     events.forEach((event) => {
       for (const stored of [event.start, event.end]) {
         const shown = roundDisplayYear(stored);
-        const period = resolvePeriod(stored, PRESENT);
-        expect(shown, `${event.id} ${stored}`).toBeGreaterThanOrEqual(period.start);
-        expect(shown, `${event.id} ${stored}`).toBeLessThanOrEqual(period.end);
+        const bound = Math.max(500, Math.abs(stored) * 0.02);
+        expect(Math.abs(shown - stored), `${event.id} ${stored}`).toBeLessThanOrEqual(bound);
         expect(shown, event.id).not.toBe(0);
+        expect(Math.abs(shown - stored), `${event.id} ${stored}`).toBeLessThan(5000);
       }
     });
   });

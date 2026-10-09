@@ -176,7 +176,7 @@ describe('corrected routes and wording', () => {
   });
 
   it('keeps history in the text and leaves out the drawing', () => {
-    const banned = /\bthe line\b|\bthe arrow\b|\bschematic\b|\bpin\b/i;
+    const banned = /\bthe line\b|\bthe arrow\b|\bschematic\b|\bpin\b|marked separately|separate historical|\bseparately\b|elsewhere on/i;
     events.forEach((event) => {
       expect(event.summary, event.id).not.toMatch(banned);
       expect(event.dateNote, event.id).not.toMatch(banned);
@@ -184,6 +184,12 @@ describe('corrected routes and wording', () => {
     });
     const nazca = events.find((event) => event.id === 'nazca-lines')!;
     expect(nazca.dateNote).toMatch(/lines are widely dated/i);
+    const journey = events.find((event) => event.id === 'journey-to-the-west')!;
+    expect(journey.summary).toContain('Xuanzang made the real pilgrimage to India in the 7th century.');
+    const sundiata = events.find((event) => event.id === 'sundiata-epic')!;
+    expect(sundiata.summary).toContain('Sundiata founded Mali after the battle of Kirina, about 1235.');
+    const troy = events.find((event) => event.id === 'troy-bronze-age')!;
+    expect(troy.summary).toContain('Archaeology does not confirm the Homeric war.');
   });
 
   it('says the Australian parliament first sat in Melbourne', () => {

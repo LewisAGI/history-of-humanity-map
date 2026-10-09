@@ -81,7 +81,10 @@ html, body {
   gap: 8px;
 }
 
-.zoom.is-hidden {
+.zoom.is-hidden,
+.time.is-covered,
+.key-wrap.is-covered,
+.maplibregl-ctrl-bottom-right.is-covered {
   visibility: hidden;
   pointer-events: none;
 }
@@ -394,6 +397,8 @@ html, body {
 }
 
 .event-sheet[hidden] { display: none; }
+
+.event-sheet.is-covering { z-index: 6; }
 
 .sheet-body {
   overflow: auto;

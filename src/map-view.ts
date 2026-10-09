@@ -17,7 +17,7 @@ export interface MapView {
   zoomOut: () => void;
   getZoom: () => number;
   setEvents: (events: HistoryEvent[]) => void;
-  setSelected: (event: HistoryEvent | null, options?: { keepRoute?: boolean }) => void;
+  setSelected: (event: HistoryEvent | null, options?: { keepRoute?: boolean; framePoles?: boolean }) => void;
   onSelect: (handler: (event: HistoryEvent | null) => void) => void;
   onPopupClose: (handler: () => void) => void;
   onMove: (handler: () => void) => void;
@@ -162,6 +162,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       restoreKey();
       restoreAttribution();
       restoreZoom();
+      restoreCoveredChrome();
       return;
     }
     openPopup(event);
@@ -191,14 +192,16 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     root.dataset.ready = 'true';
   }
 
-  function setSelected(event: HistoryEvent | null, options?: { keepRoute?: boolean }) {
+  function setSelected(event: HistoryEvent | null, options?: { keepRoute?: boolean; framePoles?: boolean }) {
     selectedId = event?.id ?? null;
     userCamera = false;
     markers.forEach((pin) => pin.element.classList.toggle('is-selected', pin.event.id === selectedId));
     if (event) drawArrow(event);
     else if (!options?.keepRoute) drawArrow(null);
     openPopup(event);
-    if (!event) clearFramePadding();
+    if (!event) {
+      if (!(options?.framePoles && framePoles())) clearFramePadding();
+    }
     const framed = event ? frameSelection(event) : false;
     if (framed) map.once('moveend', () => finishPopup());
     else requestAnimationFrame(() => finishPopup());
@@ -321,6 +324,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     restoreKey();
     restoreAttribution();
     restoreZoom();
+    restoreCoveredChrome();
     if (!event) return;
     if (useSheet()) {
       showSheet(event);
@@ -406,7 +410,9 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     const key = visibleRect(document.querySelector('.key-wrap'));
     const attrib = visibleRect(document.querySelector('.maplibregl-ctrl-attrib'));
     const top = Math.round((wordmark ? wordmark.bottom : 40) + gap);
+    sheet.classList.remove('is-covering');
     if (side) {
+      restoreCoveredChrome();
       const floors = [time?.top].filter((value): value is number => value != null);
       const controlTop = floors.length > 0 ? Math.min(...floors) : window.innerHeight - 128;
       const bottomEdge = Math.round(controlTop - gap);
@@ -422,6 +428,24 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       sheet.style.maxHeight = `${height}px`;
       return;
     }
+    if (coversChrome()) {
+      sheet.classList.add('is-covering');
+      hideCoveredChrome();
+      const bottom = margin;
+      const available = window.innerHeight - bottom - top;
+      const maxHeight = Math.min(window.innerHeight * 0.4, Math.max(1, available));
+      sheet.style.left = `${margin}px`;
+      sheet.style.right = `${margin}px`;
+      sheet.style.top = 'auto';
+      sheet.style.bottom = `${bottom}px`;
+      sheet.style.width = 'auto';
+      sheet.style.height = 'auto';
+      sheet.style.maxWidth = 'none';
+      sheet.style.maxHeight = `${Math.floor(maxHeight)}px`;
+      raiseZoomAboveSheet();
+      return;
+    }
+    restoreCoveredChrome();
     const floors = [time?.top, key?.top, attrib?.top].filter((value): value is number => value != null);
     const controlTop = floors.length > 0 ? Math.min(...floors) : window.innerHeight - 128;
     const bottom = Math.max(margin, window.innerHeight - controlTop + gap);
@@ -491,13 +515,26 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     zoomEl.style.transform = '';
   }
 
+  /** Short portrait sheets sit on the bottom chrome, the way zoom is hidden. */
+  function hideCoveredChrome() {
+    document.querySelector('.time')?.classList.add('is-covered');
+    document.querySelector('.key-wrap')?.classList.add('is-covered');
+    document.querySelector('.maplibregl-ctrl-bottom-right')?.classList.add('is-covered');
+  }
+
+  function restoreCoveredChrome() {
+    document.querySelector('.time')?.classList.remove('is-covered');
+    document.querySelector('.key-wrap')?.classList.remove('is-covered');
+    document.querySelector('.maplibregl-ctrl-bottom-right')?.classList.remove('is-covered');
+  }
+
   /** A bottom sheet on a short portrait phone runs through the zoom column. Lift it clear. */
   function raiseZoomAboveSheet() {
     const zoomEl = document.querySelector<HTMLElement>('.zoom');
     const sheetBox = visibleRect(sheet);
     if (!zoomEl || !sheetBox) return;
     const zoom = zoomEl.getBoundingClientRect();
-    const overlaps = zoom.top < sheetBox.bottom - 4 && zoom.bottom > sheetBox.top + 4;
+    const overlaps = zoom.top < sheetBox.bottom - 1 && zoom.bottom > sheetBox.top - 1;
     if (!overlaps || zoom.height < 2) return;
     const wordmark = visibleRect(document.querySelector('.wordmark'));
     const topLimit = (wordmark ? wordmark.bottom : 40) + 8;
@@ -601,14 +638,29 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
    * lands on the padding centre instead of a hundred pixels toward the sheet.
    */
   function framePoint(event: HistoryEvent): boolean {
-    const padding = framePadding();
-    const minZoom = map.getMinZoom();
     const polar = Math.abs(event.lat) >= 80;
+    const padding = polar ? liftPole(framePadding()) : framePadding();
+    const minZoom = map.getMinZoom();
     map.easeTo({
       center: [wrapLng(event.lng), polar ? event.lat : clampCenterLat(event.lat)],
       zoom: polar ? minZoom : Math.max(minZoom, map.getZoom()),
       padding,
       duration: 500,
+    });
+    return true;
+  }
+
+  /** One ease that puts every pole pin above the time bar. */
+  function framePoles(): boolean {
+    const poles = markers.filter((pin) => Math.abs(pin.event.lat) >= 80);
+    if (poles.length === 0) return false;
+    const lat = poles.reduce((sum, pin) => sum + pin.event.lat, 0) / poles.length;
+    const lng = poles.reduce((sum, pin) => sum + pin.at.lng, 0) / poles.length;
+    map.easeTo({
+      center: [wrapLng(lng), lat],
+      zoom: map.getMinZoom(),
+      padding: liftPole(framePadding()),
+      duration: 700,
     });
     return true;
   }
@@ -624,15 +676,20 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     const maxLat = Math.max(...lats);
     const span = Math.max(maxLng - minLng, maxLat - minLat);
     if (span <= 2) return framePoint(event);
-    const padding = framePadding();
     const midLat = (minLat + maxLat) / 2;
-    if (useSheet() && Math.abs(midLat) > 60 && maxLng <= 180 && minLng >= -180) {
+    const antimeridian = maxLng > 180 || minLng < -180;
+    const heads = routeLines(event.path).map((line) => line[line.length - 1].lat);
+    const southernHead = heads.some((lat) => lat <= minLat + 8);
+    // A southern arrowhead needs a deeper inset, except on a short portrait
+    // where that inset pushes Beringia off the top of the free band.
+    const padding = framePadding(antimeridian && southernHead && !coversChrome() ? 80 : 20);
+    if (!antimeridian && Math.abs(midLat) > 60) {
       const shrunk = (maxLng - minLng) * Math.cos((Math.abs(midLat) * Math.PI) / 180);
       // Sit the camera on the poleward end so its arrowhead is the padding centre.
-      // A midpoint at this latitude leaves that head above the screen.
+      // Keeping the user's zoom leaves that head above the screen.
       const centerLat = Math.max(-82, Math.min(82, midLat > 0 ? maxLat : minLat));
       const polar = Math.log2(Math.max(0.2, Math.cos((Math.abs(centerLat) * Math.PI) / 180)));
-      const fitted = zoomForSpan(Math.max(shrunk, 6), Math.max(maxLat - minLat, 4), padding, 2.2);
+      const fitted = zoomForSpan(Math.max(shrunk, 6), Math.max(maxLat - minLat, 4), padding, 2.2, false);
       map.easeTo({
         center: [wrapLng((minLng + maxLng) / 2), centerLat],
         zoom: Math.max(map.getMinZoom(), Math.min(1.35, fitted + polar)),
@@ -641,38 +698,41 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       });
       return true;
     }
-    if (maxLng > 180 || minLng < -180) {
+    if (antimeridian) {
       const centerLng = ((((minLng + maxLng) / 2 + 540) % 360) + 360) % 360 - 180;
-      const centerLat = Math.max(-70, Math.min(70, (minLat + maxLat) / 2));
-      // A southern arrowhead needs the extra bottom inset. Other crossings,
-      // such as Cook, lose their northern half off the top of a short phone if
-      // the vanishing point sits that high.
-      const heads = routeLines(event.path).map((line) => line[line.length - 1].lat);
-      const southernHead = heads.some((lat) => lat <= minLat + 8);
-      const fitted = framePadding(southernHead ? 80 : 16);
+      const centerLat = Math.max(-70, Math.min(70, midLat));
       map.easeTo({
         center: [centerLng, centerLat],
-        zoom: zoomForSpan(maxLng - minLng, maxLat - minLat, fitted, useSheet() ? 1.35 : 3.2),
+        zoom: zoomForSpan(maxLng - minLng, maxLat - minLat, padding, useSheet() ? 1.35 : 3.2),
         duration: 800,
-        padding: fitted,
-      });
-      return true;
-    }
-    const sheetBox = sheet.hidden ? null : visibleRect(sheet);
-    if (sheetBox) {
-      map.easeTo({
-        center: [wrapLng((minLng + maxLng) / 2), Math.max(-70, Math.min(70, midLat))],
-        zoom: zoomForSpan(maxLng - minLng, maxLat - minLat, padding, 2.2),
         padding,
-        duration: 600,
       });
       return true;
     }
-    // easeTo keeps the padding on this one move. fitBounds bakes padding into
-    // the centre and then drops it, so a later route inherits a stale inset.
+    // One ease onto the route bounds. cameraForBounds with absolute padding
+    // returns a centre that already sits in that inset; easeTo stores the inset.
+    const camera = map.cameraForBounds(
+      [
+        [minLng, minLat],
+        [maxLng, maxLat],
+      ],
+      { padding, absolutePadding: true, maxZoom: useSheet() ? 2.4 : 2.15 },
+    );
+    if (camera?.center && camera.zoom != null) {
+      // A haircut keeps arrowheads inside the padded view when the globe
+      // bends a fitted corner outward.
+      const haircut = coversChrome() ? 0.18 : 0;
+      map.easeTo({
+        center: camera.center,
+        zoom: Math.max(map.getMinZoom(), camera.zoom - haircut),
+        padding,
+        duration: 800,
+      });
+      return true;
+    }
     map.easeTo({
       center: [wrapLng((minLng + maxLng) / 2), Math.max(-70, Math.min(70, midLat))],
-      zoom: zoomForSpan(maxLng - minLng, maxLat - minLat, padding, useSheet() ? 2.4 : 3.2),
+      zoom: Math.max(map.getMinZoom(), map.getZoom()),
       padding,
       duration: 800,
     });
@@ -780,8 +840,10 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   }
 
   function framePadding(bottomExtra = 64): { top: number; bottom: number; left: number; right: number } {
-    const zoom = visibleRect(document.querySelector('.zoom'));
-    const time = visibleRect(document.querySelector('.time'));
+    const zoomEl = document.querySelector('.zoom');
+    const zoom = zoomEl?.classList.contains('is-hidden') ? null : visibleRect(zoomEl);
+    const timeEl = document.querySelector('.time');
+    const time = timeEl?.classList.contains('is-covered') ? null : visibleRect(timeEl);
     const wordmark = visibleRect(document.querySelector('.wordmark'));
     const sheetBox = sheet.hidden ? null : visibleRect(sheet);
     const top = Math.max(56, (wordmark ? wordmark.bottom : 40) + 16);
@@ -797,14 +859,17 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       }
       return {
         top,
-        left: 24,
-        right: (zoom?.width ?? 44) + 24,
-        // Extra inset so an arrowhead on the padding edge clears the sheet.
+        // The globe draws a fitted edge a little outside the mercator box, so the
+        // inset has to clear the zoom column and the screen edge, not just the box.
+        left: 48,
+        right: (zoom?.width ?? 44) + 56,
         bottom: Math.max(16, window.innerHeight - sheetBox.top + bottomExtra),
       };
     }
+    const popupBox = popup ? visibleRect(popup.getElement()) : null;
+    const cardColumn = popupBox && popupBox.width > 40 ? popupBox.width + 48 : 340;
     const bottom = time ? Math.max(150, window.innerHeight - time.top + 24) : 150;
-    return { top: 72, bottom, left: 48, right: 72 };
+    return { top: 72, bottom, left: 48, right: Math.max(72, cardColumn) };
   }
 
   function zoomForSpan(
@@ -812,6 +877,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     latSpan: number,
     padding: { top: number; bottom: number; left: number; right: number },
     cap = 3.2,
+    floor = true,
   ): number {
     const width = Math.max(64, map.getContainer().clientWidth - padding.left - padding.right);
     const height = Math.max(64, map.getContainer().clientHeight - padding.top - padding.bottom);
@@ -819,8 +885,28 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     const zoomLng = Math.log2((width * 360) / (Math.max(lngSpan, 1) * world));
     const zoomLat = Math.log2((height * 160) / (Math.max(latSpan, 1) * world));
     let zoom = Math.min(cap, zoomLng, zoomLat);
-    if (!useSheet()) zoom = Math.max(1.75, zoom);
+    if (floor && !useSheet()) zoom = Math.max(1.75, zoom);
     return Math.max(map.getMinZoom(), zoom);
+  }
+
+  /**
+   * The pole is drawn at the padding centre. Raise the bottom inset until that
+   * point, and the pin under it, sit above the time bar.
+   */
+  function liftPole(padding: { top: number; bottom: number; left: number; right: number }) {
+    const timeEl = document.querySelector('.time');
+    if (timeEl?.classList.contains('is-covered')) return padding;
+    const time = visibleRect(timeEl ?? null);
+    if (!time) return padding;
+    const pinReach = 22;
+    const target = time.top - 4 - pinReach;
+    const focal = padding.top + (window.innerHeight - padding.top - padding.bottom) / 2;
+    if (focal + pinReach <= time.top - 4) return padding;
+    if (target <= padding.top + 8) {
+      return { ...padding, bottom: Math.max(padding.bottom, window.innerHeight - padding.top - 16) };
+    }
+    const bottom = window.innerHeight - padding.top - 2 * (target - padding.top);
+    return { ...padding, bottom: Math.max(padding.bottom, bottom) };
   }
 
   function layoutPinOffsets() {
@@ -891,10 +977,15 @@ interface BoxLimits {
   bottom: number;
 }
 
-/** Portrait always uses the bottom sheet. Short landscape uses the side sheet. */
+/** Portrait always uses the bottom sheet. Landscape up to 800 tall and 1366 wide uses the side sheet. */
 function useSheet(): boolean {
   if (window.innerHeight > window.innerWidth) return true;
-  return window.innerHeight <= 620;
+  return window.innerHeight <= 800 && window.innerWidth <= 1366;
+}
+
+/** On a short portrait the open sheet covers the time row, key, and attribution. */
+function coversChrome(): boolean {
+  return window.innerHeight > window.innerWidth && window.innerHeight <= 670;
 }
 
 function clampCenterLat(lat: number): number {
@@ -958,9 +1049,11 @@ function boxInside(rect: DOMRect, limits: BoxLimits): boolean {
 }
 
 function hitsControls(rect: DOMRect): boolean {
-  return ['.zoom', '.key-wrap', '.time', '.wordmark'].some((selector) => {
+  const covering = !!document.querySelector('.event-sheet.is-covering');
+  const selectors = covering ? ['.zoom', '.wordmark'] : ['.zoom', '.key-wrap', '.time', '.wordmark'];
+  return selectors.some((selector) => {
     const element = document.querySelector(selector);
-    if (element?.classList.contains('is-hidden')) return false;
+    if (!element || element.classList.contains('is-hidden') || element.classList.contains('is-covered')) return false;
     const control = visibleRect(element);
     if (!control || control.bottom < 0) return false;
     return rect.left < control.right && rect.right > control.left && rect.top < control.bottom && rect.bottom > control.top;

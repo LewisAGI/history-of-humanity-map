@@ -148,10 +148,10 @@ function applyPeriod(next: Period) {
   memory[next.era] = next;
   selected = null;
   retainRoute = false;
-  render();
+  render({ framePoles: true });
 }
 
-function render() {
+function render(options?: { framePoles?: boolean }) {
   const inEra = periodsForEra(period.era, present);
   const visible = events.filter((event) => eventOverlapsPeriod(event, period));
   if (selected && !visible.some((event) => event.id === selected?.id)) selected = null;
@@ -175,8 +175,9 @@ function render() {
 
   const keepRoute = retainRoute && selected === null;
   retainRoute = false;
+  const framePoles = !!options?.framePoles && selected === null && visible.some((event) => Math.abs(event.lat) >= 80);
   mapView.setEvents(visible);
-  mapView.setSelected(selected, { keepRoute });
+  mapView.setSelected(selected, { keepRoute, framePoles });
 }
 
 function togglePopout(panel: HTMLElement, button: HTMLElement) {

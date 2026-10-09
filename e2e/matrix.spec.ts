@@ -22,6 +22,8 @@ const VIEWPORTS = [
   { width: 844, height: 390 },
   { width: 932, height: 430 },
   { width: 1024, height: 600 },
+  { width: 1280, height: 720 },
+  { width: 1366, height: 768 },
   { width: 1440, height: 900 },
 ];
 
@@ -132,14 +134,31 @@ for (const viewport of VIEWPORTS) {
       });
     });
     const failures: string[] = [];
+    const report: Record<string, unknown>[] = [];
     let black: number | null = null;
     try {
     for (const route of ROUTES) {
       await show(page, route.date, route.id);
       const vis = await routeVisibility(page);
       const card = await cardState(page);
-      if (vis.pct < 0.5 || vis.heads < 1 || vis.headsClear !== vis.heads) {
-        failures.push(`${route.id} ${Math.round(vis.pct * 100)}% heads ${vis.headsClear}/${vis.heads} ${vis.headMiss}`);
+      const nearPct = vis.near === 0 ? 0 : vis.shown / vis.near;
+      report.push({
+        id: route.id,
+        nearPct: Math.round(nearPct * 1000) / 1000,
+        shown: vis.shown,
+        near: vis.near,
+        off: vis.off,
+        far: vis.far,
+        cover: vis.cover,
+        heads: `${vis.headsClear}/${vis.heads}`,
+        headMiss: vis.headMiss,
+      });
+      // 0.9 of the near-side samples. Off-screen and far-side are counted apart.
+      // Cook may miss only where the globe faces away; an off-screen or covered sample is framing.
+      if (nearPct < 0.9 || vis.heads < 1 || vis.headsClear !== vis.heads) {
+        failures.push(
+          `${route.id} near ${Math.round(nearPct * 100)}% shown ${vis.shown}/${vis.near} off ${vis.off} far ${vis.far} cover ${vis.cover} heads ${vis.headsClear}/${vis.heads} ${vis.headMiss}`,
+        );
       }
       if (!card.inside) failures.push(`${route.id} card outside`);
       if (!card.closeOk) failures.push(`${route.id} close ${card.closeWidth}x${card.closeHeight}`);
@@ -147,21 +166,22 @@ for (const viewport of VIEWPORTS) {
         failures.push(`${route.id} mode ${card.mode}`);
       }
       if (black === null) black = await blackEdge(page);
-      if (['atlantic-slave-trade', 'zheng-he', 'cook-pacific'].includes(route.id)) {
-        const name = `${viewport.width}x${viewport.height}`;
-        if (
-          (name === '360x640' || name === '375x553') &&
-          ['atlantic-slave-trade', 'zheng-he', 'cook-pacific'].includes(route.id)
-        ) {
-          await page.screenshot({ path: path.join(shots, `r6_${name}_${route.id}.png`) });
+      const name = `${viewport.width}x${viewport.height}`;
+      if (testInfo.project.name === 'matrix-chromium') {
+        if (route.id === 'peopling-of-the-americas' && (name === '320x568' || name === '360x640')) {
+          await page.screenshot({ path: path.join(shots, `r7_${name}_${route.id}.png`) });
         }
-        if (name === '844x390' && route.id === 'cook-pacific') {
-          await page.screenshot({ path: path.join(shots, 'r6_844x390_cook-pacific.png') });
+        if (route.id === 'thule-migration' && name === '1280x720') {
+          await page.screenshot({ path: path.join(shots, `r7_${name}_${route.id}.png`) });
         }
       }
     }
     for (const pin of PINS) {
       await openDate(page, pin.date);
+      if (pin.id === 'scott-pole' || pin.id === 'amundsen-pole') {
+        const period = await pinState(page, pin.id);
+        if (!period.clear) failures.push(`${pin.id} period frame ${period.reason}`);
+      }
       await page.evaluate((id) => new Promise<void>((resolve) => {
         const marker = document.querySelector<HTMLElement>(`.pin[data-id="${id}"]`);
         if (!marker) throw new Error(`missing pin ${id}`);
@@ -198,7 +218,7 @@ for (const viewport of VIEWPORTS) {
     }
     } finally {
       const label = `${testInfo.project.name} ${viewport.width}x${viewport.height}`;
-      fs.appendFileSync('/tmp/matrix-report.jsonl', `${JSON.stringify({ label, failures, black })}\n`);
+      fs.appendFileSync('/tmp/matrix-report.jsonl', `${JSON.stringify({ label, failures, black, report })}\n`);
     }
     expect(black ?? 0, 'black edge').toBeLessThan(64);
     expect(failures, `${testInfo.project.name} ${viewport.width}x${viewport.height}`).toEqual([]);
@@ -218,7 +238,9 @@ test('rotation switches between the bottom sheet and the side sheet', async ({ p
   const landscape = await cardState(page);
   expect(landscape.mode).toBe('side');
   const vis = await routeVisibility(page);
-  expect(vis.pct).toBeGreaterThanOrEqual(0.5);
+  const nearPct = vis.near === 0 ? 0 : vis.shown / vis.near;
+  expect(nearPct).toBeGreaterThanOrEqual(0.9);
+  expect(vis.off).toBe(0);
   expect(vis.headsClear).toBe(vis.heads);
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.waitForTimeout(1200);
@@ -236,22 +258,28 @@ async function show(page: Page, date: string, id: string) {
       zoom: 3,
     });
   }, id);
-  await page.locator(`.pin[data-id="${id}"]`).click({ force: true });
+  await page.locator(`.pin[data-id="${id}"]`).evaluate((element: HTMLElement) => element.click());
   await expect(page.locator('#app')).toHaveAttribute('data-arrow', id);
   await expect(page.locator('#app')).toHaveAttribute('data-popup', 'in');
   await page.waitForFunction(() => !window.__historyMap.isMoving(), undefined, { timeout: 8_000 });
 }
 
 async function openDate(page: Page, value: string) {
-  if (await page.locator('#date-popout').isHidden()) await page.locator('#period-button').click();
-  await page.locator('#date-input').fill(value);
-  await page.locator('#date-popout').evaluate((form: HTMLFormElement) => form.requestSubmit());
+  await page.evaluate((next) => {
+    const form = document.querySelector<HTMLFormElement>('#date-popout');
+    const input = document.querySelector<HTMLInputElement>('#date-input');
+    if (!form || !input) throw new Error('missing date form');
+    form.hidden = false;
+    input.value = next;
+    form.requestSubmit();
+  }, value);
   await page.locator('#app[data-ready="true"]').waitFor();
+  await page.waitForFunction(() => !window.__historyMap.isMoving(), undefined, { timeout: 8_000 });
 }
 
 function expectedMode(width: number, height: number): 'bottom' | 'side' | 'popup' {
   if (height > width) return 'bottom';
-  if (height <= 620) return 'side';
+  if (height <= 800 && width <= 1366) return 'side';
   return 'popup';
 }
 
@@ -263,10 +291,15 @@ async function cardState(page: Page) {
     if (!card) return { inside: false, closeOk: false, closeWidth: 0, closeHeight: 0, mode: 'none' };
     const rect = card.getBoundingClientRect();
     const inside = rect.left >= -1 && rect.top >= -1 && rect.right <= window.innerWidth + 1 && rect.bottom <= window.innerHeight + 1 && rect.width > 2;
-    const controls = ['.zoom', '.key-wrap', '.time', '.maplibregl-ctrl-attrib', '.wordmark'];
+    const covering = !!document.querySelector('.event-sheet.is-covering');
+    const controls = covering
+      ? ['.zoom', '.wordmark']
+      : ['.zoom', '.key-wrap', '.time', '.maplibregl-ctrl-attrib', '.wordmark'];
     for (const selector of controls) {
-      const control = document.querySelector(selector)?.getBoundingClientRect();
-      if (!control || control.width < 2 || control.height < 2 || control.bottom < 0) continue;
+      const element = document.querySelector(selector);
+      if (!element || element.classList.contains('is-hidden') || element.classList.contains('is-covered') || element.closest('.is-covered, .is-hidden')) continue;
+      const control = element.getBoundingClientRect();
+      if (control.width < 2 || control.height < 2 || control.bottom < 0) continue;
       const hit = rect.left < control.right && rect.right > control.left && rect.top < control.bottom && rect.bottom > control.top;
       if (hit) return { inside: false, closeOk: false, closeWidth: 0, closeHeight: 0, mode: selector };
     }
@@ -306,8 +339,10 @@ async function pinState(page: Page, id: string) {
     }
     const obstacles = ['.event-sheet:not([hidden])', '.maplibregl-popup', '.time', '.zoom', '.key-wrap', '.maplibregl-ctrl-attrib', '.wordmark'];
     for (const selector of obstacles) {
-      const control = document.querySelector(selector)?.getBoundingClientRect();
-      if (!control || control.width < 2 || control.height < 2) continue;
+      const element = document.querySelector(selector);
+      if (!element || element.classList.contains('is-hidden') || element.classList.contains('is-covered') || element.closest('.is-covered, .is-hidden')) continue;
+      const control = element.getBoundingClientRect();
+      if (control.width < 2 || control.height < 2 || control.bottom <= 0) continue;
       const hit = rect.left < control.right && rect.right > control.left && rect.top < control.bottom && rect.bottom > control.top;
       if (hit) return { clear: false, reason: selector };
     }
@@ -321,8 +356,13 @@ async function routeVisibility(page: Page) {
     const width = window.innerWidth;
     const height = window.innerHeight;
     const obstacles = ['.event-sheet:not([hidden])', '.maplibregl-popup', '.time', '.zoom', '.key-wrap', '.maplibregl-ctrl-attrib', '.wordmark']
-      .map((selector) => document.querySelector(selector)?.getBoundingClientRect())
-      .filter((rect): rect is DOMRect => !!rect && rect.width > 2 && rect.height > 2 && rect.bottom > 0 && rect.top < height);
+      .flatMap((selector) => {
+        const element = document.querySelector(selector);
+        if (!element || element.classList.contains('is-hidden') || element.classList.contains('is-covered') || element.closest('.is-covered, .is-hidden')) return [];
+        const rect = element.getBoundingClientRect();
+        if (rect.width <= 2 || rect.height <= 2 || rect.bottom <= 0 || rect.top >= height) return [];
+        return [rect];
+      });
     const blocked = (point: { x: number; y: number }) =>
       obstacles.some((rect) => point.x >= rect.left && point.x <= rect.right && point.y >= rect.top && point.y <= rect.bottom);
     const facingCamera = (coord: [number, number]) => {
@@ -362,6 +402,9 @@ async function routeVisibility(page: Page) {
     const data = await map.getSource('migration').getData();
     let total = 0;
     let shown = 0;
+    let far = 0;
+    let off = 0;
+    let cover = 0;
     let heads = 0;
     let headsClear = 0;
     let headMiss = '';
@@ -371,7 +414,11 @@ async function routeVisibility(page: Page) {
       if (role === 'line' && geometry?.type === 'LineString' && Array.isArray(geometry.coordinates)) {
         for (const coord of densify(geometry.coordinates as [number, number][])) {
           total += 1;
-          if (!miss(coord, 'migration-line')) shown += 1;
+          const why = miss(coord, 'migration-line');
+          if (!why) shown += 1;
+          else if (why === 'far') far += 1;
+          else if (why === 'off') off += 1;
+          else if (why.startsWith('cover')) cover += 1;
         }
       }
       if (role === 'head' && geometry?.type === 'Point' && Array.isArray(geometry.coordinates)) {
@@ -381,7 +428,8 @@ async function routeVisibility(page: Page) {
         else headMiss = why;
       }
     }
-    return { pct: total === 0 ? 0 : shown / total, heads, headsClear, headMiss };
+    const near = total - far;
+    return { pct: total === 0 ? 0 : shown / total, shown, near, far, off, cover, heads, headsClear, headMiss };
   });
 }
 

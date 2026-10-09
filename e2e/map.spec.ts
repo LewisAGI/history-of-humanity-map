@@ -793,7 +793,7 @@ function usesSheet(page: Page): boolean {
   const width = size?.width ?? 1000;
   const height = size?.height ?? 1000;
   if (height > width) return true;
-  return height <= 620;
+  return height <= 800 && width <= 1366;
 }
 
 async function expectPopupClearOfControls(page: Page) {
@@ -801,9 +801,15 @@ async function expectPopupClearOfControls(page: Page) {
   const overlap = await page.evaluate(() => {
     const popup = document.querySelector('.event-sheet:not([hidden]), .maplibregl-popup')?.getBoundingClientRect();
     if (!popup) return ['missing popup'];
-      return ['.zoom', '.key-wrap', '.time', '.maplibregl-ctrl-attrib', '.wordmark'].flatMap((selector) => {
-      const control = document.querySelector(selector)?.getBoundingClientRect();
-      if (!control || control.width < 2) return [];
+      const covering = !!document.querySelector('.event-sheet.is-covering');
+      const selectors = covering
+        ? ['.zoom', '.wordmark']
+        : ['.zoom', '.key-wrap', '.time', '.maplibregl-ctrl-attrib', '.wordmark'];
+      return selectors.flatMap((selector) => {
+      const element = document.querySelector(selector);
+      if (!element || element.classList.contains('is-hidden') || element.classList.contains('is-covered') || element.closest('.is-covered, .is-hidden')) return [];
+      const control = element.getBoundingClientRect();
+      if (control.width < 2 || control.bottom < 0) return [];
       const hit =
         popup.left < control.right && popup.right > control.left && popup.top < control.bottom && popup.bottom > control.top;
       return hit ? [selector] : [];

@@ -709,6 +709,18 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       });
       return true;
     }
+    // Tall portrait and the side sheet already fit with the span zoom. A small
+    // haircut pulls an arrowhead that would sit on the screen edge back inside.
+    if (useSheet() && !coversChrome()) {
+      const fitted = zoomForSpan(maxLng - minLng, maxLat - minLat, padding, 2.2);
+      map.easeTo({
+        center: [wrapLng((minLng + maxLng) / 2), Math.max(-70, Math.min(70, midLat))],
+        zoom: Math.max(map.getMinZoom(), fitted - 0.1),
+        padding,
+        duration: 800,
+      });
+      return true;
+    }
     // One ease onto the route bounds. cameraForBounds with absolute padding
     // returns a centre that already sits in that inset; easeTo stores the inset.
     const camera = map.cameraForBounds(
@@ -853,7 +865,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
         return {
           top,
           left: sheetBox.right + 16,
-          right: (zoom?.width ?? 44) + 24,
+          right: (zoom?.width ?? 44) + 56,
           bottom: time ? Math.max(16, window.innerHeight - time.top + 16) : 120,
         };
       }
@@ -867,9 +879,9 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       };
     }
     const popupBox = popup ? visibleRect(popup.getElement()) : null;
-    const cardColumn = popupBox && popupBox.width > 40 ? popupBox.width + 48 : 340;
+    const right = popupBox && popupBox.width > 40 ? popupBox.width + 48 : 72;
     const bottom = time ? Math.max(150, window.innerHeight - time.top + 24) : 150;
-    return { top: 72, bottom, left: 48, right: Math.max(72, cardColumn) };
+    return { top: 72, bottom, left: 48, right };
   }
 
   function zoomForSpan(

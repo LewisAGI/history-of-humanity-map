@@ -118,8 +118,8 @@ test('timeline, globe, pins, and labels', async ({ page }, testInfo) => {
 
   await page.getByRole('button', { name: 'Key' }).click();
   await expect(page.locator('#key-panel')).toBeVisible();
-  await expect(page.locator('#key-panel')).toContainText('History');
-  await expect(page.locator('#key-panel')).toContainText('Myth');
+  await expect(page.locator('#key-panel [data-kind="history"]')).toHaveAttribute('aria-label', 'History');
+  await expect(page.locator('#key-panel [data-kind="myth"]')).toHaveAttribute('aria-label', 'Myth');
   await shot(page, `${name}_key_open`);
   await page.getByRole('button', { name: 'Key' }).click();
   await expect(page.locator('#key-panel')).toBeHidden();
@@ -661,6 +661,143 @@ test('every migration route draws a line', async ({ page }) => {
   }
 });
 
+test('glass scrubber plays, labels the thumb, and opens the key', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'style checks run once');
+  test.setTimeout(120_000);
+  await page.goto('/');
+  await page.locator('#app[data-ready="true"]').waitFor();
+
+  await page.getByRole('button', { name: 'Switch era' }).click();
+  await page.getByRole('button', { name: 'Before civilisation' }).click();
+  await expect.poll(() => page.locator('.tick').count()).toBeGreaterThan(10);
+  const beforeTicks = await page.locator('.tick').count();
+  await page.getByRole('button', { name: 'Switch era' }).click();
+  await page.getByRole('button', { name: 'After civilisation' }).click();
+  await expect.poll(() => page.locator('.tick').count()).toBeGreaterThan(beforeTicks);
+
+  await openDate(page, '1405');
+  await expect(page.locator('#period-button')).toHaveText('1400–1449 CE');
+  const thumbGap = await page.evaluate(() => {
+    const label = document.querySelector('#period-button')!.getBoundingClientRect();
+    const slider = document.querySelector('#slider') as HTMLInputElement;
+    const track = slider.getBoundingClientRect();
+    const ratio = Number(slider.max) <= 0 ? 0 : Number(slider.value) / Number(slider.max);
+    const thumb = track.left + ratio * track.width;
+    return Math.abs(thumb - (label.left + label.width / 2));
+  });
+  expect(thumbGap).toBeLessThan(28);
+
+  await page.locator('#date-button').click();
+  await expect(page.locator('#date-popout')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.locator('#date-popout')).toBeHidden();
+  await page.locator('#date-button').click();
+  await expect(page.locator('#date-popout')).toBeVisible();
+  const empty = await canvasPoint(page);
+  await page.locator('#map canvas').click({ position: empty });
+  await expect(page.locator('#date-popout')).toBeHidden();
+
+  await page.getByRole('button', { name: 'Key' }).click();
+  await expect(page.locator('#key-panel')).toBeVisible();
+  await expect(page.locator('.swatch.history')).toBeVisible();
+  await expect(page.locator('.swatch.myth')).toBeVisible();
+  await expect(page.locator('#key-panel')).not.toContainText('History');
+  await expect(page.locator('#key-panel')).not.toContainText('Myth');
+  await page.locator('#map canvas').click({ position: empty });
+  await expect(page.locator('#key-panel')).toBeHidden();
+
+  await openDate(page, '1066');
+  await centerOn(page, 'hastings');
+  await page.locator('.pin[data-id="hastings"]').click();
+  await expect(page.locator('.popup-title')).toBeVisible();
+  await page.locator('#date-button').click();
+  await expect(page.locator('#date-popout')).toBeVisible();
+  await expectGlassContrast(page);
+  await page.getByRole('button', { name: 'Switch era' }).click();
+  await expect(page.locator('#era-popout')).toBeVisible();
+  await expectGlassContrast(page);
+  await page.keyboard.press('Escape');
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator('.pin[data-id="hastings"]').evaluate((element: HTMLElement) => element.click());
+  await expect(page.locator('.event-sheet:not([hidden]) .popup-title')).toBeVisible();
+  await expectGlassContrast(page);
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openDate(page, '1066');
+  const held = await page.locator('#period-button').innerText();
+  await page.locator('#play').click();
+  await expect(page.locator('#play')).toHaveAttribute('aria-pressed', 'true');
+  await page.locator('#map canvas').click({ position: { x: 40, y: 40 } });
+  await expect(page.locator('#play')).toHaveAttribute('aria-pressed', 'false');
+  await page.waitForTimeout(1800);
+  await expect(page.locator('#period-button')).toHaveText(held);
+
+  await openDate(page, '1990');
+  await page.locator('#play').click();
+  await expect(page.locator('#period-button')).toHaveText('2000–2026 CE', { timeout: 4_000 });
+  await expect(page.locator('#play')).toHaveAttribute('aria-pressed', 'false');
+
+  await page.locator('#play').click();
+  await expect(page.locator('#play')).toHaveAttribute('aria-pressed', 'false');
+  await page.waitForTimeout(1700);
+  await expect(page.locator('#period-button')).toHaveText('2000–2026 CE');
+});
+
+test('play steps once when motion is reduced', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'style checks run once');
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/');
+  await page.locator('#app[data-ready="true"]').waitFor();
+  await openDate(page, '1066');
+  const label = await page.locator('#period-button').innerText();
+  await page.locator('#play').click();
+  await expect(page.locator('#period-button')).not.toHaveText(label);
+  await expect(page.locator('#app')).not.toHaveAttribute('data-playing', '1');
+  const stepped = await page.locator('#period-button').innerText();
+  await page.waitForTimeout(1800);
+  await expect(page.locator('#period-button')).toHaveText(stepped);
+});
+
+test('night globe screenshots', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'one production pass records the style shots');
+  test.setTimeout(180_000);
+  const viewports = [
+    { width: 1440, height: 900 },
+    { width: 390, height: 844 },
+    { width: 844, height: 390 },
+    { width: 375, height: 553 },
+  ];
+  for (const viewport of viewports) {
+    await page.setViewportSize(viewport);
+    await page.goto('/');
+    await page.locator('#app[data-ready="true"]').waitFor();
+    await page.waitForTimeout(400);
+    await styleShot(page, viewport, 'default');
+    await openFramed(page, '1518', 'atlantic-slave-trade');
+    await styleShot(page, viewport, 'slave');
+    await openFramed(page, '1405', 'zheng-he');
+    await styleShot(page, viewport, 'zheng');
+    await page.locator('.maplibregl-popup-close-button, .sheet-close').click();
+    await expect(page.locator('#period-button')).toHaveText(/1400/);
+    await styleShot(page, viewport, 'thumb');
+    await page.locator('#date-button').click();
+    await expect(page.locator('#date-popout')).toBeVisible();
+    await styleShot(page, viewport, 'date');
+    await page.keyboard.press('Escape');
+    await page.getByRole('button', { name: 'Key' }).click();
+    await expect(page.locator('#key-panel')).toBeVisible();
+    await styleShot(page, viewport, 'key');
+    await page.keyboard.press('Escape');
+    await openDate(page, '1066');
+    await page.locator('#play').click();
+    await expect(page.locator('#play')).toHaveAttribute('aria-pressed', 'true');
+    await page.waitForTimeout(1700);
+    await expect(page.locator('#play')).toHaveAttribute('aria-pressed', 'true');
+    await styleShot(page, viewport, 'play');
+  }
+});
+
 async function showArrow(page: Page, date: string, id: string) {
   await openDate(page, date);
   await centerOn(page, id, 7.5);
@@ -929,8 +1066,10 @@ async function expectNoBlackHole(page: Page) {
       const red = data[offset];
       const green = data[offset + 1];
       const blue = data[offset + 2];
-      const background = Math.abs(red - 18) <= 4 && Math.abs(green - 23) <= 4 && Math.abs(blue - 28) <= 4;
-      return background || (red <= 10 && green <= 10 && blue <= 10);
+      // Page background #070b12 showing through a missing canvas. The night
+      // sky is the same colour; a hole is a straight cut of it. Dark oceans
+      // are not this exact colour, so they stay part of the map.
+      return Math.abs(red - 7) <= 4 && Math.abs(green - 11) <= 4 && Math.abs(blue - 18) <= 4;
     };
     const isPaper = (x: number, y: number) => {
       const offset = (y * width + x) * 4;
@@ -983,6 +1122,113 @@ async function waitForPainted(page: Page) {
     undefined,
     { timeout: 8_000 },
   ).catch(() => undefined);
+}
+
+async function canvasPoint(page: Page) {
+  return page.evaluate(() => {
+    const mapCanvas = document.querySelector('#map canvas');
+    for (let x = 24; x < window.innerWidth - 16; x += 20) {
+      for (const y of [80, 140, 200]) {
+        if (y > window.innerHeight - 16) continue;
+        if (document.elementFromPoint(x, y) === mapCanvas) return { x, y };
+      }
+    }
+    return { x: Math.floor(window.innerWidth * 0.7), y: Math.floor(window.innerHeight * 0.35) };
+  });
+}
+
+async function openFramed(page: Page, date: string, id: string) {
+  const close = page.locator('.maplibregl-popup-close-button, .event-sheet:not([hidden]) .sheet-close');
+  if (await close.count()) {
+    await close.first().click();
+    await expect(page.locator('#app')).not.toHaveAttribute('data-popup', 'in');
+  }
+  await openDate(page, date);
+  await page.locator(`.pin[data-id="${id}"]`).evaluate((element: HTMLElement) => element.click());
+  await expect(page.locator('#app')).toHaveAttribute('data-popup', 'in');
+  await waitForIdle(page);
+  await page.waitForTimeout(250);
+}
+
+async function styleShot(page: Page, viewport: { width: number; height: number }, name: string) {
+  await page.screenshot({ path: path.join(shots, `style_${viewport.width}x${viewport.height}_${name}.png`) });
+  await expectNoBlackHole(page);
+}
+
+async function expectGlassContrast(page: Page) {
+  const failures = await page.evaluate(() => {
+    const sky = [7, 11, 18];
+    const white = [255, 255, 255];
+    const rel = (channel: number) => {
+      const value = channel / 255;
+      return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+    };
+    const lum = (rgb: number[]) => 0.2126 * rel(rgb[0]) + 0.7152 * rel(rgb[1]) + 0.0722 * rel(rgb[2]);
+    const ratio = (a: number[], b: number[]) => {
+      const left = lum(a);
+      const right = lum(b);
+      const [hi, lo] = left > right ? [left, right] : [right, left];
+      return (hi + 0.05) / (lo + 0.05);
+    };
+    const parse = (input: string) => {
+      const match = input.match(/rgba?\(([-\d.]+)[,\s]+([-\d.]+)[,\s]+([-\d.]+)(?:[,\s/]+([-\d.]+%?))?\)/);
+      if (!match) return null;
+      const alpha = match[4] == null ? 1 : match[4].endsWith('%') ? Number(match[4].slice(0, -1)) / 100 : Number(match[4]);
+      return [Number(match[1]), Number(match[2]), Number(match[3]), alpha];
+    };
+    const over = (fg: number[], bg: number[]) => [
+      fg[0] * fg[3] + bg[0] * (1 - fg[3]),
+      fg[1] * fg[3] + bg[1] * (1 - fg[3]),
+      fg[2] * fg[3] + bg[2] * (1 - fg[3]),
+    ];
+    const stack = (element: Element, base: number[]) => {
+      const layers: number[][] = [];
+      let node: Element | null = element;
+      while (node) {
+        const parsed = parse(getComputedStyle(node).backgroundColor);
+        if (parsed && parsed[3] > 0.01) layers.push(parsed);
+        if (parsed && parsed[3] >= 0.99) break;
+        node = node.parentElement;
+      }
+      let acc = base;
+      for (let index = layers.length - 1; index >= 0; index -= 1) acc = over(layers[index], acc);
+      return acc;
+    };
+    const problems: string[] = [];
+    const selectors = [
+      '.wordmark',
+      '#period-button',
+      '.popup-title',
+      '.popup-summary',
+      '.popup-date',
+      '.popup-note',
+      '.maplibregl-ctrl-attrib',
+      '#date-input',
+      '.era-option',
+      '.sheet-close',
+      '.maplibregl-popup-close-button',
+    ];
+    for (const selector of selectors) {
+      const element = document.querySelector(selector);
+      if (!element || element.closest('[hidden]')) continue;
+      const style = getComputedStyle(element);
+      if (style.visibility === 'hidden' || style.display === 'none') continue;
+      const fg = parse(style.color);
+      if (!fg) continue;
+      const painted = stack(element, sky);
+      const worst = stack(element, white);
+      const fgPainted = over(fg, painted);
+      const fgWorst = over(fg, worst);
+      const value = Math.min(ratio(fgPainted, painted), ratio(fgWorst, worst));
+      const size = parseFloat(style.fontSize);
+      const weight = Number(style.fontWeight);
+      const large = size >= 18 || (size >= 14 && weight >= 700);
+      const need = large ? 3 : 4.5;
+      if (value < need) problems.push(`${selector} ${value.toFixed(2)} < ${need}`);
+    }
+    return problems;
+  });
+  expect(failures).toEqual([]);
 }
 
 async function shot(page: Page, fileName: string) {

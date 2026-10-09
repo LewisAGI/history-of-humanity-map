@@ -451,8 +451,7 @@ async function blackEdge(page: Page) {
       const red = data[offset];
       const green = data[offset + 1];
       const blue = data[offset + 2];
-      const background = Math.abs(red - 18) <= 4 && Math.abs(green - 23) <= 4 && Math.abs(blue - 28) <= 4;
-      return background || (red <= 10 && green <= 10 && blue <= 10);
+      return Math.abs(red - 7) <= 4 && Math.abs(green - 11) <= 4 && Math.abs(blue - 18) <= 4;
     };
     const isPaper = (x: number, y: number) => {
       const offset = (y * width + x) * 4;

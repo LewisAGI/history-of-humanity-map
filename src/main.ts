@@ -7,6 +7,7 @@ import eventsJson from '../data/events.json';
 
 const events = eventsJson as HistoryEvent[];
 const present = presentYear();
+const PLAY_MS = 1500;
 
 const app = document.querySelector<HTMLElement>('#app');
 if (!app) throw new Error('Missing #app');
@@ -21,27 +22,32 @@ app.innerHTML = `
   <div class="key-wrap">
     <button type="button" id="key-button" class="icon-button" data-tip="Key" aria-label="Key" aria-expanded="false">${iconKey()}</button>
     <div id="key-panel" class="popout key-panel" hidden>
-      <p class="key-row"><span class="swatch history"></span>History</p>
-      <p class="key-row"><span class="swatch myth"></span>Myth</p>
+      <p class="key-row" data-kind="history" role="img" aria-label="History" data-tip="History"><span class="swatch history"></span></p>
+      <p class="key-row" data-kind="myth" role="img" aria-label="Myth" data-tip="Myth"><span class="swatch myth"></span></p>
     </div>
   </div>
   <div class="time">
-    <div class="time-top">
-      <button type="button" id="era-button" class="icon-button" data-tip="Switch era" aria-label="Switch era" aria-expanded="false">${iconEra()}</button>
-      <button type="button" id="period-button" aria-label="Date"></button>
-      <div id="era-popout" class="popout" hidden>
-        <button type="button" class="era-option" data-era="before">Before civilisation</button>
-        <button type="button" class="era-option" data-era="after">After civilisation</button>
-      </div>
-      <form id="date-popout" class="popout" hidden>
-        <input id="date-input" name="date" aria-label="Date" autocomplete="off" enterkeyhint="go" />
-      </form>
+    <div class="thumb-band">
+      <button type="button" id="period-button" class="thumb-label"></button>
     </div>
     <div class="time-row">
       <button type="button" id="step-back" class="icon-button" data-tip="Earlier" aria-label="Earlier">${iconChevron('left')}</button>
-      <input id="slider" type="range" min="0" step="1" aria-label="Time" />
+      <button type="button" id="play" class="icon-button" data-tip="Play" aria-label="Play" aria-pressed="false">${iconPlay()}</button>
+      <div class="ruler">
+        <div class="ticks" id="ticks" aria-hidden="true"></div>
+        <input id="slider" type="range" min="0" step="1" aria-label="Time" />
+      </div>
       <button type="button" id="step-forward" class="icon-button" data-tip="Later" aria-label="Later">${iconChevron('right')}</button>
+      <button type="button" id="date-button" class="icon-button" data-tip="Date" aria-label="Date" aria-expanded="false">${iconDate()}</button>
+      <button type="button" id="era-button" class="icon-button" data-tip="Switch era" aria-label="Switch era" aria-expanded="false">${iconEra()}</button>
     </div>
+    <div id="era-popout" class="popout" hidden>
+      <button type="button" class="era-option" data-era="before">Before civilisation</button>
+      <button type="button" class="era-option" data-era="after">After civilisation</button>
+    </div>
+    <form id="date-popout" class="popout" hidden>
+      <input id="date-input" name="date" aria-label="Date" autocomplete="off" enterkeyhint="go" />
+    </form>
   </div>
 `;
 
@@ -49,10 +55,13 @@ const mapEl = app.querySelector<HTMLElement>('#map')!;
 const mapView = createMap(mapEl, app);
 const periodButton = app.querySelector<HTMLButtonElement>('#period-button')!;
 const slider = app.querySelector<HTMLInputElement>('#slider')!;
+const ticks = app.querySelector<HTMLElement>('#ticks')!;
 const stepBack = app.querySelector<HTMLButtonElement>('#step-back')!;
 const stepForward = app.querySelector<HTMLButtonElement>('#step-forward')!;
+const playButton = app.querySelector<HTMLButtonElement>('#play')!;
 const eraButton = app.querySelector<HTMLButtonElement>('#era-button')!;
 const eraPopout = app.querySelector<HTMLElement>('#era-popout')!;
+const dateButton = app.querySelector<HTMLButtonElement>('#date-button')!;
 const datePopout = app.querySelector<HTMLFormElement>('#date-popout')!;
 const dateInput = app.querySelector<HTMLInputElement>('#date-input')!;
 const keyButton = app.querySelector<HTMLButtonElement>('#key-button')!;
@@ -62,6 +71,8 @@ let period = resolvePeriod(present, present);
 const memory: Partial<Record<Era, Period>> = { after: period };
 let selected: HistoryEvent | null = null;
 let retainRoute = false;
+let playing = false;
+let playTimer: ReturnType<typeof setInterval> | null = null;
 
 mapView.onSelect((event) => {
   closePopouts();
@@ -91,6 +102,11 @@ slider.addEventListener('input', () => {
   applyPeriod(periodByIndex(period.era, Number(slider.value), present));
 });
 
+playButton.addEventListener('click', () => {
+  if (playing) stopPlayback();
+  else startPlayback();
+});
+
 eraButton.addEventListener('click', () => {
   togglePopout(eraPopout, eraButton);
 });
@@ -106,17 +122,35 @@ eraPopout.querySelectorAll<HTMLButtonElement>('[data-era]').forEach((button) => 
   });
 });
 
-periodButton.addEventListener('click', () => {
-  togglePopout(datePopout, periodButton);
-  if (!datePopout.hidden) dateInput.focus();
+periodButton.addEventListener('click', toggleDate);
+dateButton.addEventListener('click', toggleDate);
+
+document.addEventListener('pointerdown', (event) => {
+  const element = event.target instanceof Element ? event.target : null;
+  if (!element?.closest('#play')) stopPlayback();
+  if (!element) return;
+  if (!datePopout.hidden && !element.closest('#date-popout, #date-button, #period-button')) {
+    datePopout.hidden = true;
+    dateInput.classList.remove('is-invalid');
+    dateButton.setAttribute('aria-expanded', 'false');
+    periodButton.setAttribute('aria-expanded', 'false');
+  }
+  if (!eraPopout.hidden && !element.closest('#era-popout, #era-button')) {
+    eraPopout.hidden = true;
+    eraButton.setAttribute('aria-expanded', 'false');
+  }
+  if (!keyPanel.hidden && !element.closest('#key-panel, #key-button')) {
+    keyPanel.hidden = true;
+    keyButton.setAttribute('aria-expanded', 'false');
+  }
 });
 
 document.addEventListener('keydown', (event) => {
+  const element = event.target instanceof Element ? event.target : null;
+  if (!element?.closest('#play')) stopPlayback();
   if (event.key !== 'Escape') return;
-  if (!datePopout.hidden) {
-    datePopout.hidden = true;
-    dateInput.classList.remove('is-invalid');
-    periodButton.setAttribute('aria-expanded', 'false');
+  if (!datePopout.hidden || !eraPopout.hidden || !keyPanel.hidden) {
+    closePopouts();
     return;
   }
   if (!selected) return;
@@ -124,6 +158,8 @@ document.addEventListener('keydown', (event) => {
   retainRoute = true;
   render();
 });
+
+document.addEventListener('wheel', () => stopPlayback(), { passive: true });
 
 datePopout.addEventListener('submit', (event) => {
   event.preventDefault();
@@ -143,6 +179,8 @@ keyButton.addEventListener('click', () => {
   togglePopout(keyPanel, keyButton);
 });
 
+window.addEventListener('resize', refreshRuler);
+
 function applyPeriod(next: Period) {
   period = next;
   memory[next.era] = next;
@@ -156,7 +194,9 @@ function render(options?: { framePoles?: boolean }) {
   const visible = events.filter((event) => eventOverlapsPeriod(event, period));
   if (selected && !visible.some((event) => event.id === selected?.id)) selected = null;
 
-  periodButton.textContent = formatYearRange(period.start, period.end);
+  const label = formatYearRange(period.start, period.end);
+  periodButton.textContent = label;
+  periodButton.setAttribute('aria-label', label);
   slider.max = String(inEra.length - 1);
   slider.value = String(period.index);
   app!.dataset.era = period.era;
@@ -173,11 +213,90 @@ function render(options?: { framePoles?: boolean }) {
     button.setAttribute('aria-current', current ? 'true' : 'false');
   });
 
+  refreshRuler();
+  requestAnimationFrame(refreshRuler);
+
   const keepRoute = retainRoute && selected === null;
   retainRoute = false;
   const framePoles = !!options?.framePoles && selected === null && visible.some((event) => Math.abs(event.lat) >= 80);
   mapView.setEvents(visible);
   mapView.setSelected(selected, { keepRoute, framePoles });
+}
+
+function refreshRuler() {
+  paintTicks(periodsForEra(period.era, present).length);
+  placeThumb();
+}
+
+function paintTicks(count: number) {
+  const width = ticks.clientWidth;
+  if (width < 8) return;
+  const maxFit = Math.max(2, Math.floor(width / 3));
+  const shown = Math.min(count, maxFit);
+  ticks.replaceChildren();
+  ticks.dataset.count = String(count);
+  ticks.dataset.shown = String(shown);
+  for (let index = 0; index < shown; index += 1) {
+    const tick = document.createElement('span');
+    tick.className = index % 5 === 0 ? 'tick is-major' : 'tick';
+    const ratio = shown === 1 ? 0 : index / (shown - 1);
+    tick.style.left = `${ratio * 100}%`;
+    ticks.append(tick);
+  }
+}
+
+function placeThumb() {
+  const band = periodButton.parentElement;
+  if (!band) return;
+  const max = Number(slider.max);
+  const ratio = max <= 0 ? 0 : Number(slider.value) / max;
+  const sliderRect = slider.getBoundingClientRect();
+  const bandRect = band.getBoundingClientRect();
+  if (bandRect.width < 8 || sliderRect.width < 2) return;
+  const half = periodButton.offsetWidth / 2;
+  let x = sliderRect.left - bandRect.left + ratio * sliderRect.width;
+  x = Math.min(Math.max(x, half + 2), Math.max(half + 2, bandRect.width - half - 2));
+  periodButton.style.left = `${x}px`;
+}
+
+function startPlayback() {
+  if (stepForward.disabled || playing) return;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    applyPeriod(shiftPeriod(period, 1, present));
+    return;
+  }
+  playing = true;
+  app!.dataset.playing = '1';
+  playButton.setAttribute('aria-pressed', 'true');
+  playButton.setAttribute('aria-label', 'Pause');
+  playButton.dataset.tip = 'Pause';
+  playButton.innerHTML = iconPause();
+  playTimer = setInterval(() => {
+    applyPeriod(shiftPeriod(period, 1, present));
+    if (stepForward.disabled) stopPlayback();
+  }, PLAY_MS);
+}
+
+function stopPlayback() {
+  if (playTimer) clearInterval(playTimer);
+  playTimer = null;
+  if (!playing) return;
+  playing = false;
+  delete app!.dataset.playing;
+  playButton.setAttribute('aria-pressed', 'false');
+  playButton.setAttribute('aria-label', 'Play');
+  playButton.dataset.tip = 'Play';
+  playButton.innerHTML = iconPlay();
+}
+
+function toggleDate() {
+  const open = datePopout.hidden;
+  closePopouts();
+  if (!open) return;
+  datePopout.hidden = false;
+  dateButton.setAttribute('aria-expanded', 'true');
+  periodButton.setAttribute('aria-expanded', 'true');
+  dateInput.focus();
 }
 
 function togglePopout(panel: HTMLElement, button: HTMLElement) {
@@ -189,11 +308,13 @@ function togglePopout(panel: HTMLElement, button: HTMLElement) {
 
 function closePopouts() {
   datePopout.hidden = true;
+  dateInput.classList.remove('is-invalid');
   eraPopout.hidden = true;
   keyPanel.hidden = true;
   eraButton.setAttribute('aria-expanded', 'false');
   keyButton.setAttribute('aria-expanded', 'false');
   periodButton.setAttribute('aria-expanded', 'false');
+  dateButton.setAttribute('aria-expanded', 'false');
 }
 
 function iconPlus() {
@@ -211,6 +332,15 @@ function iconKey() {
 }
 function iconEra() {
   return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 16c2.5-4 5-4 8 0s5.5 4 8 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="8" r="2.2" fill="currentColor"/></svg>';
+}
+function iconPlay() {
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l12 7-12 7z" fill="currentColor"/></svg>';
+}
+function iconPause() {
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg>';
+}
+function iconDate() {
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 3v4M16 3v4M4 10h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
 }
 
 render();

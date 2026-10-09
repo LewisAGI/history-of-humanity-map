@@ -47,10 +47,10 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       started = true;
       map.setProjection({ type: 'globe' });
       map.setSky({
-        'sky-color': '#12171c',
-        'horizon-color': '#9aafc2',
-        'sky-horizon-blend': 0.55,
-        'atmosphere-blend': 0.45,
+        'sky-color': '#070b12',
+        'horizon-color': '#8ec5ff',
+        'sky-horizon-blend': 0.36,
+        'atmosphere-blend': 0.92,
       });
       addArrowImage(map);
       map.addSource('migration', { type: 'geojson', data: EMPTY });
@@ -59,7 +59,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
         type: 'line',
         source: 'migration',
         filter: ['==', ['get', 'role'], 'line'],
-        paint: { 'line-color': '#1c1916', 'line-width': 5, 'line-opacity': 0.8 },
+        paint: { 'line-color': '#070b12', 'line-width': 7, 'line-opacity': 0.85 },
         layout: { 'line-cap': 'round', 'line-join': 'round' },
       });
       map.addLayer({
@@ -67,8 +67,12 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
         type: 'line',
         source: 'migration',
         filter: ['==', ['get', 'role'], 'line'],
-        paint: { 'line-color': '#f6f1e6', 'line-width': 2.2 },
-        layout: { 'line-cap': 'round', 'line-join': 'round' },
+        paint: {
+          'line-color': '#f7f4ee',
+          'line-width': 2.8,
+          'line-dasharray': [2.4, 1.7],
+        },
+        layout: { 'line-cap': 'butt', 'line-join': 'round' },
       });
       map.addLayer({
         id: 'migration-head',
@@ -77,7 +81,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
         filter: ['==', ['get', 'role'], 'head'],
         layout: {
           'icon-image': 'migration-arrow',
-          'icon-size': 0.8,
+          'icon-size': 1.15,
           'icon-rotate': ['get', 'bearing'],
           'icon-rotation-alignment': 'map',
           'icon-allow-overlap': true,
@@ -1109,23 +1113,23 @@ function escapeHtml(value: string): string {
 
 function addArrowImage(map: MapLibreMap) {
   const canvas = document.createElement('canvas');
-  canvas.width = 32;
-  canvas.height = 32;
+  canvas.width = 40;
+  canvas.height = 40;
   const context = canvas.getContext('2d');
   if (!context) return;
-  context.clearRect(0, 0, 32, 32);
+  context.clearRect(0, 0, 40, 40);
   context.beginPath();
-  context.moveTo(16, 3);
-  context.lineTo(28, 28);
-  context.lineTo(16, 21);
-  context.lineTo(4, 28);
+  context.moveTo(20, 3);
+  context.lineTo(36, 36);
+  context.lineTo(20, 26);
+  context.lineTo(4, 36);
   context.closePath();
-  context.fillStyle = '#f6f1e6';
+  context.fillStyle = '#f7f4ee';
   context.fill();
-  context.lineWidth = 2;
-  context.strokeStyle = '#1c1916';
+  context.lineWidth = 3;
+  context.strokeStyle = '#070b12';
   context.stroke();
-  const image = context.getImageData(0, 0, 32, 32);
+  const image = context.getImageData(0, 0, 40, 40);
   if (!map.hasImage('migration-arrow')) map.addImage('migration-arrow', image);
 }
 
@@ -1141,27 +1145,26 @@ function mapStyle(): StyleSpecification {
         ],
         tileSize: 256,
         maxzoom: 8,
-        attribution: 'NASA Blue Marble',
       },
     },
     layers: [
-      { id: 'ocean', type: 'background', paint: { 'background-color': '#1c3d52' } },
-      { id: 'land', type: 'fill', source: 'land', paint: { 'fill-color': '#c6b79a' } },
+      { id: 'ocean', type: 'background', paint: { 'background-color': '#071018' } },
+      { id: 'land', type: 'fill', source: 'land', paint: { 'fill-color': '#1a2822' } },
       {
         id: 'coast',
         type: 'line',
         source: 'land',
-        paint: { 'line-color': '#6d624e', 'line-width': 0.6 },
+        paint: { 'line-color': '#24362e', 'line-width': 0.6 },
       },
       {
         id: 'marble',
         type: 'raster',
         source: 'marble',
         paint: {
-          'raster-saturation': -0.38,
-          'raster-contrast': -0.06,
-          'raster-brightness-min': 0.05,
-          'raster-brightness-max': 0.96,
+          'raster-saturation': 0.2,
+          'raster-contrast': -0.05,
+          'raster-brightness-min': 0,
+          'raster-brightness-max': 0.92,
         },
       },
     ],

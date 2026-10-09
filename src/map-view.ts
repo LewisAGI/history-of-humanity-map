@@ -159,6 +159,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   window.addEventListener('resize', () => {
     const event = markers.find((pin) => pin.event.id === selectedId)?.event ?? null;
     if (!event) {
+      sheet.classList.remove('is-covering');
       restoreKey();
       restoreAttribution();
       restoreZoom();
@@ -320,6 +321,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     popup = null;
     suppressClose = false;
     sheet.hidden = true;
+    sheet.classList.remove('is-covering');
     sheet.innerHTML = '';
     restoreKey();
     restoreAttribution();
@@ -393,6 +395,14 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   }
 
   function placeSheet() {
+    // The closed sheet must not keep the time row hidden. Covering chrome is
+    // only for the open short-portrait sheet.
+    if (sheet.hidden) {
+      sheet.classList.remove('is-covering');
+      restoreCoveredChrome();
+      restoreZoom();
+      return;
+    }
     const margin = 12;
     const gap = 8;
     const side = window.innerWidth > window.innerHeight;

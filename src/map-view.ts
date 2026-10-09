@@ -98,6 +98,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   let suppressClose = false;
   let ignoreMapClick = false;
   let selectedId: string | null = null;
+  let routeGeometry: GeoJSON.Feature[] = [];
   let anchorObserver: MutationObserver | null = null;
   let userCamera = false;
   let popupAnchor: 'top' | 'bottom' = 'bottom';
@@ -282,6 +283,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     const lines = routeLines(event?.path);
     if (lines.length === 0) {
       source.setData(EMPTY);
+      routeGeometry = [];
       root.dataset.arrow = '';
       return;
     }
@@ -302,6 +304,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       });
     });
     source.setData({ type: 'FeatureCollection', features });
+    routeGeometry = features;
     root.dataset.arrow = event!.id;
   }
 
@@ -646,7 +649,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       // the vanishing point sits that high.
       const heads = routeLines(event.path).map((line) => line[line.length - 1].lat);
       const southernHead = heads.some((lat) => lat <= minLat + 8);
-      const fitted = framePadding(southernHead ? 112 : 16);
+      const fitted = framePadding(southernHead ? 80 : 16);
       map.easeTo({
         center: [centerLng, centerLat],
         zoom: zoomForSpan(maxLng - minLng, maxLat - minLat, fitted, useSheet() ? 1.35 : 3.2),
@@ -689,7 +692,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     const pin = document.querySelector('.pin.is-selected')?.getBoundingClientRect();
     const samples: { x: number; y: number }[] = [];
     const heads: { x: number; y: number }[] = [];
-    map.queryRenderedFeatures({ layers: ['migration-line', 'migration-head'] }).forEach((feature) => {
+    routeGeometry.forEach((feature) => {
       const geometry = feature.geometry;
       if (geometry.type === 'Point') {
         const [lng, lat] = geometry.coordinates;
@@ -705,7 +708,10 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
         const steps = Math.max(1, Math.ceil(Math.hypot(end[0] - start[0], end[1] - start[1]) / 4));
         for (let step = 0; step <= steps; step += 1) {
           const t = step / steps;
-          const point = map.project([start[0] + (end[0] - start[0]) * t, start[1] + (end[1] - start[1]) * t]);
+          const point = map.project([
+            start[0] + (end[0] - start[0]) * t,
+            start[1] + (end[1] - start[1]) * t,
+          ]);
           samples.push({ x: point.x, y: point.y });
         }
       }
@@ -732,16 +738,32 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     if (inside(current) && !blocked(current) && covered(current) === 0) return { dx, dy };
     const width = rect.width;
     const height = rect.height;
-    const spots = [
-      { dx, dy },
-      { dx: limits.left - rect.left, dy: limits.top - rect.top },
-      { dx: limits.right - width - rect.left, dy: limits.top - rect.top },
-      { dx: limits.left - rect.left, dy: limits.bottom - height - rect.top },
-      { dx: limits.right - width - rect.left, dy: limits.bottom - height - rect.top },
-    ];
+    // A point card stays beside its pin. A route card may sit in a corner so the line stays visible.
+    const spots =
+      samples.length === 0
+        ? [{ dx, dy }]
+        : [
+            { dx, dy },
+            { dx: limits.left - rect.left, dy: limits.top - rect.top },
+            { dx: limits.right - width - rect.left, dy: limits.top - rect.top },
+            { dx: limits.left - rect.left, dy: limits.bottom - height - rect.top },
+            { dx: limits.right - width - rect.left, dy: limits.bottom - height - rect.top },
+          ];
     if (pin && pin.width > 2) {
-      spots.push({ dx: dx + (pin.left - 10 - (rect.right + dx)), dy });
-      spots.push({ dx: dx + (pin.right + 10 - (rect.left + dx)), dy });
+      const box = shifted(rect, dx, dy);
+      if (samples.length === 0) {
+        const nudgeLeft = box.right - (pin.left - 10);
+        const nudgeRight = pin.right + 10 - box.left;
+        const nudgeUp = box.bottom - (pin.top - 10);
+        const nudgeDown = pin.bottom + 10 - box.top;
+        if (nudgeLeft > 0 && nudgeLeft <= 48) spots.push({ dx: dx - nudgeLeft, dy });
+        if (nudgeRight > 0 && nudgeRight <= 48) spots.push({ dx: dx + nudgeRight, dy });
+        if (nudgeUp > 0 && nudgeUp <= 48) spots.push({ dx, dy: dy - nudgeUp });
+        if (nudgeDown > 0 && nudgeDown <= 48) spots.push({ dx, dy: dy + nudgeDown });
+      } else {
+        spots.push({ dx: dx + (pin.left - 10 - box.right), dy });
+        spots.push({ dx: dx + (pin.right + 10 - box.left), dy });
+      }
     }
     let best = { dx, dy, score: covered(current) + (blocked(current) || !inside(current) ? 100000 : 0) };
     for (const spot of spots) {

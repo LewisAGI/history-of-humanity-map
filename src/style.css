@@ -367,7 +367,12 @@ html, body {
 .event-sheet {
   position: absolute;
   z-index: 4;
-  overflow: auto;
+  /* The card itself must not scroll. overflow:auto here makes Chromium
+     present a transparent rectangle of the WebGL canvas, so the page
+     background shows as a black block on the globe. */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   background: #f7f4ee;
   color: var(--ink);
   border-radius: 16px;
@@ -377,6 +382,12 @@ html, body {
 }
 
 .event-sheet[hidden] { display: none; }
+
+.sheet-body {
+  overflow: auto;
+  min-height: 0;
+  overscroll-behavior: contain;
+}
 
 .sheet-close {
   position: absolute;

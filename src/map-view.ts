@@ -318,7 +318,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
 
   function showSheet(event: HistoryEvent) {
     sheet.hidden = false;
-    sheet.innerHTML = `<button type="button" class="sheet-close" aria-label="Close">×</button>${popupHtml(event)}`;
+    sheet.innerHTML = `<button type="button" class="sheet-close" aria-label="Close">×</button><div class="sheet-body">${popupHtml(event)}</div>`;
     sheet.querySelector<HTMLButtonElement>('.sheet-close')?.addEventListener('mousedown', () => {
       ignoreMapClick = true;
     });
@@ -338,19 +338,23 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   }
 
   function placeSheet() {
+    const margin = 12;
     const gap = 8;
     const time = visibleRect(document.querySelector('.time'));
     const zoom = visibleRect(document.querySelector('.zoom'));
     const key = visibleRect(document.querySelector('.key-wrap'));
     const attrib = visibleRect(document.querySelector('.maplibregl-ctrl-attrib'));
-    const bottom = time ? window.innerHeight - time.top + gap : 128;
-    const topLimit = zoom ? zoom.bottom + gap : 56;
-    const left = Math.max(12, key ? key.right + gap : 12);
-    let right = 12;
-    if (attrib) right = Math.max(right, window.innerWidth - attrib.left + gap);
-    const maxHeight = Math.max(120, Math.min(window.innerHeight * 0.42, window.innerHeight - bottom - topLimit));
-    sheet.style.left = `${left}px`;
-    sheet.style.right = `${right}px`;
+    const controlTops = [time?.top, key?.top, attrib?.top].filter((value): value is number => value != null);
+    const controlTop = controlTops.length > 0 ? Math.min(...controlTops) : window.innerHeight - 128;
+    const bottom = Math.max(margin, window.innerHeight - controlTop + gap);
+    const topLimit = (zoom ? zoom.bottom : 56) + gap;
+    const available = Math.max(96, window.innerHeight - bottom - topLimit);
+    const maxHeight = Math.min(window.innerHeight * 0.42, available);
+    sheet.style.left = `${margin}px`;
+    sheet.style.right = `${margin}px`;
+    sheet.style.top = 'auto';
+    sheet.style.width = 'auto';
+    sheet.style.maxWidth = 'none';
     sheet.style.bottom = `${bottom}px`;
     sheet.style.maxHeight = `${Math.floor(maxHeight)}px`;
   }

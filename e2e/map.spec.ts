@@ -6,6 +6,8 @@ declare global {
       getZoom: () => number;
       getProjection: () => { type: string };
       isMoving: () => boolean;
+      loaded: () => boolean;
+      areTilesLoaded: () => boolean;
       isSourceLoaded: (id: string) => boolean;
       jumpTo: (options: { center: [number, number]; zoom: number }) => void;
       once: (type: string, listener: () => void) => void;
@@ -418,6 +420,9 @@ test('phone routes stay visible beside the open popup', async ({ page }, testInf
     await page.waitForTimeout(300);
     const vis = await routeVisibility(page);
     results.push({ id: route.id, pct: vis.pct, heads: vis.heads, headsClear: vis.headsClear });
+    await expectSheetReadable(page, route.id);
+    await expectPopupClearOfControls(page);
+    await expectNoBlackHole(page);
     if (['zheng-he', 'out-of-africa', 'atlantic-slave-trade', 'cook-pacific'].includes(route.id)) {
       await shot(page, `${testInfo.project.name}_${route.id}_sheet`);
     }
@@ -446,6 +451,7 @@ test('Qesem Cave stays on screen', async ({ page }, testInfo) => {
   await page.waitForTimeout(1000);
   await expectPopupInside(page);
   await expectPopupClearOfControls(page);
+  if ((page.viewportSize()?.width ?? 0) <= 600) await expectSheetReadable(page, 'qesem-fire');
   await shot(page, `${testInfo.project.name}_qesem`);
 });
 
@@ -463,6 +469,7 @@ test('Tiananmen stays on screen', async ({ page }, testInfo) => {
   await page.waitForTimeout(1000);
   await expectPopupInside(page);
   await expectPopupClearOfControls(page);
+  if ((page.viewportSize()?.width ?? 0) <= 600) await expectSheetReadable(page, 'tiananmen-1989');
   await shot(page, `${testInfo.project.name}_tiananmen`);
 });
 
@@ -669,8 +676,118 @@ function eventCard(page: Page) {
   return page.locator('.event-sheet:not([hidden]), .maplibregl-popup');
 }
 
+async function expectSheetReadable(page: Page, id: string) {
+  const info = await page.evaluate(() => {
+    const sheet = document.querySelector<HTMLElement>('.event-sheet:not([hidden])');
+    const body = sheet?.querySelector<HTMLElement>('.sheet-body');
+    const title = sheet?.querySelector<HTMLElement>('.popup-title');
+    const note = sheet?.querySelector<HTMLElement>('.popup-note') ?? sheet?.querySelector<HTMLElement>('.popup-summary');
+    if (!sheet || !body || !title || !note) return null;
+    body.scrollTop = body.scrollHeight;
+    const sheetRect = sheet.getBoundingClientRect();
+    const noteRect = note.getBoundingClientRect();
+    const endVisible = noteRect.bottom <= sheetRect.bottom + 1 && noteRect.bottom > sheetRect.top + 4;
+    body.scrollTop = 0;
+    return {
+      width: sheetRect.width,
+      viewport: window.innerWidth,
+      titleLines: title.getClientRects().length,
+      bodyOverflow: getComputedStyle(body).overflowY,
+      sheetOverflow: getComputedStyle(sheet).overflowY,
+      noteVisible: endVisible,
+      scrollHeight: body.scrollHeight,
+      clientHeight: body.clientHeight,
+    };
+  });
+  expect(info, id).not.toBeNull();
+  if (!info) return;
+  expect(info.width, id).toBeGreaterThanOrEqual(info.viewport - 32);
+  expect(info.titleLines, id).toBeGreaterThan(0);
+  expect(info.titleLines, id).toBeLessThanOrEqual(3);
+  expect(info.bodyOverflow, id).toMatch(/auto|scroll/);
+  expect(info.sheetOverflow, id).toBe('hidden');
+  expect(info.noteVisible, id).toBe(true);
+  expect(info.scrollHeight, id).toBeGreaterThanOrEqual(info.clientHeight);
+}
+
+/**
+ * The black rectangle is the page background showing through the canvas.
+ * It meets the globe on a straight edge. A round limb does not.
+ */
+async function expectNoBlackHole(page: Page) {
+  await waitForPainted(page);
+  const png = await page.screenshot();
+  const longest = await page.evaluate(async (b64) => {
+    const image = new Image();
+    image.src = `data:image/png;base64,${b64}`;
+    await image.decode();
+    const canvas = document.createElement('canvas');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    const context = canvas.getContext('2d');
+    if (!context) return 0;
+    context.drawImage(image, 0, 0);
+    const { data, width, height } = context.getImageData(0, 0, image.width, image.height);
+    const isHole = (x: number, y: number) => {
+      const offset = (y * width + x) * 4;
+      const red = data[offset];
+      const green = data[offset + 1];
+      const blue = data[offset + 2];
+      const background = Math.abs(red - 18) <= 4 && Math.abs(green - 23) <= 4 && Math.abs(blue - 28) <= 4;
+      return background || (red <= 10 && green <= 10 && blue <= 10);
+    };
+    const isPaper = (x: number, y: number) => {
+      const offset = (y * width + x) * 4;
+      return data[offset] > 220 && data[offset + 1] > 210 && data[offset + 2] > 190;
+    };
+    const columns = new Map<number, number[]>();
+    for (let y = 0; y < height; y += 1) {
+      let previous = isHole(0, y);
+      for (let x = 1; x < width; x += 1) {
+        const current = isHole(x, y);
+        if (current !== previous) {
+          const edge = current ? x - 1 : x;
+          const mapX = previous ? x : x - 1;
+          const onMap = mapX >= 0 && mapX < width && !isHole(mapX, y) && !isPaper(mapX, y);
+          if (onMap && edge > 6 && edge < width - 7) {
+            const rows = columns.get(edge) ?? [];
+            rows.push(y);
+            columns.set(edge, rows);
+          }
+        }
+        previous = current;
+      }
+    }
+    let straight = 0;
+    columns.forEach((rows) => {
+      let run = 1;
+      for (let index = 1; index < rows.length; index += 1) {
+        if (rows[index] === rows[index - 1] + 1) run += 1;
+        else {
+          if (run > straight) straight = run;
+          run = 1;
+        }
+      }
+      if (run > straight) straight = run;
+    });
+    return straight;
+  }, png.toString('base64'));
+  expect(longest, 'straight black edge cut into the globe').toBeLessThan(64);
+}
+
+async function waitForPainted(page: Page) {
+  await waitForIdle(page);
+  await page.waitForFunction(
+    () => window.__historyMap.loaded() && window.__historyMap.areTilesLoaded(),
+    undefined,
+    { timeout: 8_000 },
+  ).catch(() => undefined);
+}
+
 async function shot(page: Page, fileName: string) {
-  await page.screenshot({ path: path.join(shots, `r3_${fileName}.png`) });
+  await waitForPainted(page);
+  await page.screenshot({ path: path.join(shots, `r4_${fileName}.png`) });
+  await expectNoBlackHole(page);
 }
 
 function isAppAsset(url: string): boolean {

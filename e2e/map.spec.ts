@@ -201,7 +201,7 @@ test('timeline, globe, pins, and labels', async ({ page }, testInfo) => {
   await page.locator('.pin[data-id="gilgamesh"]').click();
   await expect(page.locator('.popup-note')).toContainText('Earliest written source');
 
-  await page.getByRole('button', { name: 'Switch era' }).click();
+  await openEraList(page);
   await page.getByRole('button', { name: 'Before civilisation' }).click();
   await expect(page.locator('#app')).toHaveAttribute('data-era', 'before');
   await page.locator('#slider').evaluate((el: HTMLInputElement) => {
@@ -661,18 +661,23 @@ test('every migration route draws a line', async ({ page }) => {
   }
 });
 
-test('glass scrubber plays, labels the thumb, and opens the key', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'desktop', 'style checks run once');
+test('glass scrubber plays, labels the thumb, and opens the key', async ({ page }) => {
   test.setTimeout(120_000);
   await page.goto('/');
   await page.locator('#app[data-ready="true"]').waitFor();
 
-  await page.getByRole('button', { name: 'Switch era' }).click();
-  await page.getByRole('button', { name: 'Before civilisation' }).click();
+  await openEraList(page);
+  const beforeEra = page.getByRole('button', { name: 'Before civilisation' });
+  const afterEra = page.getByRole('button', { name: 'After civilisation' });
+  await expect(beforeEra).toHaveAttribute('aria-label', 'Before civilisation');
+  await expect(afterEra).toHaveAttribute('aria-label', 'After civilisation');
+  await expect(beforeEra).toHaveText('');
+  await expect(afterEra).toHaveText('');
+  await beforeEra.click();
   await expect.poll(() => page.locator('.tick').count()).toBeGreaterThan(10);
   const beforeTicks = await page.locator('.tick').count();
-  await page.getByRole('button', { name: 'Switch era' }).click();
-  await page.getByRole('button', { name: 'After civilisation' }).click();
+  await openEraList(page);
+  await afterEra.click();
   await expect.poll(() => page.locator('.tick').count()).toBeGreaterThan(beforeTicks);
 
   await openDate(page, '1405');
@@ -687,12 +692,10 @@ test('glass scrubber plays, labels the thumb, and opens the key', async ({ page 
   });
   expect(thumbGap).toBeLessThan(28);
 
-  await page.locator('#date-button').click();
-  await expect(page.locator('#date-popout')).toBeVisible();
+  await openDatePopout(page);
   await page.keyboard.press('Escape');
   await expect(page.locator('#date-popout')).toBeHidden();
-  await page.locator('#date-button').click();
-  await expect(page.locator('#date-popout')).toBeVisible();
+  await openDatePopout(page);
   const empty = await canvasPoint(page);
   await page.locator('#map canvas').click({ position: empty });
   await expect(page.locator('#date-popout')).toBeHidden();
@@ -710,11 +713,10 @@ test('glass scrubber plays, labels the thumb, and opens the key', async ({ page 
   await centerOn(page, 'hastings');
   await page.locator('.pin[data-id="hastings"]').click();
   await expect(page.locator('.popup-title')).toBeVisible();
-  await page.locator('#date-button').click();
-  await expect(page.locator('#date-popout')).toBeVisible();
+  await openDatePopout(page);
   await expectGlassContrast(page);
-  await page.getByRole('button', { name: 'Switch era' }).click();
-  await expect(page.locator('#era-popout')).toBeVisible();
+  await page.keyboard.press('Escape');
+  await openEraList(page);
   await expectGlassContrast(page);
   await page.keyboard.press('Escape');
 
@@ -744,8 +746,7 @@ test('glass scrubber plays, labels the thumb, and opens the key', async ({ page 
   await expect(page.locator('#period-button')).toHaveText('2000–2026 CE');
 });
 
-test('play steps once when motion is reduced', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'desktop', 'style checks run once');
+test('play steps once when motion is reduced', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
   await page.locator('#app[data-ready="true"]').waitFor();
@@ -757,6 +758,102 @@ test('play steps once when motion is reduced', async ({ page }, testInfo) => {
   const stepped = await page.locator('#period-button').innerText();
   await page.waitForTimeout(1800);
   await expect(page.locator('#period-button')).toHaveText(stepped);
+});
+
+test('touch shows a label on long-press and not after a tap', async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.use.hasTouch, 'touch projects only');
+  await page.goto('/');
+  await page.locator('#app[data-ready="true"]').waitFor();
+  const zoom = page.locator('#zoom-in');
+  await zoom.tap();
+  await page.waitForTimeout(80);
+  const stuck = await page.evaluate(() => {
+    const element = document.querySelector('#zoom-in');
+    if (!element) return true;
+    if (element.classList.contains('is-long-tip')) return true;
+    const content = getComputedStyle(element, '::after').content;
+    return content !== 'none' && content !== 'normal' && content !== '""';
+  });
+  expect(stuck).toBe(false);
+
+  await page.evaluate(() => {
+    document.querySelector('#zoom-out')?.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true, pointerType: 'touch', pointerId: 1, isPrimary: true }),
+    );
+  });
+  await page.waitForTimeout(600);
+  await expect(page.locator('#zoom-out')).toHaveClass(/is-long-tip/);
+  const shown = await page.evaluate(() => getComputedStyle(document.querySelector('#zoom-out')!, '::after').content);
+  expect(shown).toContain('Zoom out');
+  await page.evaluate(() => {
+    document.querySelector('#zoom-out')?.dispatchEvent(
+      new PointerEvent('pointerup', { bubbles: true, pointerType: 'touch', pointerId: 1, isPrimary: true }),
+    );
+  });
+  await expect(page.locator('#zoom-out')).not.toHaveClass(/is-long-tip/);
+});
+
+test('the scrubber thumb, tick labels, tip, and attribution stay clear', async ({ page }, testInfo) => {
+  test.setTimeout(90_000);
+  await page.goto('/');
+  await page.locator('#app[data-ready="true"]').waitFor();
+  await expect(page.locator('#slider')).toHaveAttribute('aria-valuetext', / to /);
+  await openDate(page, '1066');
+  await expect(page.locator('#slider')).toHaveAttribute('aria-valuetext', '1050 to 1099 CE');
+  await expect(page.locator('#period-button')).toHaveText('1050–1099 CE');
+
+  const sizes =
+    testInfo.project.name === 'desktop'
+      ? [
+          { width: 320, height: 568 },
+          { width: 390, height: 844 },
+          { width: 1440, height: 900 },
+          { width: 1920, height: 1080 },
+        ]
+      : [page.viewportSize() ?? { width: 390, height: 844 }];
+  for (const viewport of sizes) {
+    await page.setViewportSize(viewport);
+    await page.waitForTimeout(80);
+    if (viewport.width === 390) {
+      const ruler = await page.locator('.ruler').evaluate((element) => element.getBoundingClientRect().width);
+      expect(ruler, '390 ruler').toBeGreaterThanOrEqual(250);
+    }
+    await expectThumbInside(page);
+    await expectEraTicksClear(page);
+    await openEraList(page);
+    await page.getByRole('button', { name: 'Before civilisation' }).click();
+    await page.waitForTimeout(80);
+    await expectThumbInside(page);
+    await expectEraTicksClear(page);
+    await openEraList(page);
+    await page.getByRole('button', { name: 'After civilisation' }).click();
+    await page.waitForTimeout(80);
+  }
+
+  await openDate(page, '1066');
+  await centerOn(page, 'hastings');
+  await page.locator('.pin[data-id="hastings"]').click();
+  await expect(page.locator('#app')).toHaveAttribute('data-popup', 'in');
+  await expectTipAimed(page);
+
+  if (testInfo.project.name === 'desktop') {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await openDate(page, '1518');
+    await page.locator('.pin[data-id="atlantic-slave-trade"]').evaluate((element: HTMLElement) => element.click());
+    await expect(page.locator('#app')).toHaveAttribute('data-popup', 'in');
+    await expect(page.locator('.maplibregl-popup')).toHaveClass(/is-detached/);
+    await expect(page.locator('.maplibregl-popup-tip')).toBeHidden();
+  }
+
+  const attrib = page.locator('.maplibregl-ctrl-attrib');
+  await expect(attrib).toBeVisible();
+  const colors = await attrib.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { background: style.backgroundColor, color: style.color };
+  });
+  expect(colors.background).not.toBe('rgb(255, 255, 255)');
+  expect(colors.color).not.toBe('rgb(0, 0, 0)');
+  await expectGlassContrast(page);
 });
 
 test('night globe screenshots', async ({ page }, testInfo) => {
@@ -781,10 +878,14 @@ test('night globe screenshots', async ({ page }, testInfo) => {
     await page.locator('.maplibregl-popup-close-button, .sheet-close').click();
     await expect(page.locator('#period-button')).toHaveText(/1400/);
     await styleShot(page, viewport, 'thumb');
-    await page.locator('#date-button').click();
-    await expect(page.locator('#date-popout')).toBeVisible();
+    await openDatePopout(page);
     await styleShot(page, viewport, 'date');
     await page.keyboard.press('Escape');
+    if (viewport.width === 1440 && viewport.height === 900) {
+      await openFramed(page, '1066', 'hastings');
+      await styleShot(page, viewport, 'tip');
+      await page.locator('.maplibregl-popup-close-button').click();
+    }
     await page.getByRole('button', { name: 'Key' }).click();
     await expect(page.locator('#key-panel')).toBeVisible();
     await styleShot(page, viewport, 'key');
@@ -964,6 +1065,72 @@ async function expectPopupInside(page: Page) {
   expect(box.y).toBeGreaterThanOrEqual(-1);
   expect(box.x + box.width).toBeLessThanOrEqual(viewport.width + 1);
   expect(box.y + box.height).toBeLessThanOrEqual(viewport.height + 1);
+}
+
+async function expectThumbInside(page: Page) {
+  const box = await page.evaluate(() => {
+    const label = document.querySelector('#period-button')!.getBoundingClientRect();
+    const card = document.querySelector('.time')!.getBoundingClientRect();
+    const text = document.querySelector('#period-button')!.textContent;
+    const value = document.querySelector('#slider')!.getAttribute('aria-valuetext');
+    return {
+      text,
+      value,
+      left: label.left - card.left,
+      right: card.right - label.right,
+    };
+  });
+  expect(box.left).toBeGreaterThanOrEqual(-1);
+  expect(box.right).toBeGreaterThanOrEqual(-1);
+  expect(box.value).toBe(box.text?.replaceAll('–', ' to ').replace(/\s+/g, ' ').trim());
+}
+
+async function expectEraTicksClear(page: Page) {
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  const problems = await page.evaluate(() => {
+    const hit = (a: DOMRect, b: DOMRect) =>
+      a.width > 1 && b.width > 1 && a.left < b.right - 1 && a.right > b.left + 1 && a.top < b.bottom - 1 && a.bottom > b.top + 1;
+    const labels = [...document.querySelectorAll<HTMLElement>('.era-tick')].filter((node) => !node.hidden);
+    const thumb = document.querySelector('#period-button')!.getBoundingClientRect();
+    const found: string[] = [];
+    labels.forEach((node, index) => {
+      const rect = node.getBoundingClientRect();
+      if (hit(rect, thumb)) found.push(`thumb ${node.textContent}`);
+      labels.slice(index + 1).forEach((other) => {
+        if (hit(rect, other.getBoundingClientRect())) found.push(`${node.textContent}|${other.textContent}`);
+      });
+    });
+    return found;
+  });
+  expect(problems).toEqual([]);
+}
+
+async function expectTipAimed(page: Page) {
+  const aim = await page.evaluate(() => {
+    const tip = document.querySelector<HTMLElement>('.maplibregl-popup-tip');
+    const pin = document.querySelector('.pin.is-selected');
+    if (!tip || !pin || getComputedStyle(tip).display === 'none' || tip.getClientRects().length === 0) return null;
+    const tipBox = tip.getBoundingClientRect();
+    const pinBox = pin.getBoundingClientRect();
+    return Math.abs(tipBox.left + tipBox.width / 2 - (pinBox.left + pinBox.width / 2));
+  });
+  if (aim != null) expect(aim).toBeLessThanOrEqual(16);
+}
+
+async function openEraList(page: Page) {
+  if (await page.locator('#era-popout').isVisible()) return;
+  const era = page.locator('#era-button');
+  if (await era.isVisible()) await era.click();
+  else await page.locator('#tools-button').click();
+  await expect(page.locator('#era-popout')).toBeVisible();
+}
+
+async function openDatePopout(page: Page) {
+  if (await page.locator('#date-popout').isVisible()) return;
+  const date = page.locator('#date-button');
+  if (await date.isVisible()) await date.click();
+  else await page.locator('#tools-button').click();
+  await expect(page.locator('#date-popout')).toBeVisible();
 }
 
 async function openDate(page: Page, value: string) {
@@ -1219,11 +1386,12 @@ async function expectGlassContrast(page: Page) {
       const worst = stack(element, white);
       const fgPainted = over(fg, painted);
       const fgWorst = over(fg, worst);
-      const value = Math.min(ratio(fgPainted, painted), ratio(fgWorst, worst));
       const size = parseFloat(style.fontSize);
       const weight = Number(style.fontWeight);
       const large = size >= 18 || (size >= 14 && weight >= 700);
-      const need = large ? 3 : 4.5;
+      const wordmark = selector === '.wordmark';
+      const value = wordmark ? ratio(over(fg, sky), sky) : Math.min(ratio(fgPainted, painted), ratio(fgWorst, worst));
+      const need = wordmark || large ? 3 : 4.5;
       if (value < need) problems.push(`${selector} ${value.toFixed(2)} < ${need}`);
     }
     return problems;

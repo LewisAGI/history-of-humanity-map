@@ -29,25 +29,27 @@ app.innerHTML = `
   <div class="time">
     <div class="thumb-band">
       <button type="button" id="period-button" class="thumb-label"></button>
+      <button type="button" id="tools-button" class="icon-button tools-button" data-tip="Date and era" aria-label="Date and era" aria-expanded="false">${iconDate()}</button>
     </div>
     <div class="time-row">
       <button type="button" id="step-back" class="icon-button" data-tip="Earlier" aria-label="Earlier">${iconChevron('left')}</button>
       <button type="button" id="play" class="icon-button" data-tip="Play" aria-label="Play" aria-pressed="false">${iconPlay()}</button>
       <div class="ruler">
         <div class="ticks" id="ticks" aria-hidden="true"></div>
+        <div class="era-labels" id="era-labels" aria-hidden="true"></div>
         <input id="slider" type="range" min="0" step="1" aria-label="Time" />
       </div>
       <button type="button" id="step-forward" class="icon-button" data-tip="Later" aria-label="Later">${iconChevron('right')}</button>
       <button type="button" id="date-button" class="icon-button" data-tip="Date" aria-label="Date" aria-expanded="false">${iconDate()}</button>
       <button type="button" id="era-button" class="icon-button" data-tip="Switch era" aria-label="Switch era" aria-expanded="false">${iconEra()}</button>
     </div>
-    <div id="era-popout" class="popout" hidden>
-      <button type="button" class="era-option" data-era="before">Before civilisation</button>
-      <button type="button" class="era-option" data-era="after">After civilisation</button>
+    <div id="era-popout" class="popout tools-popout" hidden>
+      <form id="date-popout">
+        <input id="date-input" name="date" aria-label="Date" autocomplete="off" enterkeyhint="go" />
+      </form>
+      <button type="button" class="era-option" data-era="before" data-tip="Before civilisation" aria-label="Before civilisation">${iconAxe()}</button>
+      <button type="button" class="era-option" data-era="after" data-tip="After civilisation" aria-label="After civilisation">${iconTemple()}</button>
     </div>
-    <form id="date-popout" class="popout" hidden>
-      <input id="date-input" name="date" aria-label="Date" autocomplete="off" enterkeyhint="go" />
-    </form>
   </div>
 `;
 
@@ -56,6 +58,8 @@ const mapView = createMap(mapEl, app);
 const periodButton = app.querySelector<HTMLButtonElement>('#period-button')!;
 const slider = app.querySelector<HTMLInputElement>('#slider')!;
 const ticks = app.querySelector<HTMLElement>('#ticks')!;
+const eraLabels = app.querySelector<HTMLElement>('#era-labels')!;
+const toolsButton = app.querySelector<HTMLButtonElement>('#tools-button')!;
 const stepBack = app.querySelector<HTMLButtonElement>('#step-back')!;
 const stepForward = app.querySelector<HTMLButtonElement>('#step-forward')!;
 const playButton = app.querySelector<HTMLButtonElement>('#play')!;
@@ -107,9 +111,8 @@ playButton.addEventListener('click', () => {
   else startPlayback();
 });
 
-eraButton.addEventListener('click', () => {
-  togglePopout(eraPopout, eraButton);
-});
+eraButton.addEventListener('click', toggleDate);
+toolsButton.addEventListener('click', toggleDate);
 
 eraPopout.querySelectorAll<HTMLButtonElement>('[data-era]').forEach((button) => {
   button.addEventListener('click', () => {
@@ -125,19 +128,27 @@ eraPopout.querySelectorAll<HTMLButtonElement>('[data-era]').forEach((button) => 
 periodButton.addEventListener('click', toggleDate);
 dateButton.addEventListener('click', toggleDate);
 
+let pressTimer: ReturnType<typeof setTimeout> | null = null;
+
+function clearLongTip() {
+  if (pressTimer) clearTimeout(pressTimer);
+  pressTimer = null;
+  document.querySelectorAll('.is-long-tip').forEach((node) => node.classList.remove('is-long-tip'));
+}
+
 document.addEventListener('pointerdown', (event) => {
+  clearLongTip();
   const element = event.target instanceof Element ? event.target : null;
   if (!element?.closest('#play')) stopPlayback();
-  if (!element) return;
-  if (!datePopout.hidden && !element.closest('#date-popout, #date-button, #period-button')) {
-    datePopout.hidden = true;
-    dateInput.classList.remove('is-invalid');
-    dateButton.setAttribute('aria-expanded', 'false');
-    periodButton.setAttribute('aria-expanded', 'false');
+  const pointer = event as PointerEvent;
+  const tipHost = element?.closest<HTMLElement>('[data-tip]');
+  const fineHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (tipHost && (!fineHover || pointer.pointerType === 'touch')) {
+    pressTimer = setTimeout(() => tipHost.classList.add('is-long-tip'), 500);
   }
-  if (!eraPopout.hidden && !element.closest('#era-popout, #era-button')) {
-    eraPopout.hidden = true;
-    eraButton.setAttribute('aria-expanded', 'false');
+  if (!element) return;
+  if (!eraPopout.hidden && !element.closest('#era-popout, #era-button, #date-button, #tools-button, #period-button')) {
+    closePopouts();
   }
   if (!keyPanel.hidden && !element.closest('#key-panel, #key-button')) {
     keyPanel.hidden = true;
@@ -145,11 +156,14 @@ document.addEventListener('pointerdown', (event) => {
   }
 });
 
+document.addEventListener('pointerup', clearLongTip);
+document.addEventListener('pointercancel', clearLongTip);
+
 document.addEventListener('keydown', (event) => {
   const element = event.target instanceof Element ? event.target : null;
   if (!element?.closest('#play')) stopPlayback();
   if (event.key !== 'Escape') return;
-  if (!datePopout.hidden || !eraPopout.hidden || !keyPanel.hidden) {
+  if (!eraPopout.hidden || !keyPanel.hidden) {
     closePopouts();
     return;
   }
@@ -199,6 +213,7 @@ function render(options?: { framePoles?: boolean }) {
   periodButton.setAttribute('aria-label', label);
   slider.max = String(inEra.length - 1);
   slider.value = String(period.index);
+  slider.setAttribute('aria-valuetext', spokenRange(label));
   app!.dataset.era = period.era;
   app!.dataset.periodStart = String(period.start);
   app!.dataset.periodEnd = String(period.end);
@@ -225,7 +240,13 @@ function render(options?: { framePoles?: boolean }) {
 
 function refreshRuler() {
   paintTicks(periodsForEra(period.era, present).length);
+  paintEraLabels();
   placeThumb();
+  requestAnimationFrame(separateEraLabels);
+}
+
+function spokenRange(label: string) {
+  return label.replaceAll('–', ' to ').replace(/\s+/g, ' ').trim();
 }
 
 function paintTicks(count: number) {
@@ -245,17 +266,84 @@ function paintTicks(count: number) {
   }
 }
 
+const ERA_MARKS: { year: number; text: string }[] = [
+  { year: -300000, text: '300k' },
+  { year: -100000, text: '100k' },
+  { year: -3000, text: '3000 BCE' },
+  { year: 0, text: '0' },
+  { year: 2000, text: '2000' },
+];
+const HIDE_ERA_MARK_FIRST = ['100k', '0', '3000 BCE', '300k', '2000'];
+
+function paintEraLabels() {
+  const periods = periodsForEra(period.era, present);
+  const start = periods[0].start;
+  const end = periods[periods.length - 1].end;
+  const span = end - start;
+  eraLabels.replaceChildren();
+  for (const mark of ERA_MARKS) {
+    if (mark.year === 0 && period.era !== 'after') continue;
+    if (mark.year !== 0 && mark.year !== -3000 && (mark.year < start || mark.year > end)) continue;
+    const ratio = span <= 0 ? 0 : Math.min(1, Math.max(0, (mark.year - start) / span));
+    const node = document.createElement('span');
+    node.className = 'era-tick';
+    node.dataset.mark = mark.text;
+    node.textContent = mark.text;
+    node.style.left = `${ratio * 100}%`;
+    node.style.transform = ratio <= 0.02 ? 'translateX(0)' : ratio >= 0.98 ? 'translateX(-100%)' : 'translateX(-50%)';
+    eraLabels.append(node);
+  }
+}
+
+function separateEraLabels() {
+  const labels = [...eraLabels.querySelectorAll<HTMLElement>('.era-tick')];
+  labels.forEach((node) => {
+    node.hidden = false;
+  });
+  const thumb = periodButton.getBoundingClientRect();
+  const hits = (a: DOMRect, b: DOMRect) =>
+    a.width > 1 && b.width > 1 && a.left < b.right - 1 && a.right > b.left + 1 && a.top < b.bottom - 1 && a.bottom > b.top + 1;
+  for (let guard = 0; guard < labels.length; guard += 1) {
+    const visible = labels.filter((node) => !node.hidden);
+    let hide: HTMLElement | null = null;
+    let hideRank = HIDE_ERA_MARK_FIRST.length;
+    for (const node of visible) {
+      const rect = node.getBoundingClientRect();
+      const collides =
+        hits(rect, thumb) ||
+        visible.some((other) => other !== node && hits(rect, other.getBoundingClientRect()));
+      if (!collides) continue;
+      const rank = HIDE_ERA_MARK_FIRST.indexOf(node.dataset.mark ?? '');
+      if (rank !== -1 && rank < hideRank) {
+        hide = node;
+        hideRank = rank;
+      }
+    }
+    if (!hide) break;
+    hide.hidden = true;
+  }
+}
+
 function placeThumb() {
   const band = periodButton.parentElement;
-  if (!band) return;
+  const card = band?.closest<HTMLElement>('.time');
+  if (!band || !card) return;
   const max = Number(slider.max);
   const ratio = max <= 0 ? 0 : Number(slider.value) / max;
   const sliderRect = slider.getBoundingClientRect();
   const bandRect = band.getBoundingClientRect();
+  const cardRect = card.getBoundingClientRect();
   if (bandRect.width < 8 || sliderRect.width < 2) return;
+  const thumbWidth = 4;
+  const center = sliderRect.left + thumbWidth / 2 + ratio * (sliderRect.width - thumbWidth);
   const half = periodButton.offsetWidth / 2;
-  let x = sliderRect.left - bandRect.left + ratio * sliderRect.width;
-  x = Math.min(Math.max(x, half + 2), Math.max(half + 2, bandRect.width - half - 2));
+  const min = Math.max(half + 2, cardRect.left - bandRect.left + half + 4);
+  let maxX = cardRect.right - bandRect.left - half - 4;
+  if (toolsButton.offsetParent) {
+    const tools = toolsButton.getBoundingClientRect();
+    if (tools.width > 2) maxX = Math.min(maxX, tools.left - bandRect.left - half - 4);
+  }
+  const x = Math.min(Math.max(center - bandRect.left, min), Math.max(min, maxX));
   periodButton.style.left = `${x}px`;
 }
 
@@ -290,11 +378,13 @@ function stopPlayback() {
 }
 
 function toggleDate() {
-  const open = datePopout.hidden;
+  const open = eraPopout.hidden;
   closePopouts();
   if (!open) return;
-  datePopout.hidden = false;
+  eraPopout.hidden = false;
   dateButton.setAttribute('aria-expanded', 'true');
+  eraButton.setAttribute('aria-expanded', 'true');
+  toolsButton.setAttribute('aria-expanded', 'true');
   periodButton.setAttribute('aria-expanded', 'true');
   dateInput.focus();
 }
@@ -307,11 +397,11 @@ function togglePopout(panel: HTMLElement, button: HTMLElement) {
 }
 
 function closePopouts() {
-  datePopout.hidden = true;
   dateInput.classList.remove('is-invalid');
   eraPopout.hidden = true;
   keyPanel.hidden = true;
   eraButton.setAttribute('aria-expanded', 'false');
+  toolsButton.setAttribute('aria-expanded', 'false');
   keyButton.setAttribute('aria-expanded', 'false');
   periodButton.setAttribute('aria-expanded', 'false');
   dateButton.setAttribute('aria-expanded', 'false');
@@ -341,6 +431,12 @@ function iconPause() {
 }
 function iconDate() {
   return '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8 3v4M16 3v4M4 10h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+}
+function iconAxe() {
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5c2.6 3.2 4.2 6.4 4.2 9.2a4.2 4.2 0 0 1-8.4 0c0-2.8 1.6-6 4.2-9.2z" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M9.2 13.2h5.6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+}
+function iconTemple() {
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16M6.5 20V9.5M12 20V9.5M17.5 20V9.5M3.5 9.5h17M6 9.5V6.5h12V9.5M12 6.5V4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 }
 
 render();

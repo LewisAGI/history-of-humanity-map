@@ -104,6 +104,8 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   let selectedId: string | null = null;
   let routeGeometry: GeoJSON.Feature[] = [];
   let anchorObserver: MutationObserver | null = null;
+  let settlingPopup = false;
+  let popupClassHolds = 0;
   let userCamera = false;
   let popupAnchor: 'top' | 'bottom' = 'bottom';
   const sheet = document.createElement('div');
@@ -368,7 +370,10 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       if (target instanceof Element && target.closest('.maplibregl-popup-close-button')) ignoreMapClick = true;
     });
     if (element) {
-      anchorObserver = new MutationObserver(() => settlePopup());
+      anchorObserver = new MutationObserver(() => {
+        if (settlingPopup) return;
+        settlePopup();
+      });
       anchorObserver.observe(element, { attributes: true, attributeFilter: ['class'] });
     }
     next.on('close', () => {
@@ -608,6 +613,16 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     return pin ? [pin.at.lng, pin.at.lat] : [event.lng, event.lat];
   }
 
+  function holdPopupClass(change: () => void) {
+    popupClassHolds += 1;
+    settlingPopup = true;
+    change();
+    queueMicrotask(() => {
+      popupClassHolds -= 1;
+      if (popupClassHolds === 0) settlingPopup = false;
+    });
+  }
+
   function settlePopup(attempt = 0) {
     const element = popup?.getElement();
     if (!element) {
@@ -616,6 +631,10 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     }
     element.style.marginLeft = '0px';
     element.style.marginTop = '0px';
+    const tip = element.querySelector<HTMLElement>('.maplibregl-popup-tip');
+    if (tip) tip.style.transform = '';
+    // The class observer is a microtask, so the guard has to outlive this turn.
+    holdPopupClass(() => element.classList.remove('is-detached'));
     const rect = element.getBoundingClientRect();
     if (rect.width < 2 || rect.height < 2) {
       if (attempt < 6) requestAnimationFrame(() => settlePopup(attempt + 1));
@@ -632,6 +651,17 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     ({ dx, dy } = clearOfSelection(rect, dx, dy, limits));
     element.style.marginLeft = `${dx}px`;
     element.style.marginTop = `${dy}px`;
+    const detached = Math.abs(dx) > 12 || Math.abs(dy) > 12;
+    holdPopupClass(() => element.classList.toggle('is-detached', detached));
+    if (tip) {
+      if (detached) tip.style.transform = '';
+      else {
+        const limit = Math.max(0, rect.width / 2 - 18);
+        const shiftX = Math.max(-limit, Math.min(limit, -dx));
+        const shiftY = Math.max(-14, Math.min(14, -dy));
+        tip.style.transform = `translate(${shiftX}px, ${shiftY}px)`;
+      }
+    }
     const placed = element.getBoundingClientRect();
     const outside = !boxInside(placed, limits) || hitsControls(placed);
     if (outside && attempt < 8) {

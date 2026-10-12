@@ -20,8 +20,8 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npx playwright install --with-deps chromium
-      # The layout matrix is about 38 minutes. Map specs are the 6–7 minute run.
-      - run: npx playwright test --ignore-project=matrix-chromium
+      # The layout matrix is about 38 minutes. These three projects are the map specs.
+      - run: npx playwright test --project=desktop --project=iphone --project=landscape
 
   deploy-preview:
     needs: test

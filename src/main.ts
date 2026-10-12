@@ -328,20 +328,24 @@ function placeThumb() {
   const band = periodButton.parentElement;
   const card = band?.closest<HTMLElement>('.time');
   if (!band || !card) return;
-  const max = Number(slider.max);
-  const ratio = max <= 0 ? 0 : Number(slider.value) / max;
+  const steps = Number(slider.max);
+  const ratio = steps <= 0 ? 0 : Number(slider.value) / steps;
   const sliderRect = slider.getBoundingClientRect();
   const bandRect = band.getBoundingClientRect();
   const cardRect = card.getBoundingClientRect();
   if (bandRect.width < 8 || sliderRect.width < 2) return;
   const thumbWidth = 4;
   const center = sliderRect.left + thumbWidth / 2 + ratio * (sliderRect.width - thumbWidth);
-  const half = periodButton.offsetWidth / 2;
-  // Stay on the thumb. Slide along the card edge only when the label would leave the card.
-  const min = cardRect.left - bandRect.left + half + 2;
-  const maxX = cardRect.right - bandRect.left - half - 2;
-  const lo = Math.min(min, maxX);
-  const hi = Math.max(min, maxX);
+  const half = periodButton.getBoundingClientRect().width / 2;
+  // Stay on the thumb. Slide in only to stay inside the card, and clear of the phone date button.
+  let minCenter = cardRect.left + half + 2;
+  let maxCenter = cardRect.right - half - 2;
+  if (toolsButton.offsetParent) {
+    const tools = toolsButton.getBoundingClientRect();
+    if (tools.width > 2) maxCenter = Math.min(maxCenter, tools.left - half - 5);
+  }
+  const lo = Math.min(minCenter, maxCenter) - bandRect.left;
+  const hi = Math.max(minCenter, maxCenter) - bandRect.left;
   const x = Math.min(Math.max(center - bandRect.left, lo), hi);
   periodButton.style.left = `${x}px`;
 }

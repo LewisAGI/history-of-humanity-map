@@ -890,6 +890,38 @@ test('the period label stays on the thumb at both ends of the phone ruler', asyn
   }
 });
 
+test('the date pop-out stays on screen at 320 and 375', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== 'desktop', 'resized widths cover the phone layout');
+  await page.goto('/');
+  await page.locator('#app[data-ready="true"]').waitFor();
+  for (const viewport of [
+    { width: 320, height: 568 },
+    { width: 375, height: 667 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await openDatePopout(page);
+    const box = await page.evaluate(() => {
+      const pop = document.querySelector('#era-popout')!.getBoundingClientRect();
+      const input = document.querySelector('#date-input')!.getBoundingClientRect();
+      return {
+        popLeft: pop.left,
+        popRight: pop.right,
+        popWidth: pop.width,
+        inputLeft: input.left,
+        inputRight: input.right,
+        width: window.innerWidth,
+      };
+    });
+    expect(box.popLeft).toBeGreaterThanOrEqual(8);
+    expect(box.popRight).toBeLessThanOrEqual(box.width - 8);
+    expect(box.popWidth).toBeLessThanOrEqual(box.width - 16 + 0.5);
+    expect(box.inputLeft).toBeGreaterThanOrEqual(8);
+    expect(box.inputRight).toBeLessThanOrEqual(box.width - 8);
+    await page.keyboard.press('Escape');
+    await expect(page.locator('#era-popout')).toBeHidden();
+  }
+});
+
 test('night globe screenshots', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'one production pass records the style shots');
   test.setTimeout(180_000);
@@ -932,6 +964,17 @@ test('night globe screenshots', async ({ page }, testInfo) => {
     await expect(page.locator('#play')).toHaveAttribute('aria-pressed', 'true');
     await styleShot(page, viewport, 'play');
   }
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.goto('/');
+  await page.locator('#app[data-ready="true"]').waitFor();
+  await page.locator('#slider').evaluate((element: HTMLInputElement) => {
+    element.value = element.max;
+    element.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  await styleShot(page, { width: 320, height: 568 }, 'range_end');
+  await openDatePopout(page);
+  await styleShot(page, { width: 320, height: 568 }, 'date');
 });
 
 async function showArrow(page: Page, date: string, id: string) {
@@ -1118,13 +1161,17 @@ async function expectLabelOnThumb(page: Page, label: string, end: '0' | 'max') {
     const ratio = max <= 0 ? 0 : Number(slider.value) / max;
     const thumbWidth = 4;
     const thumb = track.left + thumbWidth / 2 + ratio * (track.width - thumbWidth);
+    const tools = document.querySelector<HTMLElement>('#tools-button');
+    const toolsBox = tools && tools.offsetParent ? tools.getBoundingClientRect() : null;
     return {
       gap: Math.abs(thumb - (thumbLabel.left + thumbLabel.width / 2)),
       inside: thumbLabel.left >= card.left - 1 && thumbLabel.right <= card.right + 1,
+      clearance: toolsBox ? toolsBox.left - thumbLabel.right : null,
     };
   });
   expect(gap.inside, `${label} inside the card`).toBe(true);
-  expect(gap.gap, label).toBeLessThanOrEqual(8);
+  if (gap.clearance != null) expect(gap.clearance, `${label} clear of the date button`).toBeGreaterThanOrEqual(4);
+  if (end === '0' || gap.clearance == null) expect(gap.gap, label).toBeLessThanOrEqual(8);
 }
 
 async function shootRange(page: Page, viewport: { width: number; height: number }) {

@@ -23,7 +23,11 @@ export default defineConfig({
   fullyParallel: false,
   workers: 1,
   timeout: 90_000,
+  // Pages CI runs the map specs only. The 14-viewport matrix is about 38 minutes
+  // and is what made `npm run test:e2e` sit for the better part of an hour.
+  globalTimeout: process.env.GITHUB_ACTIONS ? 25 * 60 * 1000 : 0,
   expect: { timeout: 15_000 },
+  reporter: process.env.GITHUB_ACTIONS ? [['line'], ['github']] : [['line']],
   use: {
     baseURL: 'http://127.0.0.1:4173',
     trace: 'retain-on-failure',

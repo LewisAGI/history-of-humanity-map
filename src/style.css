@@ -625,4 +625,18 @@ html, body {
   .thumb-band { margin: 0; }
   .time-row { gap: 0; }
   .time-row .icon-button { width: 40px; }
+  #era-popout {
+    left: 6px;
+    right: 6px;
+    box-sizing: border-box;
+    max-width: calc(100vw - 16px);
+  }
+  #date-popout {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  #date-input {
+    width: 100%;
+    min-width: 0;
+  }
 }

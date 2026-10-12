@@ -337,13 +337,12 @@ function placeThumb() {
   const thumbWidth = 4;
   const center = sliderRect.left + thumbWidth / 2 + ratio * (sliderRect.width - thumbWidth);
   const half = periodButton.offsetWidth / 2;
-  const min = Math.max(half + 2, cardRect.left - bandRect.left + half + 4);
-  let maxX = cardRect.right - bandRect.left - half - 4;
-  if (toolsButton.offsetParent) {
-    const tools = toolsButton.getBoundingClientRect();
-    if (tools.width > 2) maxX = Math.min(maxX, tools.left - bandRect.left - half - 4);
-  }
-  const x = Math.min(Math.max(center - bandRect.left, min), Math.max(min, maxX));
+  // Stay on the thumb. Slide along the card edge only when the label would leave the card.
+  const min = cardRect.left - bandRect.left + half + 2;
+  const maxX = cardRect.right - bandRect.left - half - 2;
+  const lo = Math.min(min, maxX);
+  const hi = Math.max(min, maxX);
+  const x = Math.min(Math.max(center - bandRect.left, lo), hi);
   periodButton.style.left = `${x}px`;
 }
 

@@ -252,6 +252,15 @@ test('timeline, globe, pins, and labels', async ({ page }, testInfo) => {
   await expect(page.locator('#date-popout')).toBeHidden();
 });
 
+test('the globe repaints after the land source loads and after a tile error', async ({ page }) => {
+  await page.route(/gibs\.earthdata\.nasa\.gov/, (route) => route.abort('failed'));
+  await page.goto('/');
+  await page.locator('#app[data-ready="true"]').waitFor({ timeout: 20_000 });
+  await expect(page.locator('#app')).toHaveAttribute('data-land-repaint', '1');
+  await expect(page.locator('#app')).toHaveAttribute('data-tile-repaint', '1');
+  await expect.poll(() => renderedCount(page, 'land')).toBeGreaterThan(0);
+});
+
 test('pins render when basemap tiles are blocked', async ({ page }, testInfo) => {
   await page.route(/gibs\.earthdata\.nasa\.gov/, (route) => route.abort('internetdisconnected'));
   await page.goto('/');
@@ -856,6 +865,31 @@ test('the scrubber thumb, tick labels, tip, and attribution stay clear', async (
   await expectGlassContrast(page);
 });
 
+test('the period label stays on the thumb at both ends of the phone ruler', async ({ page }, testInfo) => {
+  test.skip(!['desktop', 'iphone'].includes(testInfo.project.name), 'portrait phone widths');
+  await page.goto('/');
+  await page.locator('#app[data-ready="true"]').waitFor();
+  const widths = [
+    { width: 320, height: 568 },
+    { width: 375, height: 667 },
+    { width: 390, height: 844 },
+  ];
+  for (const viewport of widths) {
+    await page.setViewportSize(viewport);
+    await page.waitForTimeout(80);
+    await expectLabelOnThumb(page, '3000–2951 BCE', '0');
+    await expectLabelOnThumb(page, '2000–2026 CE', 'max');
+    await openEraList(page);
+    await page.getByRole('button', { name: 'Before civilisation' }).click();
+    await expect(page.locator('#app')).toHaveAttribute('data-era', 'before');
+    await expectLabelOnThumb(page, '300,000–295,001 BCE', '0');
+    await expectLabelOnThumb(page, '5000–3001 BCE', 'max');
+    await openEraList(page);
+    await page.getByRole('button', { name: 'After civilisation' }).click();
+    await expect(page.locator('#app')).toHaveAttribute('data-era', 'after');
+  }
+});
+
 test('night globe screenshots', async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== 'desktop', 'one production pass records the style shots');
   test.setTimeout(180_000);
@@ -871,6 +905,7 @@ test('night globe screenshots', async ({ page }, testInfo) => {
     await page.locator('#app[data-ready="true"]').waitFor();
     await page.waitForTimeout(400);
     await styleShot(page, viewport, 'default');
+    if (viewport.width === 1440 || viewport.width === 390 || viewport.width === 375) await shootRange(page, viewport);
     await openFramed(page, '1518', 'atlantic-slave-trade');
     await styleShot(page, viewport, 'slave');
     await openFramed(page, '1405', 'zheng-he');
@@ -1065,6 +1100,49 @@ async function expectPopupInside(page: Page) {
   expect(box.y).toBeGreaterThanOrEqual(-1);
   expect(box.x + box.width).toBeLessThanOrEqual(viewport.width + 1);
   expect(box.y + box.height).toBeLessThanOrEqual(viewport.height + 1);
+}
+
+async function expectLabelOnThumb(page: Page, label: string, end: '0' | 'max') {
+  await page.locator('#slider').evaluate((element: HTMLInputElement, which: string) => {
+    element.value = which === 'max' ? element.max : '0';
+    element.dispatchEvent(new Event('input', { bubbles: true }));
+  }, end);
+  await expect(page.locator('#period-button')).toHaveText(label);
+  await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  const gap = await page.evaluate(() => {
+    const thumbLabel = document.querySelector('#period-button')!.getBoundingClientRect();
+    const slider = document.querySelector('#slider') as HTMLInputElement;
+    const track = slider.getBoundingClientRect();
+    const card = document.querySelector('.time')!.getBoundingClientRect();
+    const max = Number(slider.max);
+    const ratio = max <= 0 ? 0 : Number(slider.value) / max;
+    const thumbWidth = 4;
+    const thumb = track.left + thumbWidth / 2 + ratio * (track.width - thumbWidth);
+    return {
+      gap: Math.abs(thumb - (thumbLabel.left + thumbLabel.width / 2)),
+      inside: thumbLabel.left >= card.left - 1 && thumbLabel.right <= card.right + 1,
+    };
+  });
+  expect(gap.inside, `${label} inside the card`).toBe(true);
+  expect(gap.gap, label).toBeLessThanOrEqual(8);
+}
+
+async function shootRange(page: Page, viewport: { width: number; height: number }) {
+  const marks = [
+    { name: 'range_start', value: '0' },
+    { name: 'range_mid', value: 'mid' },
+    { name: 'range_end', value: 'max' },
+  ];
+  for (const mark of marks) {
+    await page.locator('#slider').evaluate((element: HTMLInputElement, which: string) => {
+      const max = Number(element.max);
+      element.value = which === 'max' ? element.max : which === 'mid' ? String(Math.round(max / 2)) : '0';
+      element.dispatchEvent(new Event('input', { bubbles: true }));
+    }, mark.value);
+    await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    await expect(page.locator('.era-tick:not([hidden])').first()).toBeVisible();
+    await styleShot(page, viewport, mark.name);
+  }
 }
 
 async function expectThumbInside(page: Page) {

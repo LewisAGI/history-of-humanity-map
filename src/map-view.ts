@@ -40,6 +40,21 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     fadeDuration: 0,
   });
 
+  // The globe can keep the last frame after GeoJSON arrives or a raster tile fails.
+  let landRepainted = false;
+  map.on('sourcedata', (event) => {
+    if (landRepainted || event.sourceId !== 'land' || !event.isSourceLoaded) return;
+    landRepainted = true;
+    map.triggerRepaint();
+    root.dataset.landRepaint = '1';
+  });
+  map.on('error', (event) => {
+    const detail = event as { sourceId?: string; tile?: unknown };
+    if (!detail.sourceId && !detail.tile) return;
+    map.triggerRepaint();
+    root.dataset.tileRepaint = '1';
+  });
+
   const ready = new Promise<void>((resolve) => {
     let started = false;
     const setup = () => {

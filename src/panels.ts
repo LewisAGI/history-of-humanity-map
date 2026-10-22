@@ -1,8 +1,8 @@
 import { catalog, doiHref, filtersAreOpen, searchCatalog, type MapFilters } from './catalog';
-import { formatYear, formatYearRange } from './dates';
+import { formatYearRange } from './dates';
 import { externalRel, parksAustraliaUrl } from './links';
 import { readerNotice } from './notice';
-import { waypointText } from './present';
+import { shownTimelineYear, waypointText } from './present';
 import type { HistoryEvent } from './types';
 
 export interface DepthHooks {
@@ -250,7 +250,9 @@ export function mountDepth(app: HTMLElement, hooks: DepthHooks): DepthController
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'entry-button';
-      button.innerHTML = `<span class="hit-detail">${escapeHtml(formatYear(entry.t))}</span><span class="hit-label">${escapeHtml(entry.label)}</span>`;
+      const when = shownTimelineYear(entry.ref, entry.t);
+      const year = when ? `<span class="hit-detail">${escapeHtml(when)}</span>` : '';
+      button.innerHTML = `${year}<span class="hit-label">${escapeHtml(entry.label)}</span>`;
       button.addEventListener('click', () => {
         if (entry.kind === 'event' && entry.targetId) hooks.openEvent(entry.targetId);
         if (entry.kind === 'migration' && entry.targetId) {

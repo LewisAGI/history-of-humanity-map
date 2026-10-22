@@ -126,15 +126,25 @@ function readerPin(pin: Record<string, unknown>): Record<string, unknown> {
   return pin;
 }
 
+const SENSITIVE_CLAUSE = [
+  /\s*Sensitive content\.$/,
+  /\s*Sensitive colonial history\.$/,
+  /\s*Genocide; sensitive\.$/,
+  /\s*Sensitive\.$/,
+];
+
 function readerDateNote(id: string, note: string): string {
-  if (id === 'lake-mungo') {
-    return note.replace(
-      'Remains returned to Traditional Owners; deceased-person sensitivity applies.',
-      'The ancestral remains have been returned.',
-    );
-  }
+  if (id === 'lake-mungo') return 'The ancestral remains have been returned to their Traditional Owners.';
   if (id === 'wairau-bar') {
     return note.replace('Ancestral remains; deceased-person sensitivity.', 'Ancestral remains.');
+  }
+  if (id === 'three-sisters') return 'Modern invention, misattributed as tradition.';
+  return stripSensitiveClause(note);
+}
+
+function stripSensitiveClause(note: string): string {
+  for (const pattern of SENSITIVE_CLAUSE) {
+    if (pattern.test(note)) return note.replace(pattern, '').trim();
   }
   return note;
 }

@@ -8,9 +8,9 @@ import { readerNotice } from '../src/notice';
 import { sensitivityCode } from '../vite.config';
 import { parsePagesHeaders } from '../src/pages-headers';
 import { externalAnchor, mountDepth, renderDoiLinks, renderSourceLinks } from '../src/panels';
-import { popupHtml } from '../src/present';
+import { popupHtml, shownTimelineYear } from '../src/present';
 
-const EDITOR_NOTE = /handle respectfully|link to .* only|follow .* guidance|link (only|to Parks)|by request/i;
+const EDITOR_NOTE = /handle respectfully|link to .* only|follow .* guidance|link (only|to Parks)|by request|\bsensitive\b/i;
 
 class FakeNode {
   id = '';
@@ -144,9 +144,19 @@ describe('reader-facing sensitivity', () => {
 
     const mungo = catalog.events.find((event) => event.packId === 'lake-mungo' || event.id === 'lake-mungo');
     const wairau = catalog.events.find((event) => event.packId === 'wairau-bar' || event.id === 'wairau-bar');
-    expect(mungo?.dateNote).toBe('Approx.; about 42-40 ka. The ancestral remains have been returned.');
+    expect(mungo?.dateNote).toBe('The ancestral remains have been returned to their Traditional Owners.');
     expect(wairau?.dateNote).toBe('Approx.; ~late 13th century. Ancestral remains.');
     expect(`${mungo?.dateNote} ${wairau?.dateNote}`).not.toMatch(/deceased-person sensitivity/i);
+
+    const pinNote = (id: string) => content.pins.find((pin) => pin.id === id)?.dateNote;
+    expect(pinNote('nanjing')).toBe('Dec 1937 - Jan 1938. Death toll estimates vary widely.');
+    expect(pinNote('jallianwala')).toBe('13 April 1919.');
+    expect(pinNote('dhaka-1971')).toBe('1971.');
+    expect(pinNote('auschwitz')).toBe('1940-45.');
+    expect(pinNote('tuol-sleng')).toBe('1975-1979.');
+    expect(pinNote('botany-bay')).toBe('29 April 1770.');
+    const sisters = catalog.events.find((event) => event.packId === 'three-sisters' || event.id === 'three-sisters');
+    expect(sisters?.dateNote).toBe('Modern invention, misattributed as tradition.');
   });
 });
 
@@ -161,6 +171,13 @@ describe('uluru link', () => {
     expect(html).toContain('>Uluru<');
     expect(html).toContain('A sacred Anangu place. Its Tjukurpa stories are not retold here.');
     expect(html).not.toMatch(EDITOR_NOTE);
+    expect(html).not.toContain('1900');
+    expect(html).not.toContain('popup-date');
+    expect(shownTimelineYear('uluru-link', 1900)).toBe('');
+    const kenya = catalog.events.find((event) => event.id === 'kilimanjaro' || event.packId === 'kilimanjaro');
+    expect(kenya).toBeTruthy();
+    expect(popupHtml(kenya!)).toContain('1900 CE');
+    expect(shownTimelineYear('kilimanjaro', 1900)).toBe('1900 CE');
     expect(html).not.toMatch(/<a\b/i);
     expect(html).not.toContain('wikipedia.org');
     expect(html).not.toContain('uluru.gov.au');

@@ -25,6 +25,7 @@ declare global {
 }
 import fs from 'node:fs';
 import path from 'node:path';
+import { ignorableConsole, ignorablePageError } from './faults';
 
 const shots = path.join('test-results', 'screenshots');
 const APP_ORIGIN = 'http://127.0.0.1:4173';
@@ -70,7 +71,10 @@ test.beforeAll(() => {
 
 test.beforeEach(async ({ page }) => {
   faults = [];
-  page.on('pageerror', (error) => faults.push(`pageerror: ${error.message}`));
+  page.on('pageerror', (error) => {
+    if (ignorablePageError(error.message)) return;
+    faults.push(`pageerror: ${error.message}`);
+  });
   page.on('console', (message) => {
     if (message.type() !== 'error') return;
     const text = message.text();
@@ -1552,14 +1556,6 @@ function isAppAsset(url: string): boolean {
   } catch {
     return false;
   }
-}
-
-function ignorableConsole(text: string): boolean {
-  if (/Worker failed to load/i.test(text)) return false;
-  if (/gibs\.earthdata\.nasa\.gov/i.test(text)) return true;
-  // Aborted basemap tiles are reported without the tile host. A same-origin
-  // asset failure is recorded from the response, and "Worker failed to load" is not ignored.
-  return /^Failed to load resource: /i.test(text) && !/127\.0\.0\.1|\/assets\//.test(text);
 }
 
 async function expectNoHorizontalScroll(page: Page) {

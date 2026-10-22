@@ -1,6 +1,6 @@
 import { catalog, pinLinkHref } from './catalog';
-import { formatEventDate } from './dates';
-import { externalRel } from './links';
+import { formatEventDate, formatYear } from './dates';
+import { externalRel, isUluruPin } from './links';
 import type { HistoryEvent } from './types';
 
 export function markPin(
@@ -15,11 +15,26 @@ export function waypointText(stop: { name: string; standIn?: string }): string {
   return stop.standIn ? `${stop.name} · ${stop.standIn}` : stop.name;
 }
 
+/** Uluru's 1900 is a pack placeholder, not a date to show. Other 1900 dates stay. */
+export function shownEventDate(event: HistoryEvent): string {
+  if (isUluruPin(event)) return '';
+  return formatEventDate(event.start, event.end, event.dateNote);
+}
+
+export function shownTimelineYear(ref: string, year: number): string {
+  if (ref === 'uluru-link') return '';
+  return formatYear(year);
+}
+
 export function popupHtml(event: HistoryEvent): string {
   const stand = event.standIn ? `<p class="popup-standin">${escapeHtml(event.standIn)}</p>` : '';
+  const when = shownEventDate(event);
+  const date = when
+    ? `<p class="popup-date" data-status="${escapeHtml(event.dateStatus ?? '')}">${escapeHtml(when)}</p>`
+    : '';
   return `
     <h2 class="popup-title">${escapeHtml(event.title)}${reviewMark(event)}</h2>
-    <p class="popup-date" data-status="${escapeHtml(event.dateStatus ?? '')}">${escapeHtml(formatEventDate(event.start, event.end, event.dateNote))}</p>
+    ${date}
     <p class="popup-place">${escapeHtml(event.place)}</p>
     ${doiLinks(event)}
     <p class="popup-summary">${escapeHtml(event.summary)}</p>

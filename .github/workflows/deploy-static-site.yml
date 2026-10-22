@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       site:
-        description: LewisAGI repository and Cloudflare Pages project
+        description: LewisAGI repository. The Pages project comes from the deploy map.
         required: true
         type: choice
         options:
@@ -344,26 +344,30 @@ jobs:
         run: |
           set -euo pipefail
           shopt -u nocasematch
+          # Hard-coded site to Pages project map. Names are literals, not
+          # built from the input. health-claims is the existing live project.
+          # The orphan project named psychedelics is not in this map and is
+          # not modified.
           case "$SITE_INPUT" in
             health-claims)
-              SITE_NAME=health-claims
+              PAGES_PROJECT=health-claims
               EXPECTED_SUBDOMAIN=health-claims.pages.dev
               ;;
             psychedelics)
-              SITE_NAME=psychedelics
-              EXPECTED_SUBDOMAIN=psychedelics.pages.dev
+              PAGES_PROJECT=lewisagi-psychedelics
+              EXPECTED_SUBDOMAIN=lewisagi-psychedelics.pages.dev
               ;;
             indigenous-australia)
-              SITE_NAME=indigenous-australia
-              EXPECTED_SUBDOMAIN=indigenous-australia.pages.dev
+              PAGES_PROJECT=lewisagi-indigenous-australia
+              EXPECTED_SUBDOMAIN=lewisagi-indigenous-australia.pages.dev
               ;;
             celtic-ireland)
-              SITE_NAME=celtic-ireland
-              EXPECTED_SUBDOMAIN=celtic-ireland.pages.dev
+              PAGES_PROJECT=lewisagi-celtic-ireland
+              EXPECTED_SUBDOMAIN=lewisagi-celtic-ireland.pages.dev
               ;;
             ancient-greece-med)
-              SITE_NAME=ancient-greece-med
-              EXPECTED_SUBDOMAIN=ancient-greece-med.pages.dev
+              PAGES_PROJECT=lewisagi-ancient-greece-med
+              EXPECTED_SUBDOMAIN=lewisagi-ancient-greece-med.pages.dev
               ;;
             *)
               echo "Site is not in the allowlist."
@@ -392,25 +396,35 @@ jobs:
           fi
 
           projects="$("$WRANGLER" pages project list --json)"
-          found="$(printf '%s\n' "$projects" | jq -r --arg name "$SITE_NAME" 'any(.[]; .["Project Name"] == $name)')"
+          found="$(printf '%s\n' "$projects" | jq -r --arg name "$PAGES_PROJECT" 'any(.[]; .["Project Name"] == $name)')"
           if [ "$found" != "true" ] && [ "$found" != "false" ]; then
             echo "Could not read the Pages project list."
             exit 1
           fi
           if [ "$found" = "false" ]; then
             # --force keeps a new static project on Pages instead of Workers.
-            "$WRANGLER" pages project create "$SITE_NAME" --production-branch main --force
+            "$WRANGLER" pages project create "$PAGES_PROJECT" --production-branch main --force
           fi
 
-          # Read the project subdomain from the API. Do not print the token,
-          # the account id, or the response body.
-          export SITE_NAME EXPECTED_SUBDOMAIN
+          # Read the mapped project's subdomain from the API. Do not print the
+          # token, the account id, or the response body.
+          export PAGES_PROJECT EXPECTED_SUBDOMAIN
           python3 - <<'PY'
           import json
           import os
           import urllib.error
           import urllib.parse
           import urllib.request
+
+          # Same pairs as the shell map above. Membership is a lookup, not
+          # a name built from the repository input.
+          PROJECTS = {
+              "health-claims": "health-claims.pages.dev",
+              "lewisagi-psychedelics": "lewisagi-psychedelics.pages.dev",
+              "lewisagi-indigenous-australia": "lewisagi-indigenous-australia.pages.dev",
+              "lewisagi-celtic-ireland": "lewisagi-celtic-ireland.pages.dev",
+              "lewisagi-ancient-greece-med": "lewisagi-ancient-greece-med.pages.dev",
+          }
 
           class NoRedirect(urllib.request.HTTPRedirectHandler):
               def redirect_request(self, req, fp, code, msg, headers, newurl):
@@ -419,19 +433,19 @@ jobs:
           def main():
               token = os.environ.get("CLOUDFLARE_API_TOKEN") or ""
               account = os.environ.get("CLOUDFLARE_ACCOUNT_ID") or ""
-              site = os.environ.get("SITE_NAME") or ""
+              project = os.environ.get("PAGES_PROJECT") or ""
               expected = os.environ.get("EXPECTED_SUBDOMAIN") or ""
               if token == "" or account == "":
                   raise SystemExit("Cloudflare credentials are unavailable.")
-              if expected != site + ".pages.dev":
+              if PROJECTS.get(project) != expected:
                   raise SystemExit(
-                      "Refusing to deploy because the Pages subdomain is not the site pages.dev hostname."
+                      "Refusing to deploy because the Pages project is not in the hard-coded map."
                   )
               path = (
                   "/accounts/"
                   + urllib.parse.quote(account, safe="")
                   + "/pages/projects/"
-                  + urllib.parse.quote(site, safe="")
+                  + urllib.parse.quote(project, safe="")
               )
               opener = urllib.request.build_opener(NoRedirect)
               request = urllib.request.Request(
@@ -459,9 +473,9 @@ jobs:
               result = payload.get("result")
               if not isinstance(result, dict):
                   raise SystemExit("Could not read the Pages project.")
-              if result.get("name") != site or result.get("subdomain") != expected:
+              if result.get("name") != project or result.get("subdomain") != expected:
                   raise SystemExit(
-                      "Refusing to deploy because the Pages subdomain is not the site pages.dev hostname."
+                      "Refusing to deploy because the Pages subdomain is not the mapped pages.dev hostname."
                   )
 
           if __name__ == "__main__":
@@ -474,6 +488,6 @@ jobs:
           PY
 
           "$WRANGLER" pages deploy "$DIST" \
-            --project-name="$SITE_NAME" \
+            --project-name="$PAGES_PROJECT" \
             --branch=main \
             --commit-hash="$GATE_SHA"

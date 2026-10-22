@@ -1,0 +1,214 @@
+name: Deploy wildlife atlas
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch or SHA of LewisAGI/wildlife-migration-atlas to deploy
+        required: false
+        default: main
+        type: string
+  schedule:
+    # Production only, and only when atlas main moved since the last deploy.
+    - cron: "*/30 * * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-wildlife-atlas
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Resolve atlas ref
+        id: target
+        shell: bash
+        env:
+          ATLAS_REF: ${{ inputs.ref }}
+        run: |
+          set -euo pipefail
+          if [ "$GITHUB_EVENT_NAME" = "schedule" ]; then
+            ref=main
+          else
+            ref="${ATLAS_REF:-main}"
+            ref="${ref#"${ref%%[![:space:]]*}"}"
+            ref="${ref%"${ref##*[![:space:]]}"}"
+            if [ -z "$ref" ]; then
+              ref=main
+            fi
+          fi
+          if [[ ! "$ref" =~ ^[A-Za-z0-9._/-]+$ ]]; then
+            echo "Unsupported atlas ref."
+            exit 1
+          fi
+          case "$ref" in
+            -*|*'..'*)
+              echo "Unsupported atlas ref."
+              exit 1
+              ;;
+          esac
+          branch="$ref"
+          case "$branch" in
+            refs/heads/*) branch="${branch#refs/heads/}" ;;
+          esac
+          if [ -z "$branch" ]; then
+            echo "Unsupported atlas ref."
+            exit 1
+          fi
+          if [ "$branch" = "main" ]; then
+            production=true
+          else
+            production=false
+          fi
+          {
+            echo "ref=${ref}"
+            echo "branch=${branch}"
+            echo "production=${production}"
+          } >> "$GITHUB_OUTPUT"
+
+      # Last deployed production SHA, so a later schedule can skip an unchanged main.
+      - name: Restore last production SHA
+        id: last-sha
+        if: steps.target.outputs.production == 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: wildlife-atlas-state
+          key: wildlife-atlas-production-sha-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            wildlife-atlas-production-sha-
+
+      - name: Check whether atlas main changed
+        id: gate
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "$GITHUB_EVENT_NAME" != "schedule" ]; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          remote="$(git -c credential.helper= -c http.extraheader= ls-remote https://github.com/LewisAGI/wildlife-migration-atlas.git refs/heads/main)"
+          sha="$(printf '%s\n' "$remote" | awk 'NR==1 {print $1}')"
+          if [[ ! "$sha" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Could not resolve atlas main."
+            exit 1
+          fi
+          last=""
+          if [ -f wildlife-atlas-state/sha.txt ]; then
+            last="$(tr -d '[:space:]' < wildlife-atlas-state/sha.txt)"
+          fi
+          echo "Atlas main is ${sha}; last production deploy is ${last:-none}."
+          if [ "$sha" = "$last" ]; then
+            {
+              echo "deploy=false"
+              echo "sha=${sha}"
+            } >> "$GITHUB_OUTPUT"
+            echo "HEAD unchanged; skipping deploy."
+            exit 0
+          fi
+          {
+            echo "deploy=true"
+            echo "sha=${sha}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Checkout atlas
+        id: checkout
+        if: steps.gate.outputs.deploy == 'true'
+        shell: bash
+        env:
+          ATLAS_REF: ${{ steps.target.outputs.ref }}
+        run: |
+          set -euo pipefail
+          export GIT_TERMINAL_PROMPT=0
+          rm -rf atlas
+          git init --quiet atlas
+          git -C atlas remote add origin https://github.com/LewisAGI/wildlife-migration-atlas.git
+          # Public repository. Do not send a token.
+          git -C atlas -c credential.helper= -c http.extraheader= fetch --depth 1 origin "$ATLAS_REF"
+          git -C atlas checkout --detach FETCH_HEAD
+          sha="$(git -C atlas rev-parse HEAD)"
+          if [[ ! "$sha" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Checkout did not resolve a commit."
+            exit 1
+          fi
+          echo "Checked out ${sha} from ${ATLAS_REF}."
+          echo "sha=${sha}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Node
+        if: steps.gate.outputs.deploy == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: atlas/package-lock.json
+
+      - name: Install dependencies
+        if: steps.gate.outputs.deploy == 'true'
+        working-directory: atlas
+        run: npm ci
+
+      - name: Build
+        if: steps.gate.outputs.deploy == 'true'
+        working-directory: atlas
+        run: npm run build
+
+      - name: Deploy to Cloudflare Pages
+        if: steps.gate.outputs.deploy == 'true'
+        working-directory: atlas
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PAGES_BRANCH: ${{ steps.target.outputs.branch }}
+          PAGES_PRODUCTION: ${{ steps.target.outputs.production }}
+          ATLAS_SHA: ${{ steps.checkout.outputs.sha }}
+        run: |
+          set -euo pipefail
+          if [ -z "$PAGES_BRANCH" ]; then
+            echo "Refusing to deploy without a branch name."
+            exit 1
+          fi
+          if [ "$PAGES_PRODUCTION" = "true" ]; then
+            if [ "$PAGES_BRANCH" != "main" ]; then
+              echo "Refusing to deploy production from ${PAGES_BRANCH}."
+              exit 1
+            fi
+          elif [ "$PAGES_BRANCH" = "main" ]; then
+            echo "Refusing to publish a preview deployment to production."
+            exit 1
+          fi
+          if [[ ! "$ATLAS_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Refusing to deploy without the atlas commit SHA."
+            exit 1
+          fi
+          if ! npx --yes wrangler pages project list | grep -F "wildlife-migration-atlas"; then
+            npx --yes wrangler pages project create wildlife-migration-atlas --production-branch main
+          fi
+          npx --yes wrangler pages deploy dist \
+            --project-name=wildlife-migration-atlas \
+            --branch="${PAGES_BRANCH}" \
+            --commit-hash="${ATLAS_SHA}"
+
+      - name: Record deployed SHA
+        if: steps.gate.outputs.deploy == 'true' && steps.target.outputs.production == 'true'
+        shell: bash
+        env:
+          ATLAS_SHA: ${{ steps.checkout.outputs.sha }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$ATLAS_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Refusing to record an invalid SHA."
+            exit 1
+          fi
+          mkdir -p wildlife-atlas-state
+          printf '%s\n' "$ATLAS_SHA" > wildlife-atlas-state/sha.txt
+
+      - name: Save deployed SHA
+        if: steps.gate.outputs.deploy == 'true' && steps.target.outputs.production == 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: wildlife-atlas-state
+          key: wildlife-atlas-production-sha-${{ github.run_id }}-${{ github.run_attempt }}

@@ -18,14 +18,18 @@ on:
 permissions: {}
 
 concurrency:
-  # One pending run per ref. A later cron must not drop a queued preview.
-  group: "deploy-wildlife-atlas-${{ github.event_name == 'schedule' && 'main' || inputs.ref }}"
+  # One pending run per ref. Schedule, main, refs/heads/main, and an empty
+  # ref share the production group so two production deploys cannot overlap.
+  # A later cron must not drop a queued preview.
+  group: "deploy-wildlife-atlas-${{ (github.event_name == 'schedule' || inputs.ref == 'main' || inputs.ref == 'refs/heads/main' || inputs.ref == '') && 'main' || inputs.ref }}"
   cancel-in-progress: false
 
 jobs:
   gate:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # wildlife-atlas deployment branch policy is main only. It is set on the
+    # environment; this workflow does not change it.
     environment: wildlife-atlas
     # No checkout and no Node action. Listing deployments is a Cloudflare API
     # call from this step, so atlas code never shares the runner with the token.
@@ -129,8 +133,9 @@ jobs:
         run: |
           set -euo pipefail
           # wrangler 4.149.0 lists one page and reports Source as 7 characters
-          # and a successful Status as a relative time, so the newest successful
-          # deployment is selected here from created_on and latest_stage.status.
+          # and a successful Status as a relative time. The API returns newest
+          # first, so pagination stops at the first page that contains a
+          # successful production deployment.
           newest="$(python3 - <<'PY'
           import json
           import os
@@ -206,6 +211,15 @@ jobs:
                       raise SystemExit("Could not list production deployments.")
                   previous_marker = marker
                   collected.extend(result)
+                  # Newest first: the first page that contains a success holds
+                  # the newest successful production deployment.
+                  if any(
+                      isinstance(item, dict)
+                      and isinstance(item.get("latest_stage") or {}, dict)
+                      and (item.get("latest_stage") or {}).get("status") == "success"
+                      for item in result
+                  ):
+                      break
                   info = payload.get("result_info") or {}
                   if not isinstance(info, dict):
                       info = {}
@@ -217,7 +231,7 @@ jobs:
                   elif len(result) < 25 or len(result) == 0:
                       break
                   if page >= max_pages:
-                      raise SystemExit("Too many production deployments to scan.")
+                      break
                   page += 1
               return collected
           # selection-end
@@ -310,6 +324,7 @@ jobs:
     # upload-artifact finalizes through the Actions API and 403s without this
     # scope. Atlas npm runs in a container that is removed before the upload,
     # and that container is not given a token. There is no setup-node post step.
+    # Nothing may run after the build in this actions: write job without re-review.
     permissions:
       actions: write
     outputs:
@@ -403,12 +418,40 @@ jobs:
             "$image" \
             sh -c 'npm ci && npm run build'
 
+      # Nothing may run after the build in this actions: write job without re-review.
+      # upload-artifact follows symlinks, so dist is copied below and only that copy is uploaded.
+      - name: Copy dist without following links
+        if: steps.fetch.outputs.skip != 'true' && steps.lock.outputs.skip != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          dist="$PWD/atlas/dist"
+          if [ ! -d "$dist" ] || [ -L "$dist" ]; then
+            echo "dist must be a real directory."
+            exit 1
+          fi
+          if [ -n "$(find "$dist" \( -type l -o ! \( -type f -o -type d \) \) -print -quit)" ]; then
+            echo "Refusing to upload symlinks or special files from the atlas build."
+            exit 1
+          fi
+          stage="${RUNNER_TEMP}/wildlife-atlas-dist"
+          rm -rf "$stage"
+          mkdir -p "$stage"
+          # GNU tar follows a symlink only with --dereference. Leaving that off
+          # is the --no-dereference behavior: a link is stored as a link.
+          tar -C "$dist" -cf - . | tar -C "$stage" -xf -
+          if [ -n "$(find "$stage" \( -type l -o ! \( -type f -o -type d \) \) -print -quit)" ]; then
+            echo "Refusing to upload symlinks or special files from the atlas build."
+            exit 1
+          fi
+          chmod -R u-s,g-s "$stage"
+
       - name: Upload dist
         if: steps.fetch.outputs.skip != 'true' && steps.lock.outputs.skip != 'true'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: wildlife-atlas-dist
-          path: atlas/dist
+          path: ${{ runner.temp }}/wildlife-atlas-dist
           if-no-files-found: error
           retention-days: 1
 
@@ -417,6 +460,8 @@ jobs:
     if: ${{ !cancelled() && needs.build.result == 'success' && needs.build.outputs.skip != 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # wildlife-atlas deployment branch policy is main only. It is set on the
+    # environment; this workflow does not change it.
     environment: wildlife-atlas
     permissions:
       actions: read

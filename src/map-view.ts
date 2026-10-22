@@ -161,6 +161,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   let popupClassHolds = 0;
   let userCamera = false;
   let popupAnchor: 'top' | 'bottom' = 'bottom';
+  let settleGeneration = 0;
   const sheet = document.createElement('div');
   sheet.className = 'event-sheet';
   sheet.hidden = true;
@@ -291,6 +292,17 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     // Scott and Amundsen share the pole. Shift the labels apart so both can show.
     if (event.id === 'scott-pole') label.style.transform = 'translateX(calc(-50% - 78px))';
     if (event.id === 'amundsen-pole') label.style.transform = 'translateX(calc(-50% + 78px))';
+    // The marker listener only calls preventDefault. Drag pan listens on the
+    // canvas container in the bubble phase and ignores that, so a press that
+    // reaches the container starts a pan, and a move past the 1px click
+    // tolerance swallows the click. Stopping the bubble keeps the press off
+    // that listener. Selecting the pin still eases the camera; that is framing.
+    element.addEventListener('mousedown', (mouse) => {
+      mouse.stopPropagation();
+    });
+    element.addEventListener('touchstart', (touch) => {
+      touch.stopPropagation();
+    }, { passive: true });
     element.addEventListener('click', (click) => {
       click.stopPropagation();
       selectHandler(event);
@@ -689,7 +701,8 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     });
   }
 
-  function settlePopup(attempt = 0) {
+  function settlePopup(attempt = 0, generation = ++settleGeneration) {
+    if (generation !== settleGeneration) return;
     const element = popup?.getElement();
     if (!element) {
       root.dataset.popup = '';
@@ -703,7 +716,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     holdPopupClass(() => element.classList.remove('is-detached'));
     const rect = element.getBoundingClientRect();
     if (rect.width < 2 || rect.height < 2) {
-      if (attempt < 6) requestAnimationFrame(() => settlePopup(attempt + 1));
+      if (attempt < 6) requestAnimationFrame(() => settlePopup(attempt + 1, generation));
       return;
     }
     const limits = popupLimits();
@@ -732,7 +745,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     const placed = element.getBoundingClientRect();
     const outside = !boxInside(placed, limits) || hitsControls(placed);
     if (outside && attempt < 8) {
-      requestAnimationFrame(() => settlePopup(attempt + 1));
+      requestAnimationFrame(() => settlePopup(attempt + 1, generation));
       return;
     }
     root.dataset.popup = outside ? '' : 'in';

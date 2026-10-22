@@ -13,6 +13,7 @@ declare global {
       once: (type: string, listener: () => void) => void;
       on: (type: string, listener: () => void) => void;
       getCenter: () => { lng: number; lat: number };
+      dragPan: { isActive: () => boolean };
       project: (lngLat: [number, number]) => { x: number; y: number };
       getSource: (id: string) => { getData: () => Promise<{ features?: { properties?: { role?: string }; geometry?: { type?: string; coordinates?: unknown } }[] }> };
       unproject: (point: [number, number]) => { lng: number; lat: number };
@@ -25,7 +26,7 @@ declare global {
 }
 import fs from 'node:fs';
 import path from 'node:path';
-import { ignorablePageError, isGibsTileUrl, settleConsoleFaults } from './faults';
+import { ignorablePageError, isGibsTileUrl, isLocalUrl, settleConsoleFaults } from './faults';
 
 const shots = path.join('test-results', 'screenshots');
 const APP_ORIGIN = 'http://127.0.0.1:4173';
@@ -90,13 +91,13 @@ test.beforeEach(async ({ page }) => {
       failedRequestUrls.push(url);
       return;
     }
-    if (!isAppAsset(url)) return;
+    if (!isAppAsset(url) && !isLocalUrl(url)) return;
     faults.push(`http ${response.status()}: ${url}`);
   });
   page.on('requestfailed', (request) => {
     const url = request.url();
     failedRequestUrls.push(url);
-    if (!isAppAsset(url)) return;
+    if (!isAppAsset(url) && !isLocalUrl(url)) return;
     faults.push(`failed: ${url} ${request.failure()?.errorText ?? ''}`);
   });
 });
@@ -368,6 +369,47 @@ test('popup stays inside the viewport', async ({ page }, testInfo) => {
   await expectPopupInside(page);
   await expectPopupClearOfControls(page);
   await shot(page, `${testInfo.project.name}_popup_clear`);
+});
+
+test('a short press on a pin opens the card without panning', async ({ page }) => {
+  await page.goto('/');
+  await page.locator('#app[data-ready="true"]').waitFor();
+  await page.evaluate(() => {
+    const pin = document.querySelector<HTMLElement>('.pin[data-id="south-sudan"]');
+    if (!pin) throw new Error('missing pin');
+    window.__historyMap.jumpTo({
+      center: [Number(pin.dataset.lng), Number(pin.dataset.lat)],
+      zoom: 5,
+    });
+  });
+  await waitForIdle(page);
+  const point = await page.evaluate(() => {
+    const el = document.querySelector<HTMLElement>('.pin[data-id="south-sudan"]');
+    if (!el) return null;
+    const rect = el.getBoundingClientRect();
+    const x = rect.x + rect.width / 2;
+    const y = rect.y + rect.height / 2;
+    const hit = document.elementFromPoint(x, y);
+    const shifted = document.elementFromPoint(x + 4, y);
+    if (rect.width < 2 || !hit || !shifted || !el.contains(hit) || !el.contains(shifted)) return null;
+    return { id: el.dataset.id ?? '', x, y };
+  });
+  expect(point).not.toBeNull();
+  const target = point!;
+  const before = await page.evaluate(() => window.__historyMap.getCenter());
+  await page.mouse.move(target.x, target.y);
+  await page.mouse.down();
+  await page.mouse.move(target.x + 4, target.y);
+  const during = await page.evaluate(() => ({
+    active: window.__historyMap.dragPan.isActive(),
+    center: window.__historyMap.getCenter(),
+  }));
+  expect(during.active).toBe(false);
+  expect(during.center.lng).toBeCloseTo(before.lng, 5);
+  expect(during.center.lat).toBeCloseTo(before.lat, 5);
+  await page.mouse.up();
+  await expect(page.locator('#app')).toHaveAttribute('data-popup', 'in');
+  await expect(page.locator('.pin.is-selected')).toHaveAttribute('data-id', target.id);
 });
 
 test('co-located pins can both be reached', async ({ page }, testInfo) => {

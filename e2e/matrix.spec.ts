@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { expect, type Page, test } from '@playwright/test';
-import { ignorablePageError, isGibsTileUrl, settleConsoleFaults } from './faults';
+import { ignorablePageError, isGibsTileUrl, isLocalUrl, localRequestFault, settleConsoleFaults } from './faults';
 
 declare global {
   interface Window {
@@ -112,7 +112,10 @@ test.beforeEach(async ({ page }) => {
     pendingConsole.push({ text: message.text(), locationUrl: message.location().url });
   });
   page.on('requestfailed', (request) => {
-    failedRequestUrls.push(request.url());
+    const url = request.url();
+    failedRequestUrls.push(url);
+    const fault = localRequestFault(url);
+    if (fault) faults.push(fault);
   });
   page.on('response', (response) => {
     if (response.status() < 400) return;
@@ -127,7 +130,7 @@ test.beforeEach(async ({ page }) => {
     } catch {
       return;
     }
-    if (origin !== 'http://127.0.0.1:4173') return;
+    if (origin !== 'http://127.0.0.1:4173' && !isLocalUrl(url)) return;
     faults.push(`http ${response.status()} ${url}`);
   });
 });

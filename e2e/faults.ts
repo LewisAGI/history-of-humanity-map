@@ -17,31 +17,43 @@ export interface ConsoleFaultSource {
   failedRequestUrls?: readonly string[];
 }
 
+/** MapLibre's own tile and image load failures. Any other error that names the tile still counts. */
+const TILE_FAILURE = /\bAJAXError\b|Could not load image/i;
+
+/** The whole WebKit page error. Text before or after the sentence stays a fault. */
+const WEBKIT_PAGE_ERROR =
+  /^(?:https?:\/\/\S+|\/[A-Za-z0-9.-]+\.[A-Za-z]{2,}(?:\/\S*)?) due to access control checks\.?$/i;
+
+function securityPolicy(text: string): boolean {
+  return /content-security-policy|content security policy/i.test(text);
+}
+
 export function ignorableConsole(text: string, source: ConsoleFaultSource = {}): boolean {
   if (/Worker failed to load/i.test(text)) return false;
   if (/\bTypeError\b/.test(text)) return false;
-  if (/content security policy/i.test(text)) return false;
+  if (securityPolicy(text)) return false;
   if (/not allowed by Access-Control-Allow-Origin/i.test(text)) {
     if (!WEBKIT_CORS.test(text)) return false;
     return gibsFailure(text, source);
   }
   if (/^Failed to load resource: /i.test(text)) {
-    if (/127\.0\.0\.1|\/assets\//.test(text)) return false;
+    if (/127\.0\.0\.1|localhost|\/assets\//i.test(text)) return false;
     if (namesOtherHost(text)) return false;
     if (namesExactGibs(text)) return true;
     if (source.locationUrl && isExactGibsUrl(source.locationUrl)) return true;
     // Aborted basemap tiles are reported without a host.
     return quotedUrls(text).length === 0 && pathHostUrl(text) == null;
   }
-  // A load error that names the tile. TypeErrors and CSP refusals already returned.
-  return namesExactGibs(text) && !namesOtherHost(text);
+  return TILE_FAILURE.test(text) && namesExactGibs(text) && !namesOtherHost(text);
 }
 
 export function ignorablePageError(message: string): boolean {
   if (/\bTypeError\b/.test(message)) return false;
-  if (/content security policy/i.test(message)) return false;
-  if (!/access control checks/i.test(message)) return false;
-  return namesExactGibs(message) && !namesOtherHost(message);
+  if (/Worker failed to load/i.test(message)) return false;
+  if (securityPolicy(message)) return false;
+  const text = message.trim();
+  if (!WEBKIT_PAGE_ERROR.test(text)) return false;
+  return namesExactGibs(text) && !namesOtherHost(text);
 }
 
 export function settleConsoleFaults(
@@ -57,18 +69,25 @@ export function settleConsoleFaults(
 
 function gibsFailure(text: string, source: ConsoleFaultSource): boolean {
   const failed = source.failedRequestUrls ?? [];
+  const otherFailed = failed.some((url) => {
+    const host = hostnameOf(url);
+    return host != null && host !== GIBS_HOST;
+  });
+  // A local or third-party miss in the same test is not covered by a GIBS tile.
+  if (otherFailed) return false;
   if (source.locationUrl && isExactGibsUrl(source.locationUrl)) return true;
   const cited = failed.filter((url) => text.includes(url) || (source.locationUrl != null && sameUrl(url, source.locationUrl)));
   if (cited.length > 0) return cited.some(isExactGibsUrl);
   if (source.locationUrl) {
     const host = hostnameOf(source.locationUrl);
-    if (host && host !== GIBS_HOST && !isLocalHost(host)) return false;
+    // The page URL is where the console line was logged, not a failed request.
+    if (host && host !== GIBS_HOST && !(isLocalHost(host) && isDocumentLocation(source.locationUrl))) return false;
   }
   if (namesOtherHost(resourceText(text))) return false;
   const gibs = failed.filter(isExactGibsUrl);
   const other = failed.filter((url) => {
     const host = hostnameOf(url);
-    return host != null && host !== GIBS_HOST && !isLocalHost(host);
+    return host != null && host !== GIBS_HOST;
   });
   return gibs.length > 0 && other.length === 0;
 }
@@ -137,4 +156,24 @@ function sameUrl(left: string, right: string): boolean {
 
 function isLocalHost(host: string): boolean {
   return host === '127.0.0.1' || host === 'localhost';
+}
+
+export function isLocalUrl(value: string): boolean {
+  const host = hostnameOf(value);
+  return host != null && isLocalHost(host);
+}
+
+/** A failed local request is always a fault. A GIBS tile failure is not. */
+export function localRequestFault(url: string): string | null {
+  if (!isLocalUrl(url)) return null;
+  return `failed: ${url}`;
+}
+
+function isDocumentLocation(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return (url.pathname === '/' || url.pathname === '/index.html') && url.search === '' && url.hash === '';
+  } catch {
+    return false;
+  }
 }

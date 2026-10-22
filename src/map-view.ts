@@ -161,6 +161,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
   let popupClassHolds = 0;
   let userCamera = false;
   let popupAnchor: 'top' | 'bottom' = 'bottom';
+  let settleGeneration = 0;
   const sheet = document.createElement('div');
   sheet.className = 'event-sheet';
   sheet.hidden = true;
@@ -291,6 +292,14 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     // Scott and Amundsen share the pole. Shift the labels apart so both can show.
     if (event.id === 'scott-pole') label.style.transform = 'translateX(calc(-50% - 78px))';
     if (event.id === 'amundsen-pole') label.style.transform = 'translateX(calc(-50% + 78px))';
+    // MapLibre only preventDefaults a marker press, so the press still bubbles
+    // and starts a map drag. That drag can swallow the click or close the card.
+    element.addEventListener('mousedown', (mouse) => {
+      mouse.stopPropagation();
+    });
+    element.addEventListener('touchstart', (touch) => {
+      touch.stopPropagation();
+    }, { passive: true });
     element.addEventListener('click', (click) => {
       click.stopPropagation();
       selectHandler(event);
@@ -666,12 +675,14 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       root.dataset.popup = '';
       return;
     }
+    clearMapScroll();
+    const placed = sheet.getBoundingClientRect();
     const inside =
-      rect.left >= -1 &&
-      rect.top >= -1 &&
-      rect.right <= window.innerWidth + 1 &&
-      rect.bottom <= window.innerHeight + 1;
-    root.dataset.popup = inside && !hitsControls(rect) ? 'in' : '';
+      placed.left >= -1 &&
+      placed.top >= -1 &&
+      placed.right <= window.innerWidth + 1 &&
+      placed.bottom <= window.innerHeight + 1;
+    root.dataset.popup = inside && !hitsControls(placed) ? 'in' : '';
   }
 
   function pinLngLat(event: HistoryEvent): [number, number] {
@@ -689,12 +700,25 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     });
   }
 
-  function settlePopup(attempt = 0) {
+  /**
+   * A click on a pin past the edge scrolls this container to reveal it.
+   * The canvas does not move with that scroll, so the card is measured in the wrong place.
+   */
+  function clearMapScroll() {
+    const container = map.getContainer();
+    if (!container.scrollLeft && !container.scrollTop) return;
+    container.scrollLeft = 0;
+    container.scrollTop = 0;
+  }
+
+  function settlePopup(attempt = 0, generation = ++settleGeneration) {
+    if (generation !== settleGeneration) return;
     const element = popup?.getElement();
     if (!element) {
       root.dataset.popup = '';
       return;
     }
+    clearMapScroll();
     element.style.marginLeft = '0px';
     element.style.marginTop = '0px';
     const tip = element.querySelector<HTMLElement>('.maplibregl-popup-tip');
@@ -703,7 +727,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     holdPopupClass(() => element.classList.remove('is-detached'));
     const rect = element.getBoundingClientRect();
     if (rect.width < 2 || rect.height < 2) {
-      if (attempt < 6) requestAnimationFrame(() => settlePopup(attempt + 1));
+      if (attempt < 6) requestAnimationFrame(() => settlePopup(attempt + 1, generation));
       return;
     }
     const limits = popupLimits();
@@ -732,9 +756,10 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     const placed = element.getBoundingClientRect();
     const outside = !boxInside(placed, limits) || hitsControls(placed);
     if (outside && attempt < 8) {
-      requestAnimationFrame(() => settlePopup(attempt + 1));
+      requestAnimationFrame(() => settlePopup(attempt + 1, generation));
       return;
     }
+    if (generation !== settleGeneration) return;
     root.dataset.popup = outside ? '' : 'in';
   }
 

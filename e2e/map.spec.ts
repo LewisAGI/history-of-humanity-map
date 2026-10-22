@@ -25,7 +25,7 @@ declare global {
 }
 import fs from 'node:fs';
 import path from 'node:path';
-import { ignorablePageError, isGibsTileUrl, settleConsoleFaults } from './faults';
+import { ignorablePageError, isGibsTileUrl, isLocalUrl, settleConsoleFaults } from './faults';
 
 const shots = path.join('test-results', 'screenshots');
 const APP_ORIGIN = 'http://127.0.0.1:4173';
@@ -90,13 +90,13 @@ test.beforeEach(async ({ page }) => {
       failedRequestUrls.push(url);
       return;
     }
-    if (!isAppAsset(url)) return;
+    if (!isAppAsset(url) && !isLocalUrl(url)) return;
     faults.push(`http ${response.status()}: ${url}`);
   });
   page.on('requestfailed', (request) => {
     const url = request.url();
     failedRequestUrls.push(url);
-    if (!isAppAsset(url)) return;
+    if (!isAppAsset(url) && !isLocalUrl(url)) return;
     faults.push(`failed: ${url} ${request.failure()?.errorText ?? ''}`);
   });
 });

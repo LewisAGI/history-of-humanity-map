@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { ignorableConsole, ignorablePageError } from '../e2e/faults';
+import { ignorableConsole, ignorablePageError, localRequestFault } from '../e2e/faults';
 
 const WEBKIT = 'Origin http://127.0.0.1:4173 is not allowed by Access-Control-Allow-Origin. Status code: 502';
 const WEBKIT_FAILED = `Failed to load resource: ${WEBKIT}`;
@@ -69,5 +69,62 @@ describe('basemap fault filter', () => {
     expect(ignorablePageError('failed to draw gibs.earthdata.nasa.gov tile')).toBe(false);
     expect(ignorableConsole(`${WEBKIT} extra`, { locationUrl: GIBS, failedRequestUrls: [GIBS] })).toBe(false);
     expect(ignorableConsole(`${WEBKIT_FAILED} extra`, { locationUrl: GIBS, failedRequestUrls: [GIBS] })).toBe(false);
+  });
+
+  it('ignores only tile-failure wording that names the GIBS host', () => {
+    expect(ignorableConsole(`AJAXError: 502 (): ${GIBS}`)).toBe(true);
+    expect(ignorableConsole('AJAXError: 502 (): https://cdn.example.com/a.jpg')).toBe(false);
+    expect(ignorableConsole(`Could not load image ${GIBS}: the response is empty`)).toBe(true);
+    expect(ignorableConsole(`ReferenceError: missing ${GIBS}`, { locationUrl: GIBS })).toBe(false);
+    expect(ignorableConsole(`Error: draw failed ${GIBS}`, { locationUrl: GIBS, failedRequestUrls: [GIBS] })).toBe(false);
+    expect(ignorablePageError(`ReferenceError: ${GIBS}`)).toBe(false);
+    expect(ignorablePageError(`Error: draw failed ${GIBS}`)).toBe(false);
+  });
+
+  it('anchors the WebKit page error to the whole sentence', () => {
+    expect(ignorablePageError(`note ${TILE_ERROR}`)).toBe(false);
+    expect(ignorablePageError(`${TILE_ERROR} extra`)).toBe(false);
+    expect(ignorablePageError(`before ${GIBS} due to access control checks.`)).toBe(false);
+    expect(ignorablePageError(`${GIBS} due to access control checks. trailing`)).toBe(false);
+    expect(ignorablePageError(`Worker failed to load ${GIBS}`)).toBe(false);
+    expect(ignorablePageError(`Worker failed to load ${GIBS} due to access control checks.`)).toBe(false);
+  });
+
+  it('counts a hyphenated Content-Security-Policy refusal', () => {
+    const hyphen = "Refused to connect to 'https://gibs.earthdata.nasa.gov/wmts/a.jpg' because it violates the document's Content-Security-Policy";
+    expect(ignorableConsole(hyphen, { locationUrl: GIBS, failedRequestUrls: [GIBS] })).toBe(false);
+    expect(ignorablePageError(hyphen)).toBe(false);
+    expect(ignorablePageError(`${hyphen} due to access control checks.`)).toBe(false);
+  });
+
+  it('does not let a GIBS failure mask a local failure', () => {
+    expect(
+      ignorableConsole(WEBKIT, {
+        locationUrl: 'http://127.0.0.1:4173/',
+        failedRequestUrls: [GIBS, 'http://127.0.0.1:4173/assets/app.js'],
+      }),
+    ).toBe(false);
+    expect(
+      ignorableConsole(WEBKIT, {
+        locationUrl: 'http://127.0.0.1:4173/assets/index.js',
+        failedRequestUrls: [GIBS],
+      }),
+    ).toBe(false);
+    expect(
+      ignorableConsole(WEBKIT, {
+        locationUrl: 'http://localhost:4173/',
+        failedRequestUrls: [GIBS, 'http://localhost:4173/app.js'],
+      }),
+    ).toBe(false);
+    expect(ignorableConsole('Failed to load resource: http://localhost:4173/assets/app.js')).toBe(false);
+    expect(localRequestFault('http://127.0.0.1:4173/assets/app.js')).toBe('failed: http://127.0.0.1:4173/assets/app.js');
+    expect(localRequestFault('http://localhost:4173/assets/app.js')).toBe('failed: http://localhost:4173/assets/app.js');
+    expect(localRequestFault(GIBS)).toBeNull();
+    expect(
+      ignorableConsole(WEBKIT, {
+        locationUrl: GIBS,
+        failedRequestUrls: [GIBS, 'http://127.0.0.1:4173/assets/app.js'],
+      }),
+    ).toBe(false);
   });
 });

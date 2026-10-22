@@ -1,0 +1,128 @@
+{
+  "generated": "2026-10-22",
+  "reviewer": "Checked each medium-confidence pair against title, date span, place, and whether one record is a theme or a route rather than the same episode.",
+  "accept": [
+    {
+      "packId": "rome-caesar",
+      "appId": "caesar-death",
+      "verdict": "accept",
+      "reason": "Same assassination on 15 March 44 BCE at the Theatre of Pompey."
+    },
+    {
+      "packId": "hattusa",
+      "appId": "hittite-hattusa",
+      "verdict": "accept",
+      "reason": "Same Hittite capital, about 1650–1180 BCE, within half a kilometre."
+    },
+    {
+      "packId": "baghdad",
+      "appId": "baghdad-founded",
+      "verdict": "accept",
+      "reason": "Same foundation of the round city in 762."
+    },
+    {
+      "packId": "columbus",
+      "appId": "columbus-1492",
+      "verdict": "accept",
+      "reason": "Same landfall on 12 October 1492. The voyage path stays on the app record."
+    },
+    {
+      "packId": "huaca-luna",
+      "appId": "moche",
+      "verdict": "accept",
+      "reason": "Same temple complex. The app place is Huacas del Sol y de la Luna, and the dates are the Moche florescence there."
+    },
+    {
+      "packId": "nanjing",
+      "appId": "nanjing-massacre",
+      "verdict": "accept",
+      "reason": "Same massacre from December 1937 into early 1938."
+    },
+    {
+      "packId": "constantinople-1453",
+      "appId": "fall-of-constantinople",
+      "verdict": "accept",
+      "reason": "Same Ottoman conquest on 29 May 1453."
+    },
+    {
+      "packId": "troy",
+      "appId": "trojan-war",
+      "verdict": "accept",
+      "reason": "Same Iliad tradition at Hisarlik. Bronze Age Troy stays a separate pin."
+    },
+    {
+      "packId": "amarna",
+      "appId": "akhenaten",
+      "verdict": "accept",
+      "reason": "Same new capital and Aten reform in the mid-fourteenth century BCE."
+    },
+    {
+      "packId": "beijing-1949",
+      "appId": "prc-founded",
+      "verdict": "accept",
+      "reason": "Same proclamation at Tiananmen on 1 October 1949."
+    }
+  ],
+  "reject": [
+    {
+      "packId": "auschwitz",
+      "appId": "holocaust",
+      "verdict": "reject",
+      "reason": "The camp (1940–1945) is not the genocide (1941–1945). Both pins stay."
+    },
+    {
+      "packId": "sarajevo",
+      "appId": "wwi",
+      "verdict": "reject",
+      "reason": "The 28 June 1914 assassination is not the war through 1918."
+    },
+    {
+      "packId": "timbuktu",
+      "appId": "mansa-musa",
+      "verdict": "reject",
+      "reason": "Timbuktu as a centre of learning (1325–1468) is not the 1324–1325 hajj. The route stays on the pilgrimage."
+    },
+    {
+      "packId": "karakorum",
+      "appId": "mongol-conquests",
+      "verdict": "reject",
+      "reason": "The capital is not the conquests. The campaign path stays on the conquest pin."
+    },
+    {
+      "packId": "kurukshetra",
+      "appId": "mahabharata",
+      "verdict": "reject",
+      "reason": "A battlefield telling is not the epic's composition from about 400 BCE to 400 CE."
+    },
+    {
+      "packId": "petrograd",
+      "appId": "russian-revolution",
+      "verdict": "reject",
+      "reason": "The October seizure of the Winter Palace is not both 1917 revolutions."
+    },
+    {
+      "packId": "constantinople",
+      "appId": "justinian",
+      "verdict": "reject",
+      "reason": "Hagia Sophia was completed in 537. That is not the reign of 527–565."
+    },
+    {
+      "packId": "ayodhya",
+      "appId": "ramayana",
+      "verdict": "reject",
+      "reason": "The city of Rama is not the epic's composition span."
+    },
+    {
+      "packId": "changan",
+      "appId": "xuanzang",
+      "verdict": "reject",
+      "reason": "The Tang capital (618–907) is not Xuanzang's journey of 629–645. The route stays on the pilgrimage."
+    },
+    {
+      "packId": "paris-1789",
+      "appId": "french-revolution",
+      "verdict": "reject",
+      "reason": "The storming of the Bastille on 14 July 1789 is not the revolution through 1799."
+    }
+  ]
+}

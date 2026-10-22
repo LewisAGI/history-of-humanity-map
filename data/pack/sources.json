@@ -1,0 +1,3825 @@
+{
+ "sources": [
+  {
+   "id": "doi-10-1002-sici-1520-6505-1998-6-4-132-aid-evan3-3-0-co-2-f",
+   "type": "journal-article",
+   "doi": "10.1002/(sici)1520-6505(1998)6:4<132::aid-evan3>3.0.co;2-f",
+   "url": "https://doi.org/10.1002/(sici)1520-6505(1998)6:4<132::aid-evan3>3.0.co;2-f",
+   "title": "When did humans first arrive in greater Australia and why is it important to know?",
+   "authors": [
+    "O'Connell",
+    "Allen"
+   ],
+   "year": 1998,
+   "journal": "Evolutionary Anthropology: Issues, News, and Reviews",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1017-cbo9780511978807-018",
+   "type": "journal-article",
+   "doi": "10.1017/cbo9780511978807.018",
+   "url": "https://doi.org/10.1017/cbo9780511978807.018",
+   "title": "Swamp cultivators at Kuk, New Guinea",
+   "authors": [
+    "Denham"
+   ],
+   "year": 2015,
+   "journal": "The Cambridge World History",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1017-s0003598x00047840",
+   "type": "journal-article",
+   "doi": "10.1017/s0003598x00047840",
+   "url": "https://doi.org/10.1017/s0003598x00047840",
+   "title": "The role of cult and feasting in the emergence of Neolithic communities. New evidence from Göbekli Tepe, south-eastern Turkey",
+   "authors": [
+    "Dietrich",
+    "Heun",
+    "Notroff"
+   ],
+   "year": 2012,
+   "journal": "Antiquity",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1017-s0003598x00088360",
+   "type": "journal-article",
+   "doi": "10.1017/s0003598x00088360",
+   "url": "https://doi.org/10.1017/s0003598x00088360",
+   "title": "Dating the first New Zealanders: the chronology of Wairau Bar",
+   "authors": [
+    "Higham",
+    "Anderson",
+    "Jacomb"
+   ],
+   "year": 1999,
+   "journal": "Antiquity",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1038-nature01383",
+   "type": "journal-article",
+   "doi": "10.1038/nature01383",
+   "url": "https://doi.org/10.1038/nature01383",
+   "title": "New ages for human occupation and climatic change at Lake Mungo, Australia",
+   "authors": [
+    "Bowler",
+    "Johnston",
+    "Olley"
+   ],
+   "year": 2003,
+   "journal": "Nature",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1038-nature01669",
+   "type": "journal-article",
+   "doi": "10.1038/nature01669",
+   "url": "https://doi.org/10.1038/nature01669",
+   "title": "Pleistocene Homo sapiens from Middle Awash, Ethiopia",
+   "authors": [
+    "White",
+    "Asfaw",
+    "DeGusta"
+   ],
+   "year": 2003,
+   "journal": "Nature",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1038-nature06204",
+   "type": "journal-article",
+   "doi": "10.1038/nature06204",
+   "url": "https://doi.org/10.1038/nature06204",
+   "title": "Early human use of marine resources and pigment in South Africa during the Middle Pleistocene",
+   "authors": [
+    "Marean",
+    "Bar-Matthews",
+    "Bernatchez"
+   ],
+   "year": 2007,
+   "journal": "Nature",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1038-nature09710",
+   "type": "journal-article",
+   "doi": "10.1038/nature09710",
+   "url": "https://doi.org/10.1038/nature09710",
+   "title": "Genetic history of an archaic hominin group from Denisova Cave in Siberia",
+   "authors": [
+    "Reich",
+    "Green",
+    "Kircher"
+   ],
+   "year": 2010,
+   "journal": "Nature",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1038-nature14317",
+   "type": "journal-article",
+   "doi": "10.1038/nature14317",
+   "url": "https://doi.org/10.1038/nature14317",
+   "title": "Massive migration from the steppe was a source for Indo-European languages in Europe",
+   "authors": [
+    "Haak",
+    "Lazaridis",
+    "Patterson"
+   ],
+   "year": 2015,
+   "journal": "Nature",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1038-nature19792",
+   "type": "journal-article",
+   "doi": "10.1038/nature19792",
+   "url": "https://doi.org/10.1038/nature19792",
+   "title": "Genomic analyses inform on migration events during the peopling of Eurasia",
+   "authors": [
+    "Pagani",
+    "Lawson",
+    "Jagoda"
+   ],
+   "year": 2016,
+   "journal": "Nature",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1038-nature22336",
+   "type": "journal-article",
+   "doi": "10.1038/nature22336",
+   "url": "https://doi.org/10.1038/nature22336",
+   "title": "New fossils from Jebel Irhoud, Morocco and the pan-African origin of Homo sapiens",
+   "authors": [
+    "Hublin",
+    "Ben-Ncer",
+    "Bailey"
+   ],
+   "year": 2017,
+   "journal": "Nature",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1038-nature22968",
+   "type": "journal-article",
+   "doi": "10.1038/nature22968",
+   "url": "https://doi.org/10.1038/nature22968",
+   "title": "Human occupation of northern Australia by 65,000 years ago",
+   "authors": [
+    "Clarkson",
+    "Jacobs",
+    "Marwick"
+   ],
+   "year": 2017,
+   "journal": "Nature",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1038-nature25967",
+   "type": "journal-article",
+   "doi": "10.1038/nature25967",
+   "url": "https://doi.org/10.1038/nature25967",
+   "title": "Humans thrived in South Africa through the Toba eruption about 74,000 years ago",
+   "authors": [
+    "Smith",
+    "Jacobs",
+    "Johnsen"
+   ],
+   "year": 2018,
+   "journal": "Nature",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1038-s41586-020-2259-z",
+   "type": "journal-article",
+   "doi": "10.1038/s41586-020-2259-z",
+   "url": "https://doi.org/10.1038/s41586-020-2259-z",
+   "title": "Initial Upper Palaeolithic Homo sapiens from Bacho Kiro Cave, Bulgaria",
+   "authors": [
+    "Hublin",
+    "Sirakov",
+    "Aldeias"
+   ],
+   "year": 2020,
+   "journal": "Nature",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1038-s41586-021-03972-8",
+   "type": "journal-article",
+   "doi": "10.1038/s41586-021-03972-8",
+   "url": "https://doi.org/10.1038/s41586-021-03972-8",
+   "title": "Evidence for European presence in the Americas in ad 1021",
+   "authors": [
+    "Kuitems",
+    "Wallace",
+    "Lindsay"
+   ],
+   "year": 2021,
+   "journal": "Nature",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1038-s41586-021-04275-8",
+   "type": "journal-article",
+   "doi": "10.1038/s41586-021-04275-8",
+   "url": "https://doi.org/10.1038/s41586-021-04275-8",
+   "title": "Age of the oldest known Homo sapiens from eastern Africa",
+   "authors": [
+    "Vidal",
+    "Lane",
+    "Asrat"
+   ],
+   "year": 2022,
+   "journal": "Nature",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1038-s41586-023-06770-6",
+   "type": "journal-article",
+   "doi": "10.1038/s41586-023-06770-6",
+   "url": "https://doi.org/10.1038/s41586-023-06770-6",
+   "title": "The genetic legacy of the expansion of Bantu-speaking peoples in Africa",
+   "authors": [
+    "Fortes-Lima",
+    "Burgarella",
+    "Hammarén"
+   ],
+   "year": 2023,
+   "journal": "Nature",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1093-molbev-msw117",
+   "type": "journal-article",
+   "doi": "10.1093/molbev/msw117",
+   "url": "https://doi.org/10.1093/molbev/msw117",
+   "title": "Malagasy Genetic Ancestry Comes from an Historical Malay Trading Post in Southeast Borneo",
+   "authors": [
+    "Brucato",
+    "Kusuma",
+    "Cox"
+   ],
+   "year": 2016,
+   "journal": "Molecular Biology and Evolution",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1126-sciadv-abd4648",
+   "type": "journal-article",
+   "doi": "10.1126/sciadv.abd4648",
+   "url": "https://doi.org/10.1126/sciadv.abd4648",
+   "title": "Oldest cave art found in Sulawesi",
+   "authors": [
+    "Brumm",
+    "Oktaviana",
+    "Burhan"
+   ],
+   "year": 2021,
+   "journal": "Science Advances",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1126-science-1059519",
+   "type": "journal-article",
+   "doi": "10.1126/science.1059519",
+   "url": "https://doi.org/10.1126/science.1059519",
+   "title": "Dating Caral, a Preceramic Site in the Supe Valley on the Central Coast of Peru",
+   "authors": [
+    "Solis",
+    "Haas",
+    "Creamer"
+   ],
+   "year": 2001,
+   "journal": "Science",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1126-science-1067575",
+   "type": "journal-article",
+   "doi": "10.1126/science.1067575",
+   "url": "https://doi.org/10.1126/science.1067575",
+   "title": "Emergence of Modern Human Behavior: Middle Stone Age Engravings from South Africa",
+   "authors": [
+    "Henshilwood",
+    "d'Errico",
+    "Yates"
+   ],
+   "year": 2002,
+   "journal": "Science",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1126-science-1121879",
+   "type": "journal-article",
+   "doi": "10.1126/science.1121879",
+   "url": "https://doi.org/10.1126/science.1121879",
+   "title": "Late Colonization of Easter Island",
+   "authors": [
+    "Hunt",
+    "Lipo"
+   ],
+   "year": 2006,
+   "journal": "Science",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1126-science-1137166",
+   "type": "journal-article",
+   "doi": "10.1126/science.1137166",
+   "url": "https://doi.org/10.1126/science.1137166",
+   "title": "Redefining the Age of Clovis: Implications for the Peopling of the Americas",
+   "authors": [
+    "Waters",
+    "Stafford"
+   ],
+   "year": 2007,
+   "journal": "Science",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1126-science-1166083",
+   "type": "journal-article",
+   "doi": "10.1126/science.1166083",
+   "url": "https://doi.org/10.1126/science.1166083",
+   "title": "The Peopling of the Pacific from a Bacterial Perspective",
+   "authors": [
+    "Moodley",
+    "Linz",
+    "Yamaoka"
+   ],
+   "year": 2009,
+   "journal": "Science",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1126-science-1166858",
+   "type": "journal-article",
+   "doi": "10.1126/science.1166858",
+   "url": "https://doi.org/10.1126/science.1166858",
+   "title": "Language Phylogenies Reveal Expansion Pulses and Pauses in Pacific Settlement",
+   "authors": [
+    "Gray",
+    "Drummond",
+    "Greenhill"
+   ],
+   "year": 2009,
+   "journal": "Science",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1126-science-276-5314-932",
+   "type": "journal-article",
+   "doi": "10.1126/science.276.5314.932",
+   "url": "https://doi.org/10.1126/science.276.5314.932",
+   "title": "The Initial Domestication of Cucurbita pepo in the Americas 10,000 Years Ago",
+   "authors": [
+    "Smith"
+   ],
+   "year": 1997,
+   "journal": "Science",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1126-science-aap8369",
+   "type": "journal-article",
+   "doi": "10.1126/science.aap8369",
+   "url": "https://doi.org/10.1126/science.aap8369",
+   "title": "The earliest modern humans outside Africa",
+   "authors": [
+    "Hershkovitz",
+    "Weber",
+    "Quam"
+   ],
+   "year": 2018,
+   "journal": "Science",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1126-science-abg0818",
+   "type": "journal-article",
+   "doi": "10.1126/science.abg0818",
+   "url": "https://doi.org/10.1126/science.abg0818",
+   "title": "Language trees with sampled ancestors support a hybrid model for the origin of Indo-European languages",
+   "authors": [
+    "Heggarty",
+    "Anderson",
+    "Scarborough"
+   ],
+   "year": 2023,
+   "journal": "Science",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1126-science-abg7586",
+   "type": "journal-article",
+   "doi": "10.1126/science.abg7586",
+   "url": "https://doi.org/10.1126/science.abg7586",
+   "title": "Evidence of humans in North America during the Last Glacial Maximum",
+   "authors": [
+    "Bennett",
+    "Bustos",
+    "Pigati"
+   ],
+   "year": 2021,
+   "journal": "Science",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1126-science-abm4247",
+   "type": "journal-article",
+   "doi": "10.1126/science.abm4247",
+   "url": "https://doi.org/10.1126/science.abm4247",
+   "title": "The genetic history of the Southern Arc: A bridge between West Asia and Europe",
+   "authors": [
+    "Lazaridis",
+    "Alpaslan-Roodenberg",
+    "Acar"
+   ],
+   "year": 2022,
+   "journal": "Science",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1126-science-adh5007",
+   "type": "journal-article",
+   "doi": "10.1126/science.adh5007",
+   "url": "https://doi.org/10.1126/science.adh5007",
+   "title": "Independent age estimates resolve the controversy of ancient human footprints at White Sands",
+   "authors": [
+    "Pigati",
+    "Springer",
+    "Honke"
+   ],
+   "year": 2023,
+   "journal": "Science",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-1371-journal-pone-0141923",
+   "type": "journal-article",
+   "doi": "10.1371/journal.pone.0141923",
+   "url": "https://doi.org/10.1371/journal.pone.0141923",
+   "title": "New Archaeological Evidence for an Early Human Presence at Monte Verde, Chile",
+   "authors": [
+    "Dillehay",
+    "Ocampo",
+    "Saavedra"
+   ],
+   "year": 2015,
+   "journal": "PLOS ONE",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-2307-3858043",
+   "type": "journal-article",
+   "doi": "10.2307/3858043",
+   "url": "https://doi.org/10.2307/3858043",
+   "title": "Mapungubwe and the Origins of the Zimbabwe Culture",
+   "authors": [
+    "Huffman"
+   ],
+   "year": 2000,
+   "journal": "Goodwin Series",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-4312-dp-35-11",
+   "type": "journal-article",
+   "doi": "10.4312/dp.35.11",
+   "url": "https://doi.org/10.4312/dp.35.11",
+   "title": "The Stonehenge Riverside Project: exploring the Neolithic landscape of Stonehenge",
+   "authors": [
+    "Parker Pearson",
+    "Pollard",
+    "Richards"
+   ],
+   "year": 2008,
+   "journal": "Documenta Praehistorica",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-4324-9780367810412-5",
+   "type": "journal-article",
+   "doi": "10.4324/9780367810412-5",
+   "url": "https://doi.org/10.4324/9780367810412-5",
+   "title": "Chronology of Great Zimbabwe – relative, absolute, and integrated",
+   "authors": [
+    "Chirikure"
+   ],
+   "year": 2020,
+   "journal": "Great Zimbabwe",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "doi-10-7554-elife-24231",
+   "type": "journal-article",
+   "doi": "10.7554/eLife.24231",
+   "url": "https://doi.org/10.7554/eLife.24231",
+   "title": "The age of Homo naledi and associated sediments in the Rising Star Cave, South Africa",
+   "authors": [
+    "Dirks",
+    "Roberts",
+    "Hilbert-Wolf"
+   ],
+   "year": 2017,
+   "journal": "eLife",
+   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
+   "reliability": "primary/peer-reviewed"
+  },
+  {
+   "id": "geonames-1164211",
+   "type": "gazetteer",
+   "title": "GeoNames: Swat",
+   "url": "https://www.geonames.org/1164211",
+   "retrieved": "2026-10-22",
+   "verified": "GeoNames free country dump (download.geonames.org/export/dump), row id 1164211",
+   "reliability": "gazetteer"
+  },
+  {
+   "id": "geonames-11791451",
+   "type": "gazetteer",
+   "title": "GeoNames: Echo Point - Three Sisters",
+   "url": "https://www.geonames.org/11791451",
+   "retrieved": "2026-10-22",
+   "verified": "GeoNames free country dump (download.geonames.org/export/dump), row id 11791451",
+   "reliability": "gazetteer"
+  },
+  {
+   "id": "geonames-1262080",
+   "type": "gazetteer",
+   "title": "GeoNames: Nālanda",
+   "url": "https://www.geonames.org/1262080",
+   "retrieved": "2026-10-22",
+   "verified": "GeoNames free country dump (download.geonames.org/export/dump), row id 1262080",
+   "reliability": "gazetteer"
+  },
+  {
+   "id": "geonames-1282839",
+   "type": "gazetteer",
+   "title": "GeoNames: Rummin-dei",
+   "url": "https://www.geonames.org/1282839",
+   "retrieved": "2026-10-22",
+   "verified": "GeoNames free country dump (download.geonames.org/export/dump), row id 1282839",
+   "reliability": "gazetteer"
+  },
+  {
+   "id": "geonames-1490435",
+   "type": "gazetteer",
+   "title": "GeoNames: Syntasty (Sintashta river)",
+   "url": "https://www.geonames.org/1490435",
+   "retrieved": "2026-10-22",
+   "verified": "GeoNames free country dump (download.geonames.org/export/dump), row id 1490435",
+   "reliability": "gazetteer"
+  },
+  {
+   "id": "geonames-1642911",
+   "type": "gazetteer",
+   "title": "GeoNames: Jakarta",
+   "url": "https://www.geonames.org/1642911",
+   "retrieved": "2026-10-22",
+   "verified": "GeoNames free country dump (download.geonames.org/export/dump), row id 1642911",
+   "reliability": "gazetteer"
+  },
+  {
+   "id": "geonames-2186223",
+   "type": "gazetteer",
+   "title": "GeoNames: New Zealand",
+   "url": "https://www.geonames.org/2186223",
+   "retrieved": "2026-10-22",
+   "verified": "GeoNames free country dump (download.geonames.org/export/dump), row id 2186223",
+   "reliability": "gazetteer"
+  },
+  {
+   "id": "geonames-2656161",
+   "type": "gazetteer",
+   "title": "GeoNames: Battle",
+   "url": "https://www.geonames.org/2656161",
+   "retrieved": "2026-10-22",
+   "verified": "GeoNames free country dump (download.geonames.org/export/dump), row id 2656161",
+   "reliability": "gazetteer"
+  },
+  {
+   "id": "geonames-2900941",
+   "type": "gazetteer",
+   "title": "GeoNames: Hohler Fels",
+   "url": "https://www.geonames.org/2900941",
+   "retrieved": "2026-10-22",
+   "verified": "GeoNames free country dump (download.geonames.org/export/dump), row id 2900941",
+   "reliability": "gazetteer"
+  },
+  {
+   "id": "geonames-3191281",
+   "type": "gazetteer",
+   "title": "GeoNames: Sarajevo",
+   "url": "https://www.geonames.org/3191281",
+   "retrieved": "2026-10-22",
+   "verified": "GeoNames free country dump (download.geonames.org/export/dump), row id 3191281",
+   "reliability": "gazetteer"
+  },
+  {
+   "id": "geonames-5497921",
+   "type": "gazetteer",
+   "title": "GeoNames: White Sands National Monument",
+   "url": "https://www.geonames.org/5497921",
+   "retrieved": "2026-10-22",
+   "verified": "GeoNames free country dump (download.geonames.org/export/dump), row id 5497921",
+   "reliability": "gazetteer"
+  },
+  {
+   "id": "geonames-785544",
+   "type": "gazetteer",
+   "title": "GeoNames: Starčevo",
+   "url": "https://www.geonames.org/785544",
+   "retrieved": "2026-10-22",
+   "verified": "GeoNames free country dump (download.geonames.org/export/dump), row id 785544",
+   "reliability": "gazetteer"
+  },
+  {
+   "id": "geonames-8210451",
+   "type": "gazetteer",
+   "title": "GeoNames: Lake Mungo",
+   "url": "https://www.geonames.org/8210451",
+   "retrieved": "2026-10-22",
+   "verified": "GeoNames free country dump (download.geonames.org/export/dump), row id 8210451",
+   "reliability": "gazetteer"
+  },
+  {
+   "id": "geonames-8224616",
+   "type": "gazetteer",
+   "title": "GeoNames: Rano Raraku",
+   "url": "https://www.geonames.org/8224616",
+   "retrieved": "2026-10-22",
+   "verified": "GeoNames free country dump (download.geonames.org/export/dump), row id 8224616",
+   "reliability": "gazetteer"
+  },
+  {
+   "id": "geonames-8349869",
+   "type": "gazetteer",
+   "title": "GeoNames: Paracas (district)",
+   "url": "https://www.geonames.org/8349869",
+   "retrieved": "2026-10-22",
+   "verified": "GeoNames free country dump (download.geonames.org/export/dump), row id 8349869",
+   "reliability": "gazetteer"
+  },
+  {
+   "id": "geonames-952398",
+   "type": "gazetteer",
+   "title": "GeoNames: Sterkfontein Caves",
+   "url": "https://www.geonames.org/952398",
+   "retrieved": "2026-10-22",
+   "verified": "GeoNames free country dump (download.geonames.org/export/dump), row id 952398",
+   "reliability": "gazetteer"
+  },
+  {
+   "id": "pleiades-314921",
+   "type": "gazetteer",
+   "title": "Pleiades: Carthago",
+   "url": "https://pleiades.stoa.org/places/314921",
+   "retrieved": "2026-10-22",
+   "verified": "Pleiades daily places dump (atlantides.org), place id 314921",
+   "reliability": "gazetteer"
+  },
+  {
+   "id": "pleiades-520998",
+   "type": "gazetteer",
+   "title": "Pleiades: Constantinopolis",
+   "url": "https://pleiades.stoa.org/places/520998",
+   "retrieved": "2026-10-22",
+   "verified": "Pleiades daily places dump (atlantides.org), place id 520998",
+   "reliability": "gazetteer"
+  },
+  {
+   "id": "pleiades-687917",
+   "type": "gazetteer",
+   "title": "Pleiades: Jericho",
+   "url": "https://pleiades.stoa.org/places/687917",
+   "retrieved": "2026-10-22",
+   "verified": "Pleiades daily places dump (atlantides.org), place id 687917",
+   "reliability": "gazetteer"
+  },
+  {
+   "id": "pleiades-697725",
+   "type": "gazetteer",
+   "title": "Pleiades: Petra",
+   "url": "https://pleiades.stoa.org/places/697725",
+   "retrieved": "2026-10-22",
+   "verified": "Pleiades daily places dump (atlantides.org), place id 697725",
+   "reliability": "gazetteer"
+  },
+  {
+   "id": "url-neh-gov-project-transatlantic-slave-trade-database",
+   "type": "web",
+   "url": "https://www.neh.gov/project/transatlantic-slave-trade-database",
+   "title": "NEH: The Transatlantic Slave Trade Database (12.5 million embarked, 10.7 million disembarked)",
+   "retrieved": "2026-10-22",
+   "verified": "HTTP fetch 2026-10-22 via search index; states 12.5m taken, 10.7m survived the Middle Passage 1526-1866.",
+   "reliability": "secondary/agency"
+  },
+  {
+   "id": "url-slavevoyages-org",
+   "type": "web",
+   "url": "https://www.slavevoyages.org/",
+   "title": "https://www.slavevoyages.org/",
+   "retrieved": "2026-10-22",
+   "verified": "HTTP 200 via curl 2026-10-22",
+   "reliability": "secondary/agency"
+  },
+  {
+   "id": "url-slavevoyages-org-assessment-estimates",
+   "type": "web",
+   "url": "https://www.slavevoyages.org/assessment/estimates/",
+   "title": "SlaveVoyages: Estimates, Trans-Atlantic Slave Trade (embarked total 12,521,354, 1501-1866)",
+   "retrieved": "2026-10-22",
+   "verified": "Page is JavaScript-rendered: curl/WebFetch returned only the query UI; the totals table (12,521,354 embarked, coverage 1501-1866) was read from the web-search index copy of this page on 2026-10-22. Corroborated by NEH.",
+   "reliability": "secondary/agency"
+  },
+  {
+   "id": "url-worldhistory-org",
+   "type": "web",
+   "url": "https://www.worldhistory.org/",
+   "title": "https://www.worldhistory.org/",
+   "retrieved": "2026-10-22",
+   "verified": "HTTP 200 via curl 2026-10-22",
+   "reliability": "secondary/agency"
+  },
+  {
+   "id": "wp-aachen-cathedral",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Aachen Cathedral",
+   "url": "https://en.wikipedia.org/wiki/Aachen_Cathedral",
+   "revision": 1378916526,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-abydos-egypt",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Abydos, Egypt",
+   "url": "https://en.wikipedia.org/wiki/Abydos,_Egypt",
+   "revision": 1379209127,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-accra",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Accra",
+   "url": "https://en.wikipedia.org/wiki/Accra",
+   "revision": 1381233768,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-acropolis-of-athens",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Acropolis of Athens",
+   "url": "https://en.wikipedia.org/wiki/Acropolis_of_Athens",
+   "revision": 1381204507,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-adam-s-bridge",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Adam's Bridge",
+   "url": "https://en.wikipedia.org/wiki/Adam%27s_Bridge",
+   "revision": 1371250800,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-african-great-lakes",
+   "type": "encyclopedia",
+   "title": "Wikipedia: African Great Lakes",
+   "url": "https://en.wikipedia.org/wiki/African_Great_Lakes",
+   "revision": 1380501212,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-akbar",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Akbar",
+   "url": "https://en.wikipedia.org/wiki/Akbar",
+   "revision": 1377835327,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-akhenaten",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Akhenaten",
+   "url": "https://en.wikipedia.org/wiki/Akhenaten",
+   "revision": 1381356886,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-alexander-the-great",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Alexander the Great",
+   "url": "https://en.wikipedia.org/wiki/Alexander_the_Great",
+   "revision": 1381253274,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-alexandria",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Alexandria",
+   "url": "https://en.wikipedia.org/wiki/Alexandria",
+   "revision": 1381195751,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-amarna",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Amarna",
+   "url": "https://en.wikipedia.org/wiki/Amarna",
+   "revision": 1379101483,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-angkor-wat",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Angkor Wat",
+   "url": "https://en.wikipedia.org/wiki/Angkor_Wat",
+   "revision": 1381020125,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-antioch",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Antioch",
+   "url": "https://en.wikipedia.org/wiki/Antioch",
+   "revision": 1374847636,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-aotearoa",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Aotearoa",
+   "url": "https://en.wikipedia.org/wiki/Aotearoa",
+   "revision": 1376109363,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-ashoka",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Ashoka",
+   "url": "https://en.wikipedia.org/wiki/Ashoka",
+   "revision": 1380594000,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-atalh-y-k",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Çatalhöyük",
+   "url": "https://en.wikipedia.org/wiki/%C3%87atalh%C3%B6y%C3%BCk",
+   "revision": 1379818880,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-atlantic-slave-trade",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Atlantic slave trade",
+   "url": "https://en.wikipedia.org/wiki/Atlantic_slave_trade",
+   "revision": 1381391427,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-attack-on-pearl-harbor",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Attack on Pearl Harbor",
+   "url": "https://en.wikipedia.org/wiki/Attack_on_Pearl_Harbor",
+   "revision": 1380997506,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-augustus",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Augustus",
+   "url": "https://en.wikipedia.org/wiki/Augustus",
+   "revision": 1381409269,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-auschwitz-concentration-camp",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Auschwitz concentration camp",
+   "url": "https://en.wikipedia.org/wiki/Auschwitz_concentration_camp",
+   "revision": 1378421146,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-austronesian-peoples",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Austronesian peoples",
+   "url": "https://en.wikipedia.org/wiki/Austronesian_peoples",
+   "revision": 1381258148,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-axial-age",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Axial Age",
+   "url": "https://en.wikipedia.org/wiki/Axial_Age",
+   "revision": 1379564056,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-axum",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Axum",
+   "url": "https://en.wikipedia.org/wiki/Axum",
+   "revision": 1380214483,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-ayodhya",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Ayodhya",
+   "url": "https://en.wikipedia.org/wiki/Ayodhya",
+   "revision": 1380557499,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-azadi-tower",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Azadi Tower",
+   "url": "https://en.wikipedia.org/wiki/Azadi_Tower",
+   "revision": 1375735388,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-bab-al-mandab-strait",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Bab al-Mandab Strait",
+   "url": "https://en.wikipedia.org/wiki/Bab_al-Mandab_Strait",
+   "revision": 1380777431,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-babylon",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Babylon",
+   "url": "https://en.wikipedia.org/wiki/Babylon",
+   "revision": 1381288220,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-bacho-kiro-cave",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Bacho Kiro Cave",
+   "url": "https://en.wikipedia.org/wiki/Bacho_Kiro_Cave",
+   "revision": 1369179089,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-badaling",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Badaling",
+   "url": "https://en.wikipedia.org/wiki/Badaling",
+   "revision": 1370906845,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-baghdad",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Baghdad",
+   "url": "https://en.wikipedia.org/wiki/Baghdad",
+   "revision": 1381297829,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-baikonur-cosmodrome",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Baikonur Cosmodrome",
+   "url": "https://en.wikipedia.org/wiki/Baikonur_Cosmodrome",
+   "revision": 1377848069,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-bantu-expansion",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Bantu expansion",
+   "url": "https://en.wikipedia.org/wiki/Bantu_expansion",
+   "revision": 1380028392,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-bastille",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Bastille",
+   "url": "https://en.wikipedia.org/wiki/Bastille",
+   "revision": 1374536974,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-batanes",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Batanes",
+   "url": "https://en.wikipedia.org/wiki/Batanes",
+   "revision": 1379980844,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-battle-of-adwa",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Battle of Adwa",
+   "url": "https://en.wikipedia.org/wiki/Battle_of_Adwa",
+   "revision": 1380005476,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-battle-of-dien-bien-phu",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Battle of Dien Bien Phu",
+   "url": "https://en.wikipedia.org/wiki/Battle_of_Dien_Bien_Phu",
+   "revision": 1380210802,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-battle-of-gaugamela",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Battle of Gaugamela",
+   "url": "https://en.wikipedia.org/wiki/Battle_of_Gaugamela",
+   "revision": 1373255873,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-battle-of-hastings",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Battle of Hastings",
+   "url": "https://en.wikipedia.org/wiki/Battle_of_Hastings",
+   "revision": 1380225409,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-battle-of-kadesh",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Battle of Kadesh",
+   "url": "https://en.wikipedia.org/wiki/Battle_of_Kadesh",
+   "revision": 1380942414,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-battle-of-marathon",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Battle of Marathon",
+   "url": "https://en.wikipedia.org/wiki/Battle_of_Marathon",
+   "revision": 1380768828,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-battle-of-mohi",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Battle of Mohi",
+   "url": "https://en.wikipedia.org/wiki/Battle_of_Mohi",
+   "revision": 1377748500,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-battle-of-the-somme",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Battle of the Somme",
+   "url": "https://en.wikipedia.org/wiki/Battle_of_the_Somme",
+   "revision": 1380548354,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-battle-of-thermopylae",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Battle of Thermopylae",
+   "url": "https://en.wikipedia.org/wiki/Battle_of_Thermopylae",
+   "revision": 1381239482,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-battle-of-waterloo",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Battle of Waterloo",
+   "url": "https://en.wikipedia.org/wiki/Battle_of_Waterloo",
+   "revision": 1380652941,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-benin-moat",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Benin Moat",
+   "url": "https://en.wikipedia.org/wiki/Benin_Moat",
+   "revision": 1380574477,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-bering-strait",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Bering Strait",
+   "url": "https://en.wikipedia.org/wiki/Bering_Strait",
+   "revision": 1367600768,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-berlin",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Berlin",
+   "url": "https://en.wikipedia.org/wiki/Berlin",
+   "revision": 1380979968,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-berlin-wall",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Berlin Wall",
+   "url": "https://en.wikipedia.org/wiki/Berlin_Wall",
+   "revision": 1379913666,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-bhopal-disaster",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Bhopal disaster",
+   "url": "https://en.wikipedia.org/wiki/Bhopal_disaster",
+   "revision": 1381331980,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-blackwater-draw",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Blackwater Draw",
+   "url": "https://en.wikipedia.org/wiki/Blackwater_Draw",
+   "revision": 1372717747,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-blombos-cave",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Blombos Cave",
+   "url": "https://en.wikipedia.org/wiki/Blombos_Cave",
+   "revision": 1374861035,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-bluefish-caves",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Bluefish Caves",
+   "url": "https://en.wikipedia.org/wiki/Bluefish_Caves",
+   "revision": 1364730094,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-borobudur",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Borobudur",
+   "url": "https://en.wikipedia.org/wiki/Borobudur",
+   "revision": 1381174784,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-br-na-b-inne",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Brú na Bóinne",
+   "url": "https://en.wikipedia.org/wiki/Br%C3%BA_na_B%C3%B3inne",
+   "revision": 1373017259,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-bronze-age",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Bronze Age",
+   "url": "https://en.wikipedia.org/wiki/Bronze_Age",
+   "revision": 1380966197,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-budj-bim",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Budj Bim",
+   "url": "https://en.wikipedia.org/wiki/Budj_Bim",
+   "revision": 1368621277,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-byrsa",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Byrsa",
+   "url": "https://en.wikipedia.org/wiki/Byrsa",
+   "revision": 1359243623,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-cahokia",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Cahokia",
+   "url": "https://en.wikipedia.org/wiki/Cahokia",
+   "revision": 1380096105,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-caral",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Caral",
+   "url": "https://en.wikipedia.org/wiki/Caral",
+   "revision": 1379214244,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-carthage",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Carthage",
+   "url": "https://en.wikipedia.org/wiki/Carthage",
+   "revision": 1379936790,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-cave-of-altamira",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Cave of Altamira",
+   "url": "https://en.wikipedia.org/wiki/Cave_of_Altamira",
+   "revision": 1376869007,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-cern",
+   "type": "encyclopedia",
+   "title": "Wikipedia: CERN",
+   "url": "https://en.wikipedia.org/wiki/CERN",
+   "revision": 1379303728,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-cerro-sech-n",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Cerro Sechín",
+   "url": "https://en.wikipedia.org/wiki/Cerro_Sech%C3%ADn",
+   "revision": 1360561495,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-chaco-culture-national-historical-park",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Chaco Culture National Historical Park",
+   "url": "https://en.wikipedia.org/wiki/Chaco_Culture_National_Historical_Park",
+   "revision": 1380297872,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-chan-chan",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Chan Chan",
+   "url": "https://en.wikipedia.org/wiki/Chan_Chan",
+   "revision": 1380421844,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-chang-an",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Chang'an",
+   "url": "https://en.wikipedia.org/wiki/Chang%27an",
+   "revision": 1377998084,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-charlemagne",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Charlemagne",
+   "url": "https://en.wikipedia.org/wiki/Charlemagne",
+   "revision": 1381114699,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-charles-darwin",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Charles Darwin",
+   "url": "https://en.wikipedia.org/wiki/Charles_Darwin",
+   "revision": 1381251534,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-chauvet-cave",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Chauvet Cave",
+   "url": "https://en.wikipedia.org/wiki/Chauvet_Cave",
+   "revision": 1380921083,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-chav-n-de-hu-ntar",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Chavín de Huántar",
+   "url": "https://en.wikipedia.org/wiki/Chav%C3%ADn_de_Hu%C3%A1ntar",
+   "revision": 1364711956,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-christopher-columbus",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Christopher Columbus",
+   "url": "https://en.wikipedia.org/wiki/Christopher_Columbus",
+   "revision": 1380783666,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-classical-antiquity",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Classical antiquity",
+   "url": "https://en.wikipedia.org/wiki/Classical_antiquity",
+   "revision": 1381020880,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-colchis",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Colchis",
+   "url": "https://en.wikipedia.org/wiki/Colchis",
+   "revision": 1375140746,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-confucius",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Confucius",
+   "url": "https://en.wikipedia.org/wiki/Confucius",
+   "revision": 1380175775,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-congo-basin",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Congo Basin",
+   "url": "https://en.wikipedia.org/wiki/Congo_Basin",
+   "revision": 1377202244,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-corded-ware-culture",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Corded Ware culture",
+   "url": "https://en.wikipedia.org/wiki/Corded_Ware_culture",
+   "revision": 1381228762,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-cusco",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Cusco",
+   "url": "https://en.wikipedia.org/wiki/Cusco",
+   "revision": 1379969157,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-cyrus-the-great",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Cyrus the Great",
+   "url": "https://en.wikipedia.org/wiki/Cyrus_the_Great",
+   "revision": 1381289293,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-dandi-navsari",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Dandi, Navsari",
+   "url": "https://en.wikipedia.org/wiki/Dandi,_Navsari",
+   "revision": 1375731380,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-delphi",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Delphi",
+   "url": "https://en.wikipedia.org/wiki/Delphi",
+   "revision": 1378220428,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-denisova-cave",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Denisova Cave",
+   "url": "https://en.wikipedia.org/wiki/Denisova_Cave",
+   "revision": 1369637823,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-dunhuang",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Dunhuang",
+   "url": "https://en.wikipedia.org/wiki/Dunhuang",
+   "revision": 1375804059,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-early-human-migrations",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Early human migrations",
+   "url": "https://en.wikipedia.org/wiki/Early_human_migrations",
+   "revision": 1377121594,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-early-modern-period",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Early modern period",
+   "url": "https://en.wikipedia.org/wiki/Early_modern_period",
+   "revision": 1380440539,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-easter-island",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Easter Island",
+   "url": "https://en.wikipedia.org/wiki/Easter_Island",
+   "revision": 1381044672,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-edo-castle",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Edo Castle",
+   "url": "https://en.wikipedia.org/wiki/Edo_Castle",
+   "revision": 1374889497,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-elefsina",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Elefsina",
+   "url": "https://en.wikipedia.org/wiki/Elefsina",
+   "revision": 1376708789,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-elmina-castle",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Elmina Castle",
+   "url": "https://en.wikipedia.org/wiki/Elmina_Castle",
+   "revision": 1365733135,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-erlitou-culture",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Erlitou culture",
+   "url": "https://en.wikipedia.org/wiki/Erlitou_culture",
+   "revision": 1381401058,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-etemenanki",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Etemenanki",
+   "url": "https://en.wikipedia.org/wiki/Etemenanki",
+   "revision": 1381339088,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-ezana-stone",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Ezana Stone",
+   "url": "https://en.wikipedia.org/wiki/Ezana_Stone",
+   "revision": 1380403710,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-feodosia",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Feodosia",
+   "url": "https://en.wikipedia.org/wiki/Feodosia",
+   "revision": 1375875529,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-forbidden-city",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Forbidden City",
+   "url": "https://en.wikipedia.org/wiki/Forbidden_City",
+   "revision": 1381359730,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-g-bekli-tepe",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Göbekli Tepe",
+   "url": "https://en.wikipedia.org/wiki/G%C3%B6bekli_Tepe",
+   "revision": 1380047064,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-gal-pagos-islands",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Galápagos Islands",
+   "url": "https://en.wikipedia.org/wiki/Gal%C3%A1pagos_Islands",
+   "revision": 1381185353,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-gamla-uppsala",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Gamla Uppsala",
+   "url": "https://en.wikipedia.org/wiki/Gamla_Uppsala",
+   "revision": 1369946798,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-genghis-khan",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Genghis Khan",
+   "url": "https://en.wikipedia.org/wiki/Genghis_Khan",
+   "revision": 1380845473,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-giant-s-causeway",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Giant's Causeway",
+   "url": "https://en.wikipedia.org/wiki/Giant%27s_Causeway",
+   "revision": 1379642787,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-glastonbury-tor",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Glastonbury Tor",
+   "url": "https://en.wikipedia.org/wiki/Glastonbury_Tor",
+   "revision": 1381306885,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-gona-ves",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Gonaïves",
+   "url": "https://en.wikipedia.org/wiki/Gona%C3%AFves",
+   "revision": 1375904923,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-gor-e",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Gorée",
+   "url": "https://en.wikipedia.org/wiki/Gor%C3%A9e",
+   "revision": 1380565359,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-grand-national-assembly-of-turkey",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Grand National Assembly of Turkey",
+   "url": "https://en.wikipedia.org/wiki/Grand_National_Assembly_of_Turkey",
+   "revision": 1381346846,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-great-mosque-of-djenn",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Great Mosque of Djenné",
+   "url": "https://en.wikipedia.org/wiki/Great_Mosque_of_Djenn%C3%A9",
+   "revision": 1367241290,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-great-pyramid-of-giza",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Great Pyramid of Giza",
+   "url": "https://en.wikipedia.org/wiki/Great_Pyramid_of_Giza",
+   "revision": 1378503482,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-great-zimbabwe",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Great Zimbabwe",
+   "url": "https://en.wikipedia.org/wiki/Great_Zimbabwe",
+   "revision": 1381403383,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-greenland",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Greenland",
+   "url": "https://en.wikipedia.org/wiki/Greenland",
+   "revision": 1377213152,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-guadalcanal-campaign",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Guadalcanal campaign",
+   "url": "https://en.wikipedia.org/wiki/Guadalcanal_campaign",
+   "revision": 1381296825,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-guil-naquitz-cave",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Guilá Naquitz Cave",
+   "url": "https://en.wikipedia.org/wiki/Guil%C3%A1_Naquitz_Cave",
+   "revision": 1364833915,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-ha-amonga-a-maui",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Haʻamonga ʻa Maui",
+   "url": "https://en.wikipedia.org/wiki/Ha%CA%BBamonga_%CA%BBa_Maui",
+   "revision": 1364441268,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-hadrian-s-wall",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Hadrian's Wall",
+   "url": "https://en.wikipedia.org/wiki/Hadrian%27s_Wall",
+   "revision": 1381330381,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-hagia-sophia",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Hagia Sophia",
+   "url": "https://en.wikipedia.org/wiki/Hagia_Sophia",
+   "revision": 1379544167,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-hammurabi",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Hammurabi",
+   "url": "https://en.wikipedia.org/wiki/Hammurabi",
+   "revision": 1380093815,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-harappa",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Harappa",
+   "url": "https://en.wikipedia.org/wiki/Harappa",
+   "revision": 1381130384,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-hattusa",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Hattusa",
+   "url": "https://en.wikipedia.org/wiki/Hattusa",
+   "revision": 1378779486,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-hawai-i-island",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Hawaiʻi (island)",
+   "url": "https://en.wikipedia.org/wiki/Hawai%CA%BBi_(island)",
+   "revision": 1380104375,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-herto-man",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Herto Man",
+   "url": "https://en.wikipedia.org/wiki/Herto_Man",
+   "revision": 1361283082,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-hill-of-tara",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Hill of Tara",
+   "url": "https://en.wikipedia.org/wiki/Hill_of_Tara",
+   "revision": 1377631814,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-hiroshima-peace-memorial",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Hiroshima Peace Memorial",
+   "url": "https://en.wikipedia.org/wiki/Hiroshima_Peace_Memorial",
+   "revision": 1381158548,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-hohle-fels",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Hohle Fels",
+   "url": "https://en.wikipedia.org/wiki/Hohle_Fels",
+   "revision": 1374015367,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-homer",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Homer",
+   "url": "https://en.wikipedia.org/wiki/Homer",
+   "revision": 1380834389,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-hong-kong-convention-and-exhibition-centre",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Hong Kong Convention and Exhibition Centre",
+   "url": "https://en.wikipedia.org/wiki/Hong_Kong_Convention_and_Exhibition_Centre",
+   "revision": 1364526460,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-huaca-de-la-luna",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Huaca de la Luna",
+   "url": "https://en.wikipedia.org/wiki/Huaca_de_la_Luna",
+   "revision": 1364714545,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-huaca-prieta",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Huaca Prieta",
+   "url": "https://en.wikipedia.org/wiki/Huaca_Prieta",
+   "revision": 1364836453,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-huaca-rajada",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Huaca Rajada",
+   "url": "https://en.wikipedia.org/wiki/Huaca_Rajada",
+   "revision": 1364714580,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-ibn-battuta",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Ibn Battuta",
+   "url": "https://en.wikipedia.org/wiki/Ibn_Battuta",
+   "revision": 1378809535,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-if",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Ifẹ",
+   "url": "https://en.wikipedia.org/wiki/If%E1%BA%B9",
+   "revision": 1377929923,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-igbo-ukwu",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Igbo-Ukwu",
+   "url": "https://en.wikipedia.org/wiki/Igbo-Ukwu",
+   "revision": 1380529178,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-independence-hall",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Independence Hall",
+   "url": "https://en.wikipedia.org/wiki/Independence_Hall",
+   "revision": 1375933911,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-independence-palace",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Independence Palace",
+   "url": "https://en.wikipedia.org/wiki/Independence_Palace",
+   "revision": 1376799413,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-independence-stadium-malaysia",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Independence Stadium (Malaysia)",
+   "url": "https://en.wikipedia.org/wiki/Independence_Stadium_(Malaysia)",
+   "revision": 1379286450,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-industrial-revolution",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Industrial Revolution",
+   "url": "https://en.wikipedia.org/wiki/Industrial_Revolution",
+   "revision": 1381202308,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-ingvellir",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Þingvellir",
+   "url": "https://en.wikipedia.org/wiki/%C3%9Eingvellir",
+   "revision": 1377506479,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-iron-age",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Iron Age",
+   "url": "https://en.wikipedia.org/wiki/Iron_Age",
+   "revision": 1378096360,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-ise-shrine",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Ise Shrine",
+   "url": "https://en.wikipedia.org/wiki/Ise_Shrine",
+   "revision": 1368503654,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-isla-del-sol",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Isla del Sol",
+   "url": "https://en.wikipedia.org/wiki/Isla_del_Sol",
+   "revision": 1310351529,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-ithaca-island",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Ithaca (island)",
+   "url": "https://en.wikipedia.org/wiki/Ithaca_(island)",
+   "revision": 1372192875,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-jallianwala-bagh",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Jallianwala Bagh",
+   "url": "https://en.wikipedia.org/wiki/Jallianwala_Bagh",
+   "revision": 1369392727,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-jamaica",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Jamaica",
+   "url": "https://en.wikipedia.org/wiki/Jamaica",
+   "revision": 1380212632,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-james-cook",
+   "type": "encyclopedia",
+   "title": "Wikipedia: James Cook",
+   "url": "https://en.wikipedia.org/wiki/James_Cook",
+   "revision": 1380039625,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-jamestown",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Jamestown",
+   "url": "https://en.wikipedia.org/wiki/Jamestown",
+   "revision": 1380238160,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-jebel-irhoud",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Jebel Irhoud",
+   "url": "https://en.wikipedia.org/wiki/Jebel_Irhoud",
+   "revision": 1379241346,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-jesus",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Jesus",
+   "url": "https://en.wikipedia.org/wiki/Jesus",
+   "revision": 1381175874,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-jiahu",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Jiahu",
+   "url": "https://en.wikipedia.org/wiki/Jiahu",
+   "revision": 1364837985,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-julius-caesar",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Julius Caesar",
+   "url": "https://en.wikipedia.org/wiki/Julius_Caesar",
+   "revision": 1378696395,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-k-lauea",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Kīlauea",
+   "url": "https://en.wikipedia.org/wiki/K%C4%ABlauea",
+   "revision": 1380329318,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-kamay-botany-bay-national-park",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Kamay Botany Bay National Park",
+   "url": "https://en.wikipedia.org/wiki/Kamay_Botany_Bay_National_Park",
+   "revision": 1378948056,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-karakorum",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Karakorum",
+   "url": "https://en.wikipedia.org/wiki/Karakorum",
+   "revision": 1378588956,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-kilwa-kisiwani",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Kilwa Kisiwani",
+   "url": "https://en.wikipedia.org/wiki/Kilwa_Kisiwani",
+   "revision": 1372017470,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-kingdom-of-mapungubwe",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Kingdom of Mapungubwe",
+   "url": "https://en.wikipedia.org/wiki/Kingdom_of_Mapungubwe",
+   "revision": 1381188347,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-kish-sumer",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Kish (Sumer)",
+   "url": "https://en.wikipedia.org/wiki/Kish_(Sumer)",
+   "revision": 1380176471,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-kitty-hawk-north-carolina",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Kitty Hawk, North Carolina",
+   "url": "https://en.wikipedia.org/wiki/Kitty_Hawk,_North_Carolina",
+   "revision": 1380096507,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-knossos",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Knossos",
+   "url": "https://en.wikipedia.org/wiki/Knossos",
+   "revision": 1374770779,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-kotosh",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Kotosh",
+   "url": "https://en.wikipedia.org/wiki/Kotosh",
+   "revision": 1364839908,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-koumbi-saleh",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Koumbi Saleh",
+   "url": "https://en.wikipedia.org/wiki/Koumbi_Saleh",
+   "revision": 1379297716,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-kozhikode",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Kozhikode",
+   "url": "https://en.wikipedia.org/wiki/Kozhikode",
+   "revision": 1380762937,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-ku-lap",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Kuélap",
+   "url": "https://en.wikipedia.org/wiki/Ku%C3%A9lap",
+   "revision": 1365247786,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-kuk-swamp",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Kuk Swamp",
+   "url": "https://en.wikipedia.org/wiki/Kuk_Swamp",
+   "revision": 1366154781,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-kurukshetra",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Kurukshetra",
+   "url": "https://en.wikipedia.org/wiki/Kurukshetra",
+   "revision": 1380013476,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-kyiv",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Kyiv",
+   "url": "https://en.wikipedia.org/wiki/Kyiv",
+   "revision": 1375938274,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-l-anse-aux-meadows",
+   "type": "encyclopedia",
+   "title": "Wikipedia: L'Anse aux Meadows",
+   "url": "https://en.wikipedia.org/wiki/L%27Anse_aux_Meadows",
+   "revision": 1380499184,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-lake-mungo-remains",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Lake Mungo remains",
+   "url": "https://en.wikipedia.org/wiki/Lake_Mungo_remains",
+   "revision": 1375972948,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-lake-toba",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Lake Toba",
+   "url": "https://en.wikipedia.org/wiki/Lake_Toba",
+   "revision": 1369640512,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-lalibela",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Lalibela",
+   "url": "https://en.wikipedia.org/wiki/Lalibela",
+   "revision": 1376595937,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-lascaux",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Lascaux",
+   "url": "https://en.wikipedia.org/wiki/Lascaux",
+   "revision": 1381186695,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-last-glacial-maximum",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Last Glacial Maximum",
+   "url": "https://en.wikipedia.org/wiki/Last_Glacial_Maximum",
+   "revision": 1371779680,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-late-bronze-age-collapse",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Late Bronze Age collapse",
+   "url": "https://en.wikipedia.org/wiki/Late_Bronze_Age_collapse",
+   "revision": 1381215020,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-latin-bridge",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Latin Bridge",
+   "url": "https://en.wikipedia.org/wiki/Latin_Bridge",
+   "revision": 1355946545,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-lindisfarne",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Lindisfarne",
+   "url": "https://en.wikipedia.org/wiki/Lindisfarne",
+   "revision": 1380740673,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-linear-pottery-culture",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Linear Pottery culture",
+   "url": "https://en.wikipedia.org/wiki/Linear_Pottery_culture",
+   "revision": 1380125837,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-lumbini",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Lumbini",
+   "url": "https://en.wikipedia.org/wiki/Lumbini",
+   "revision": 1381315318,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-m-banza-kongo",
+   "type": "encyclopedia",
+   "title": "Wikipedia: M'banza-Kongo",
+   "url": "https://en.wikipedia.org/wiki/M%27banza-Kongo",
+   "revision": 1378750831,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-machu-picchu",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Machu Picchu",
+   "url": "https://en.wikipedia.org/wiki/Machu_Picchu",
+   "revision": 1380992747,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-madagascar",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Madagascar",
+   "url": "https://en.wikipedia.org/wiki/Madagascar",
+   "revision": 1380304631,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-madjedbebe",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Madjedbebe",
+   "url": "https://en.wikipedia.org/wiki/Madjedbebe",
+   "revision": 1381364641,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-mahabodhi-temple",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Mahabodhi Temple",
+   "url": "https://en.wikipedia.org/wiki/Mahabodhi_Temple",
+   "revision": 1376910731,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-mahatma-gandhi",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Mahatma Gandhi",
+   "url": "https://en.wikipedia.org/wiki/Mahatma_Gandhi",
+   "revision": 1379963542,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-mainz",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Mainz",
+   "url": "https://en.wikipedia.org/wiki/Mainz",
+   "revision": 1379950089,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-manchester",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Manchester",
+   "url": "https://en.wikipedia.org/wiki/Manchester",
+   "revision": 1380417210,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-mandrin-cave",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Mandrin Cave",
+   "url": "https://en.wikipedia.org/wiki/Mandrin_Cave",
+   "revision": 1380015843,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-mansa-musa",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Mansa Musa",
+   "url": "https://en.wikipedia.org/wiki/Mansa_Musa",
+   "revision": 1380333093,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-mausoleum-of-the-yellow-emperor",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Mausoleum of the Yellow Emperor",
+   "url": "https://en.wikipedia.org/wiki/Mausoleum_of_the_Yellow_Emperor",
+   "revision": 1327029880,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-mecca",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Mecca",
+   "url": "https://en.wikipedia.org/wiki/Mecca",
+   "revision": 1381412318,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-medina",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Medina",
+   "url": "https://en.wikipedia.org/wiki/Medina",
+   "revision": 1381411186,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-mehrgarh",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Mehrgarh",
+   "url": "https://en.wikipedia.org/wiki/Mehrgarh",
+   "revision": 1379399021,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-memorial-hall-of-the-victims-in-nanjing-massacre-by-japanese-invaders",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Memorial Hall of the Victims in Nanjing Massacre by Japanese Invaders",
+   "url": "https://en.wikipedia.org/wiki/Memorial_Hall_of_the_Victims_in_Nanjing_Massacre_by_Japanese_Invaders",
+   "revision": 1378923098,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-menelik-ii",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Menelik II",
+   "url": "https://en.wikipedia.org/wiki/Menelik_II",
+   "revision": 1377897972,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-merdeka-building",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Merdeka Building",
+   "url": "https://en.wikipedia.org/wiki/Merdeka_Building",
+   "revision": 1344895055,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-mero",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Meroë",
+   "url": "https://en.wikipedia.org/wiki/Mero%C3%AB",
+   "revision": 1380753731,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-merv",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Merv",
+   "url": "https://en.wikipedia.org/wiki/Merv",
+   "revision": 1381150207,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-middle-stone-age",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Middle Stone Age",
+   "url": "https://en.wikipedia.org/wiki/Middle_Stone_Age",
+   "revision": 1369618183,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-misliya-cave",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Misliya Cave",
+   "url": "https://en.wikipedia.org/wiki/Misliya_Cave",
+   "revision": 1381214314,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-moai",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Moai",
+   "url": "https://en.wikipedia.org/wiki/Moai",
+   "revision": 1379619871,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-modern-era",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Modern era",
+   "url": "https://en.wikipedia.org/wiki/Modern_era",
+   "revision": 1379938202,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-mohenjo-daro",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Mohenjo-daro",
+   "url": "https://en.wikipedia.org/wiki/Mohenjo-daro",
+   "revision": 1376909925,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-mongol-conquests",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Mongol conquests",
+   "url": "https://en.wikipedia.org/wiki/Mongol_conquests",
+   "revision": 1381169082,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-monte-verde",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Monte Verde",
+   "url": "https://en.wikipedia.org/wiki/Monte_Verde",
+   "revision": 1374809185,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-mount-ararat",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Mount Ararat",
+   "url": "https://en.wikipedia.org/wiki/Mount_Ararat",
+   "revision": 1381170260,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-mount-kailash",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Mount Kailash",
+   "url": "https://en.wikipedia.org/wiki/Mount_Kailash",
+   "revision": 1376804607,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-mount-kenya",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Mount Kenya",
+   "url": "https://en.wikipedia.org/wiki/Mount_Kenya",
+   "revision": 1380754426,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-mount-olympus",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Mount Olympus",
+   "url": "https://en.wikipedia.org/wiki/Mount_Olympus",
+   "revision": 1381384552,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-mount-sinai",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Mount Sinai",
+   "url": "https://en.wikipedia.org/wiki/Mount_Sinai",
+   "revision": 1380194058,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-mount-tai",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Mount Tai",
+   "url": "https://en.wikipedia.org/wiki/Mount_Tai",
+   "revision": 1381369463,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-mu-a-tongatapu",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Muʻa (Tongatapu)",
+   "url": "https://en.wikipedia.org/wiki/Mu%CA%BBa_(Tongatapu)",
+   "revision": 1358126130,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-muhammad",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Muhammad",
+   "url": "https://en.wikipedia.org/wiki/Muhammad",
+   "revision": 1380560812,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-mycenae",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Mycenae",
+   "url": "https://en.wikipedia.org/wiki/Mycenae",
+   "revision": 1375201530,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-nalanda-mahavihara",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Nalanda mahavihara",
+   "url": "https://en.wikipedia.org/wiki/Nalanda_mahavihara",
+   "revision": 1370243277,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-nan-madol",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Nan Madol",
+   "url": "https://en.wikipedia.org/wiki/Nan_Madol",
+   "revision": 1378475574,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-napoleon",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Napoleon",
+   "url": "https://en.wikipedia.org/wiki/Napoleon",
+   "revision": 1381198126,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-nazca-lines",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Nazca lines",
+   "url": "https://en.wikipedia.org/wiki/Nazca_lines",
+   "revision": 1380187877,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-nelson-mandela",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Nelson Mandela",
+   "url": "https://en.wikipedia.org/wiki/Nelson_Mandela",
+   "revision": 1381404561,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-neolithic-revolution",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Neolithic Revolution",
+   "url": "https://en.wikipedia.org/wiki/Neolithic_Revolution",
+   "revision": 1381323019,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-newgrange",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Newgrange",
+   "url": "https://en.wikipedia.org/wiki/Newgrange",
+   "revision": 1381331331,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-nok-culture",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Nok culture",
+   "url": "https://en.wikipedia.org/wiki/Nok_culture",
+   "revision": 1368847651,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-old-dongola",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Old Dongola",
+   "url": "https://en.wikipedia.org/wiki/Old_Dongola",
+   "revision": 1364717485,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-omo-remains",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Omo remains",
+   "url": "https://en.wikipedia.org/wiki/Omo_remains",
+   "revision": 1314760630,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-pachacamac",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Pachacamac",
+   "url": "https://en.wikipedia.org/wiki/Pachacamac",
+   "revision": 1373667392,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-pachacuti",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Pachacuti",
+   "url": "https://en.wikipedia.org/wiki/Pachacuti",
+   "revision": 1360538777,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-paisley-caves",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Paisley Caves",
+   "url": "https://en.wikipedia.org/wiki/Paisley_Caves",
+   "revision": 1370268179,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-palatine-hill",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Palatine Hill",
+   "url": "https://en.wikipedia.org/wiki/Palatine_Hill",
+   "revision": 1358711780,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-panmunjom",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Panmunjom",
+   "url": "https://en.wikipedia.org/wiki/Panmunjom",
+   "revision": 1377352305,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-paracas-culture",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Paracas culture",
+   "url": "https://en.wikipedia.org/wiki/Paracas_culture",
+   "revision": 1360716169,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-pataliputra",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Pataliputra",
+   "url": "https://en.wikipedia.org/wiki/Pataliputra",
+   "revision": 1365209892,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-peopling-of-the-americas",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Peopling of the Americas",
+   "url": "https://en.wikipedia.org/wiki/Peopling_of_the_Americas",
+   "revision": 1380285295,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-persepolis",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Persepolis",
+   "url": "https://en.wikipedia.org/wiki/Persepolis",
+   "revision": 1376731595,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-petra",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Petra",
+   "url": "https://en.wikipedia.org/wiki/Petra",
+   "revision": 1379998497,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-pinnacle-point",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Pinnacle Point",
+   "url": "https://en.wikipedia.org/wiki/Pinnacle_Point",
+   "revision": 1365738943,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-pompeii",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Pompeii",
+   "url": "https://en.wikipedia.org/wiki/Pompeii",
+   "revision": 1377727528,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-pontic-caspian-steppe",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Pontic–Caspian steppe",
+   "url": "https://en.wikipedia.org/wiki/Pontic%E2%80%93Caspian_steppe",
+   "revision": 1381370499,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-post-classical-history",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Post-classical history",
+   "url": "https://en.wikipedia.org/wiki/Post-classical_history",
+   "revision": 1379633471,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-prehistory-of-australia",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Prehistory of Australia",
+   "url": "https://en.wikipedia.org/wiki/Prehistory_of_Australia",
+   "revision": 1379186487,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-proclamation-of-indonesian-independence",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Proclamation of Indonesian Independence",
+   "url": "https://en.wikipedia.org/wiki/Proclamation_of_Indonesian_Independence",
+   "revision": 1377046708,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-proto-indo-europeans",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Proto-Indo-Europeans",
+   "url": "https://en.wikipedia.org/wiki/Proto-Indo-Europeans",
+   "revision": 1375968937,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-pu-uhonua-o-h-naunau-national-historical-park",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Puʻuhonua o Hōnaunau National Historical Park",
+   "url": "https://en.wikipedia.org/wiki/Pu%CA%BBuhonua_o_H%C5%8Dnaunau_National_Historical_Park",
+   "revision": 1369123155,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-pyramid-of-the-sun",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Pyramid of the Sun",
+   "url": "https://en.wikipedia.org/wiki/Pyramid_of_the_Sun",
+   "revision": 1376494143,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-qin-shi-huang",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Qin Shi Huang",
+   "url": "https://en.wikipedia.org/wiki/Qin_Shi_Huang",
+   "revision": 1379215554,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-qufu",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Qufu",
+   "url": "https://en.wikipedia.org/wiki/Qufu",
+   "revision": 1379376061,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-red-fort",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Red Fort",
+   "url": "https://en.wikipedia.org/wiki/Red_Fort",
+   "revision": 1376896713,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-rising-star-cave",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Rising Star Cave",
+   "url": "https://en.wikipedia.org/wiki/Rising_Star_Cave",
+   "revision": 1377154184,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-robben-island",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Robben Island",
+   "url": "https://en.wikipedia.org/wiki/Robben_Island",
+   "revision": 1381066420,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-ruins-of-gedi",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Ruins of Gedi",
+   "url": "https://en.wikipedia.org/wiki/Ruins_of_Gedi",
+   "revision": 1379057467,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-salvador-bahia",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Salvador, Bahia",
+   "url": "https://en.wikipedia.org/wiki/Salvador,_Bahia",
+   "revision": 1381062341,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-samarkand",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Samarkand",
+   "url": "https://en.wikipedia.org/wiki/Samarkand",
+   "revision": 1381280234,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-san-lorenzo-tenochtitl-n",
+   "type": "encyclopedia",
+   "title": "Wikipedia: San Lorenzo Tenochtitlán",
+   "url": "https://en.wikipedia.org/wiki/San_Lorenzo_Tenochtitl%C3%A1n",
+   "revision": 1353658986,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-san-salvador-island",
+   "type": "encyclopedia",
+   "title": "Wikipedia: San Salvador Island",
+   "url": "https://en.wikipedia.org/wiki/San_Salvador_Island",
+   "revision": 1376767636,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-sanchi-stupa",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Sanchi Stupa",
+   "url": "https://en.wikipedia.org/wiki/Sanchi_Stupa",
+   "revision": 1380752170,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-santorini-caldera",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Santorini caldera",
+   "url": "https://en.wikipedia.org/wiki/Santorini_caldera",
+   "revision": 1373287109,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-shanidar-cave",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Shanidar Cave",
+   "url": "https://en.wikipedia.org/wiki/Shanidar_Cave",
+   "revision": 1368889989,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-sijilmasa",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Sijilmasa",
+   "url": "https://en.wikipedia.org/wiki/Sijilmasa",
+   "revision": 1377241881,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-silk-road",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Silk Road",
+   "url": "https://en.wikipedia.org/wiki/Silk_Road",
+   "revision": 1379074984,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-sintashta-culture",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Sintashta culture",
+   "url": "https://en.wikipedia.org/wiki/Sintashta_culture",
+   "revision": 1375603158,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-site-of-the-first-national-congress-of-the-chinese-communist-party",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Site of the First National Congress of the Chinese Communist Party",
+   "url": "https://en.wikipedia.org/wiki/Site_of_the_First_National_Congress_of_the_Chinese_Communist_Party",
+   "revision": 1365462860,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-skara-brae",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Skara Brae",
+   "url": "https://en.wikipedia.org/wiki/Skara_Brae",
+   "revision": 1378067716,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-socrates",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Socrates",
+   "url": "https://en.wikipedia.org/wiki/Socrates",
+   "revision": 1381188957,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-south-kalimantan",
+   "type": "encyclopedia",
+   "title": "Wikipedia: South Kalimantan",
+   "url": "https://en.wikipedia.org/wiki/South_Kalimantan",
+   "revision": 1381399080,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-star-evo-culture",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Starčevo culture",
+   "url": "https://en.wikipedia.org/wiki/Star%C4%8Devo_culture",
+   "revision": 1360732628,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-stonehenge",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Stonehenge",
+   "url": "https://en.wikipedia.org/wiki/Stonehenge",
+   "revision": 1377824638,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-suhrawardy-udyan",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Suhrawardy Udyan",
+   "url": "https://en.wikipedia.org/wiki/Suhrawardy_Udyan",
+   "revision": 1379182904,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-sulawesi",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Sulawesi",
+   "url": "https://en.wikipedia.org/wiki/Sulawesi",
+   "revision": 1379949205,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-swat-district",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Swat District",
+   "url": "https://en.wikipedia.org/wiki/Swat_District",
+   "revision": 1370242526,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-taiwan",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Taiwan",
+   "url": "https://en.wikipedia.org/wiki/Taiwan",
+   "revision": 1380084849,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-taj-mahal",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Taj Mahal",
+   "url": "https://en.wikipedia.org/wiki/Taj_Mahal",
+   "revision": 1378868244,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-takachiho-miyazaki",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Takachiho, Miyazaki",
+   "url": "https://en.wikipedia.org/wiki/Takachiho,_Miyazaki",
+   "revision": 1375351836,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-taputapuatea-marae",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Taputapuatea marae",
+   "url": "https://en.wikipedia.org/wiki/Taputapuatea_marae",
+   "revision": 1366156945,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-temple-mount",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Temple Mount",
+   "url": "https://en.wikipedia.org/wiki/Temple_Mount",
+   "revision": 1379766711,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-templo-mayor",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Templo Mayor",
+   "url": "https://en.wikipedia.org/wiki/Templo_Mayor",
+   "revision": 1380659019,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-tenochtitlan",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Tenochtitlan",
+   "url": "https://en.wikipedia.org/wiki/Tenochtitlan",
+   "revision": 1381290921,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-teotihuacan",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Teotihuacan",
+   "url": "https://en.wikipedia.org/wiki/Teotihuacan",
+   "revision": 1380618636,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-teouma",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Teouma",
+   "url": "https://en.wikipedia.org/wiki/Teouma",
+   "revision": 1364986567,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-terracotta-army",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Terracotta Army",
+   "url": "https://en.wikipedia.org/wiki/Terracotta_Army",
+   "revision": 1380487280,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-the-buddha",
+   "type": "encyclopedia",
+   "title": "Wikipedia: The Buddha",
+   "url": "https://en.wikipedia.org/wiki/The_Buddha",
+   "revision": 1381286756,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-theatre-of-pompey",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Theatre of Pompey",
+   "url": "https://en.wikipedia.org/wiki/Theatre_of_Pompey",
+   "revision": 1366971395,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-three-sisters-australia",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Three Sisters (Australia)",
+   "url": "https://en.wikipedia.org/wiki/Three_Sisters_(Australia)",
+   "revision": 1368969891,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-thule-people",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Thule people",
+   "url": "https://en.wikipedia.org/wiki/Thule_people",
+   "revision": 1368557189,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-tiananmen",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Tiananmen",
+   "url": "https://en.wikipedia.org/wiki/Tiananmen",
+   "revision": 1375688881,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-tiananmen-square",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Tiananmen Square",
+   "url": "https://en.wikipedia.org/wiki/Tiananmen_Square",
+   "revision": 1371276632,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-tikal",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Tikal",
+   "url": "https://en.wikipedia.org/wiki/Tikal",
+   "revision": 1381316604,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-timbuktu",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Timbuktu",
+   "url": "https://en.wikipedia.org/wiki/Timbuktu",
+   "revision": 1381322433,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-tintagel-castle",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Tintagel Castle",
+   "url": "https://en.wikipedia.org/wiki/Tintagel_Castle",
+   "revision": 1365004273,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-tiwanaku",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Tiwanaku",
+   "url": "https://en.wikipedia.org/wiki/Tiwanaku",
+   "revision": 1380002068,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-tokyo-station",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Tokyo Station",
+   "url": "https://en.wikipedia.org/wiki/Tokyo_Station",
+   "revision": 1379973054,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-toussaint-louverture",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Toussaint Louverture",
+   "url": "https://en.wikipedia.org/wiki/Toussaint_Louverture",
+   "revision": 1379710858,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-tower-of-jericho",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Tower of Jericho",
+   "url": "https://en.wikipedia.org/wiki/Tower_of_Jericho",
+   "revision": 1372745626,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-troy",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Troy",
+   "url": "https://en.wikipedia.org/wiki/Troy",
+   "revision": 1379991372,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-tuol-sleng-genocide-museum",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Tuol Sleng Genocide Museum",
+   "url": "https://en.wikipedia.org/wiki/Tuol_Sleng_Genocide_Museum",
+   "revision": 1377273164,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-tupaia-navigator",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Tupaia (navigator)",
+   "url": "https://en.wikipedia.org/wiki/Tupaia_(navigator)",
+   "revision": 1377619131,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-uluru",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Uluru",
+   "url": "https://en.wikipedia.org/wiki/Uluru",
+   "revision": 1374764083,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-university-of-al-qarawiyyin",
+   "type": "encyclopedia",
+   "title": "Wikipedia: University of al-Qarawiyyin",
+   "url": "https://en.wikipedia.org/wiki/University_of_al-Qarawiyyin",
+   "revision": 1376920043,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-upper-paleolithic",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Upper Paleolithic",
+   "url": "https://en.wikipedia.org/wiki/Upper_Paleolithic",
+   "revision": 1379545961,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-ur",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Ur",
+   "url": "https://en.wikipedia.org/wiki/Ur",
+   "revision": 1380249222,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-uruk",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Uruk",
+   "url": "https://en.wikipedia.org/wiki/Uruk",
+   "revision": 1380485388,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-venus-of-hohle-fels",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Venus of Hohle Fels",
+   "url": "https://en.wikipedia.org/wiki/Venus_of_Hohle_Fels",
+   "revision": 1376090319,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-wairau-bar",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Wairau Bar",
+   "url": "https://en.wikipedia.org/wiki/Wairau_Bar",
+   "revision": 1380035795,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-waitangi-northland",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Waitangi, Northland",
+   "url": "https://en.wikipedia.org/wiki/Waitangi,_Northland",
+   "revision": 1377161269,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-walls-of-constantinople",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Walls of Constantinople",
+   "url": "https://en.wikipedia.org/wiki/Walls_of_Constantinople",
+   "revision": 1377846097,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-wari-archaeological-site",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Wari (archaeological site)",
+   "url": "https://en.wikipedia.org/wiki/Wari_(archaeological_site)",
+   "revision": 1378465962,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-western-high-plateau",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Western High Plateau",
+   "url": "https://en.wikipedia.org/wiki/Western_High_Plateau",
+   "revision": 1250971920,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-white-sands-footprints",
+   "type": "encyclopedia",
+   "title": "Wikipedia: White Sands footprints",
+   "url": "https://en.wikipedia.org/wiki/White_Sands_footprints",
+   "revision": 1371757009,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-winter-palace",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Winter Palace",
+   "url": "https://en.wikipedia.org/wiki/Winter_Palace",
+   "revision": 1375170827,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-wittenberg",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Wittenberg",
+   "url": "https://en.wikipedia.org/wiki/Wittenberg",
+   "revision": 1377635131,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-yamnaya-culture",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Yamnaya culture",
+   "url": "https://en.wikipedia.org/wiki/Yamnaya_culture",
+   "revision": 1377652974,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-yan-an",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Yan'an",
+   "url": "https://en.wikipedia.org/wiki/Yan%27an",
+   "revision": 1378291234,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-yana-rhinoceros-horn-site",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Yana Rhinoceros Horn Site",
+   "url": "https://en.wikipedia.org/wiki/Yana_Rhinoceros_Horn_Site",
+   "revision": 1368825867,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-yinxu",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Yinxu",
+   "url": "https://en.wikipedia.org/wiki/Yinxu",
+   "revision": 1365742155,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  },
+  {
+   "id": "wp-zheng-he",
+   "type": "encyclopedia",
+   "title": "Wikipedia: Zheng He",
+   "url": "https://en.wikipedia.org/wiki/Zheng_He",
+   "revision": 1380488200,
+   "retrieved": "2026-10-22",
+   "verified": "Wikipedia API: page exists, not a disambiguation, revision recorded",
+   "reliability": "tertiary"
+  }
+ ]
+}

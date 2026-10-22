@@ -11,6 +11,9 @@ export const CONTINENTS = [
 export type Continent = (typeof CONTINENTS)[number];
 export type EventType = 'history' | 'myth';
 export type Era = 'before' | 'after';
+export type DateStatus = 'established' | 'approximate' | 'traditional' | 'contested' | 'unsourced';
+export type LensId = 'africa-medieval' | 'oceania' | 'andes' | 'asia-20c';
+export type Provenance = 'app' | 'merged' | 'pack';
 
 export interface Waypoint {
   lat: number;
@@ -43,6 +46,18 @@ export interface HistoryEvent {
    * A list of lines is a branching route: each line gets its own arrow.
    */
   path?: Waypoint[] | Waypoint[][];
+  /** Pack pin merged onto this event, when one was accepted. */
+  packId?: string;
+  dateStatus?: DateStatus;
+  sourceIds?: string[];
+  /** Shown before the pin opens. */
+  sensitivity?: string;
+  provenance?: Provenance;
+  /** Plotted point is a stand-in, not the site itself. */
+  standIn?: string;
+  lenses?: LensId[];
+  personIds?: string[];
+  migrationIds?: string[];
 }
 
 export interface Period {

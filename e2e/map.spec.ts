@@ -29,9 +29,9 @@ import path from 'node:path';
 const shots = path.join('test-results', 'screenshots');
 const APP_ORIGIN = 'http://127.0.0.1:4173';
 
-/** 1911 is inside 1900–1949 (26 events, including Scott). 1960 is inside 1950–1999 (39). */
-const PINS_1900 = 26;
-const PINS_1950 = 39;
+/** 1911 is inside 1900–1949 (46 events, including Scott). 1960 is inside 1950–1999 (49). */
+const PINS_1900 = 46;
+const PINS_1950 = 49;
 
 const ROUTES: { id: string; date: string }[] = [
   { id: 'out-of-africa', date: '68050 BCE' },

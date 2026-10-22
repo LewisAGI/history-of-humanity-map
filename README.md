@@ -18,7 +18,7 @@ npm run test:e2e
 
 ## Data
 
-Events live in [`data/events.json`](data/events.json). Years are historical: `-500` is 500 BCE, `1066` is 1066 CE, and there is no year 0.
+Events live in [`data/events.json`](data/events.json). The sourced pack in [`data/pack/`](data/pack/) adds pins, migrations, eras, people, a timeline, and sources. Accepted id matches keep the app text and coordinates and take the pack's sources and date status. Rejected matches stay as two pins. Years are historical: `-500` is 500 BCE, `1066` is 1066 CE, and there is no year 0.
 
 An event is shown in the selected period when the two closed intervals overlap (`event.start <= period.end` and `event.end >= period.start`). An event that crosses a boundary, including 3000 BCE, appears in every period it touches.
 

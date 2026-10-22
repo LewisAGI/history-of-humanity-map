@@ -1,0 +1,479 @@
+name: Deploy static site
+
+on:
+  workflow_dispatch:
+    inputs:
+      site:
+        description: LewisAGI repository and Cloudflare Pages project
+        required: true
+        type: choice
+        options:
+          - health-claims
+          - psychedelics
+          - indigenous-australia
+          - celtic-ireland
+          - ancient-greece-med
+
+# Jobs that run untrusted site code replace this. The choice input is not a
+# security boundary: the API can submit other values, so every job allowlists.
+permissions:
+  contents: read
+
+concurrency:
+  # One pending run per site. A later dispatch waits and does not cancel.
+  group: deploy-static-site-${{ inputs.site }}
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # No checkout and no Node action. Site code never shares a runner with
+    # Cloudflare credentials; those are only on the deploy job.
+    permissions: {}
+    outputs:
+      skip: ${{ steps.ls.outputs.skip == 'true' }}
+      sha: ${{ steps.ls.outputs.sha }}
+      site: ${{ steps.resolve.outputs.site }}
+      branch: ${{ steps.resolve.outputs.branch }}
+      production: ${{ steps.resolve.outputs.production }}
+    steps:
+      - name: Resolve site
+        id: resolve
+        shell: bash
+        env:
+          SITE_INPUT: ${{ inputs.site }}
+        run: |
+          set -euo pipefail
+          shopt -u nocasematch
+          # Reassign to a literal. The raw input is never used in a URL.
+          case "$SITE_INPUT" in
+            health-claims) SITE_NAME=health-claims ;;
+            psychedelics) SITE_NAME=psychedelics ;;
+            indigenous-australia) SITE_NAME=indigenous-australia ;;
+            celtic-ireland) SITE_NAME=celtic-ireland ;;
+            ancient-greece-med) SITE_NAME=ancient-greece-med ;;
+            *)
+              echo "Site is not in the allowlist."
+              exit 1
+              ;;
+          esac
+          {
+            echo "site=${SITE_NAME}"
+            echo "branch=main"
+            echo "production=true"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Resolve site HEAD
+        id: ls
+        shell: bash
+        env:
+          SITE_INPUT: ${{ steps.resolve.outputs.site }}
+        run: |
+          set -euo pipefail
+          shopt -u nocasematch
+          export GIT_TERMINAL_PROMPT=0
+          case "$SITE_INPUT" in
+            health-claims)
+              SITE_NAME=health-claims
+              SITE_REMOTE=https://github.com/LewisAGI/health-claims.git
+              ;;
+            psychedelics)
+              SITE_NAME=psychedelics
+              SITE_REMOTE=https://github.com/LewisAGI/psychedelics.git
+              ;;
+            indigenous-australia)
+              SITE_NAME=indigenous-australia
+              SITE_REMOTE=https://github.com/LewisAGI/indigenous-australia.git
+              ;;
+            celtic-ireland)
+              SITE_NAME=celtic-ireland
+              SITE_REMOTE=https://github.com/LewisAGI/celtic-ireland.git
+              ;;
+            ancient-greece-med)
+              SITE_NAME=ancient-greece-med
+              SITE_REMOTE=https://github.com/LewisAGI/ancient-greece-med.git
+              ;;
+            *)
+              echo "Site is not in the allowlist."
+              exit 1
+              ;;
+          esac
+          if ! remote_out="$(git -c credential.helper= -c http.extraheader= ls-remote "$SITE_REMOTE" refs/heads/main)"; then
+            echo "::warning title=site ls-remote::Could not query refs/heads/main on LewisAGI/${SITE_NAME}. Skipping this run."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          sha="$(printf '%s\n' "$remote_out" | awk 'NR==1 {print $1}')"
+          if [[ ! "$sha" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "LewisAGI/${SITE_NAME} main did not resolve."
+            exit 1
+          fi
+          {
+            echo "skip=false"
+            echo "sha=${sha}"
+          } >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: gate
+    if: ${{ !cancelled() && needs.gate.result == 'success' && needs.gate.outputs.skip != 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # upload-artifact finalizes through the Actions API and 403s without this
+    # scope. Site npm runs in a container that is removed before the upload,
+    # and that container is not given a token. There is no setup-node post step.
+    # Nothing may run after the build in this actions: write job without re-review.
+    permissions:
+      actions: write
+    outputs:
+      skip: ${{ steps.lock.outputs.skip == 'true' || steps.fetch.outputs.skip == 'true' }}
+      sha: ${{ steps.fetch.outputs.sha }}
+    steps:
+      - name: Fetch site commit
+        id: fetch
+        shell: bash
+        env:
+          SITE_INPUT: ${{ needs.gate.outputs.site }}
+          GATE_SHA: ${{ needs.gate.outputs.sha }}
+        run: |
+          set -euo pipefail
+          shopt -u nocasematch
+          export GIT_TERMINAL_PROMPT=0
+          case "$SITE_INPUT" in
+            health-claims)
+              SITE_NAME=health-claims
+              SITE_REMOTE=https://github.com/LewisAGI/health-claims.git
+              ;;
+            psychedelics)
+              SITE_NAME=psychedelics
+              SITE_REMOTE=https://github.com/LewisAGI/psychedelics.git
+              ;;
+            indigenous-australia)
+              SITE_NAME=indigenous-australia
+              SITE_REMOTE=https://github.com/LewisAGI/indigenous-australia.git
+              ;;
+            celtic-ireland)
+              SITE_NAME=celtic-ireland
+              SITE_REMOTE=https://github.com/LewisAGI/celtic-ireland.git
+              ;;
+            ancient-greece-med)
+              SITE_NAME=ancient-greece-med
+              SITE_REMOTE=https://github.com/LewisAGI/ancient-greece-med.git
+              ;;
+            *)
+              echo "Site is not in the allowlist."
+              exit 1
+              ;;
+          esac
+          if [[ ! "$GATE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Refusing to build without the gate commit SHA."
+            exit 1
+          fi
+          rm -rf site
+          git init --quiet site
+          git -C site remote add origin "$SITE_REMOTE"
+          # The gate already resolved main. Fetch that commit, not main again.
+          if ! git -C site -c credential.helper= -c http.extraheader= fetch --depth 1 origin "$GATE_SHA"; then
+            echo "Could not fetch the commit the gate resolved."
+            exit 1
+          fi
+          fetched="$(git -C site rev-parse FETCH_HEAD)"
+          if [ "$fetched" != "$GATE_SHA" ]; then
+            echo "Fetch did not return the commit the gate resolved."
+            exit 1
+          fi
+          git -C site -c core.hooksPath=/dev/null checkout --detach FETCH_HEAD
+          checked_out="$(git -C site rev-parse HEAD)"
+          if [ "$checked_out" != "$GATE_SHA" ]; then
+            echo "Checkout did not match the commit the gate resolved."
+            exit 1
+          fi
+          echo "Checked out ${GATE_SHA} from LewisAGI/${SITE_NAME}."
+          {
+            echo "skip=false"
+            echo "sha=${GATE_SHA}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Check for package-lock.json
+        id: lock
+        if: steps.fetch.outputs.skip != 'true'
+        shell: bash
+        env:
+          SITE_SHA: ${{ steps.fetch.outputs.sha }}
+        run: |
+          set -euo pipefail
+          if [[ ! "$SITE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Refusing to continue without a commit SHA."
+            exit 1
+          fi
+          if [ ! -f site/package-lock.json ]; then
+            echo "::notice title=site build::${SITE_SHA} has no package-lock.json. Skipping the build and deploy."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+
+      - name: Build in container
+        if: steps.fetch.outputs.skip != 'true' && steps.lock.outputs.skip != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ ! -d site ] || [ -L site ]; then
+            echo "Checkout must be a real directory."
+            exit 1
+          fi
+          # Same manifest-list digest as the wildlife atlas workflow. The
+          # container gets HOME only: no job token, no Cloudflare credentials,
+          # and the daemon socket is not mounted. --rm stops any process the
+          # site started before the upload step.
+          image="node:22-bookworm@sha256:63538dfe497cc29dfafdda25ada09b46db68a3f4cc205abf1f5d6bf0913f3384"
+          docker run --rm \
+            --network=bridge \
+            --user "$(id -u):$(id -g)" \
+            -e HOME=/tmp \
+            -v "$PWD/site:/w" \
+            -w /w \
+            "$image" \
+            sh -c 'npm ci && npm run build'
+
+      # Nothing may run after the build in this actions: write job without re-review.
+      # upload-artifact follows symlinks, so dist is copied below and only that copy is uploaded.
+      - name: Copy dist without following links
+        if: steps.fetch.outputs.skip != 'true' && steps.lock.outputs.skip != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          dist="$PWD/site/dist"
+          if [ ! -d "$dist" ] || [ -L "$dist" ]; then
+            echo "dist must be a real directory."
+            exit 1
+          fi
+          if [ -n "$(find "$dist" \( -type l -o ! \( -type f -o -type d \) \) -print -quit)" ]; then
+            echo "Refusing to upload symlinks or special files from the site build."
+            exit 1
+          fi
+          stage="${RUNNER_TEMP}/static-site-dist"
+          rm -rf "$stage"
+          mkdir -p "$stage"
+          # GNU tar follows a symlink only with --dereference. Leaving that off
+          # is the --no-dereference behavior: a link is stored as a link.
+          tar -C "$dist" -cf - . | tar -C "$stage" -xf -
+          if [ -n "$(find "$stage" \( -type l -o ! \( -type f -o -type d \) \) -print -quit)" ]; then
+            echo "Refusing to upload symlinks or special files from the site build."
+            exit 1
+          fi
+          chmod -R u-s,g-s "$stage"
+
+      - name: Upload dist
+        if: steps.fetch.outputs.skip != 'true' && steps.lock.outputs.skip != 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: static-site-dist
+          path: ${{ runner.temp }}/static-site-dist
+          if-no-files-found: error
+          retention-days: 1
+
+  deploy:
+    needs: [gate, build]
+    if: ${{ !cancelled() && needs.build.result == 'success' && needs.build.outputs.skip != 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Deployment branch policy is main only. It is set on the wildlife-atlas
+    # environment; this workflow does not change it.
+    environment: wildlife-atlas
+    permissions:
+      actions: read
+    steps:
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          # Caching stays off unless cache is configured. An empty token keeps
+          # the post step from receiving the job token as INPUT_TOKEN.
+          token: ""
+
+      - name: Fetch pinned Wrangler
+        shell: bash
+        run: |
+          set -euo pipefail
+          export GIT_TERMINAL_PROMPT=0
+          if [[ ! "$GITHUB_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Refusing to fetch an unexpected commit."
+            exit 1
+          fi
+          if [[ ! "$GITHUB_REPOSITORY" =~ ^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$ ]]; then
+            echo "Unexpected repository name."
+            exit 1
+          fi
+          dest="${RUNNER_TEMP}/hohm"
+          rm -rf "$dest"
+          git init --quiet "$dest"
+          git -C "$dest" remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          git -C "$dest" -c credential.helper= -c http.extraheader= fetch --depth 1 origin "$GITHUB_SHA"
+          git -C "$dest" -c core.hooksPath=/dev/null checkout --detach FETCH_HEAD
+          test -f "$dest/tools/wrangler/package.json"
+          test -f "$dest/tools/wrangler/package-lock.json"
+
+      - name: Install pinned Wrangler
+        shell: bash
+        working-directory: ${{ runner.temp }}/hohm/tools/wrangler
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+          test -x node_modules/.bin/wrangler
+
+      - name: Download dist
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: static-site-dist
+          path: ${{ runner.temp }}/static-site-dist
+
+      - name: Deploy to Cloudflare Pages
+        shell: bash
+        working-directory: ${{ runner.temp }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PAGES_BRANCH: ${{ needs.gate.outputs.branch }}
+          PAGES_PRODUCTION: ${{ needs.gate.outputs.production }}
+          GATE_SHA: ${{ needs.gate.outputs.sha }}
+          SITE_SHA: ${{ needs.build.outputs.sha }}
+          SITE_INPUT: ${{ needs.gate.outputs.site }}
+          WRANGLER: ${{ runner.temp }}/hohm/tools/wrangler/node_modules/.bin/wrangler
+          DIST: ${{ runner.temp }}/static-site-dist
+        run: |
+          set -euo pipefail
+          shopt -u nocasematch
+          case "$SITE_INPUT" in
+            health-claims)
+              SITE_NAME=health-claims
+              EXPECTED_SUBDOMAIN=health-claims.pages.dev
+              ;;
+            psychedelics)
+              SITE_NAME=psychedelics
+              EXPECTED_SUBDOMAIN=psychedelics.pages.dev
+              ;;
+            indigenous-australia)
+              SITE_NAME=indigenous-australia
+              EXPECTED_SUBDOMAIN=indigenous-australia.pages.dev
+              ;;
+            celtic-ireland)
+              SITE_NAME=celtic-ireland
+              EXPECTED_SUBDOMAIN=celtic-ireland.pages.dev
+              ;;
+            ancient-greece-med)
+              SITE_NAME=ancient-greece-med
+              EXPECTED_SUBDOMAIN=ancient-greece-med.pages.dev
+              ;;
+            *)
+              echo "Site is not in the allowlist."
+              exit 1
+              ;;
+          esac
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "Cloudflare credentials are unavailable."
+            exit 1
+          fi
+          if [ "$PAGES_PRODUCTION" != "true" ] || [ "$PAGES_BRANCH" != "main" ]; then
+            echo "Refusing to deploy anything except main as production."
+            exit 1
+          fi
+          if [[ ! "$GATE_SHA" =~ ^[0-9a-f]{40}$ ]] || [[ ! "$SITE_SHA" =~ ^[0-9a-f]{40}$ ]] || [ "$SITE_SHA" != "$GATE_SHA" ]; then
+            echo "Refusing to deploy a commit other than the one the gate resolved."
+            exit 1
+          fi
+          if [ -e "$DIST/_worker.js" ] || [ -d "$DIST/functions" ] || [ -e "$DIST/_routes.json" ]; then
+            echo "Refusing to deploy Pages Functions from the site build."
+            exit 1
+          fi
+          if [ ! -d "$DIST" ] || [ -L "$DIST" ] || [ -z "$(find "$DIST" -type f -print -quit)" ]; then
+            echo "Downloaded dist is empty."
+            exit 1
+          fi
+
+          projects="$("$WRANGLER" pages project list --json)"
+          found="$(printf '%s\n' "$projects" | jq -r --arg name "$SITE_NAME" 'any(.[]; .["Project Name"] == $name)')"
+          if [ "$found" != "true" ] && [ "$found" != "false" ]; then
+            echo "Could not read the Pages project list."
+            exit 1
+          fi
+          if [ "$found" = "false" ]; then
+            # --force keeps a new static project on Pages instead of Workers.
+            "$WRANGLER" pages project create "$SITE_NAME" --production-branch main --force
+          fi
+
+          # Read the project subdomain from the API. Do not print the token,
+          # the account id, or the response body.
+          export SITE_NAME EXPECTED_SUBDOMAIN
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  raise SystemExit("Could not read the Pages project.")
+
+          def main():
+              token = os.environ.get("CLOUDFLARE_API_TOKEN") or ""
+              account = os.environ.get("CLOUDFLARE_ACCOUNT_ID") or ""
+              site = os.environ.get("SITE_NAME") or ""
+              expected = os.environ.get("EXPECTED_SUBDOMAIN") or ""
+              if token == "" or account == "":
+                  raise SystemExit("Cloudflare credentials are unavailable.")
+              if expected != site + ".pages.dev":
+                  raise SystemExit(
+                      "Refusing to deploy because the Pages subdomain is not the site pages.dev hostname."
+                  )
+              path = (
+                  "/accounts/"
+                  + urllib.parse.quote(account, safe="")
+                  + "/pages/projects/"
+                  + urllib.parse.quote(site, safe="")
+              )
+              opener = urllib.request.build_opener(NoRedirect)
+              request = urllib.request.Request(
+                  "https://api.cloudflare.com/client/v4" + path,
+                  headers={
+                      "Authorization": "Bearer " + token,
+                      "Accept": "application/json",
+                  },
+                  method="GET",
+              )
+              try:
+                  with opener.open(request, timeout=20) as response:
+                      raw = response.read()
+              except urllib.error.HTTPError as err:
+                  err.read()
+                  raise SystemExit("Could not read the Pages project.")
+              except urllib.error.URLError:
+                  raise SystemExit("Could not read the Pages project.")
+              try:
+                  payload = json.loads(raw.decode("utf-8"))
+              except (UnicodeDecodeError, json.JSONDecodeError):
+                  raise SystemExit("Could not read the Pages project.")
+              if not isinstance(payload, dict) or payload.get("success") is not True:
+                  raise SystemExit("Could not read the Pages project.")
+              result = payload.get("result")
+              if not isinstance(result, dict):
+                  raise SystemExit("Could not read the Pages project.")
+              if result.get("name") != site or result.get("subdomain") != expected:
+                  raise SystemExit(
+                      "Refusing to deploy because the Pages subdomain is not the site pages.dev hostname."
+                  )
+
+          if __name__ == "__main__":
+              try:
+                  main()
+              except SystemExit:
+                  raise
+              except Exception:
+                  raise SystemExit("Could not read the Pages project.")
+          PY
+
+          "$WRANGLER" pages deploy "$DIST" \
+            --project-name="$SITE_NAME" \
+            --branch=main \
+            --commit-hash="$GATE_SHA"

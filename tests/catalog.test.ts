@@ -66,7 +66,7 @@ describe('pack merge', () => {
 
   it('flags Hastings and the Aotearoa centroid and does not plot the Rising Star proxy', () => {
     const hastings = catalog.events.find((event) => event.id === 'hastings')!;
-    expect(hastings.standIn).toMatch(/Town of Battle/);
+    expect(hastings.standIn).toBe('Town stand-in, not the site');
     expect(hastings.lat).toBeCloseTo(50.91, 2);
 
     const cave = catalog.events.find((event) => event.id === 'homo-naledi')!;
@@ -92,11 +92,18 @@ describe('pack merge', () => {
     markPin(plain, { standIn: undefined });
     expect(plain.dataset.standIn).toBeUndefined();
     expect(waypointText(aotearoa!)).toBe('Aotearoa · Country centroid, not a landing site');
-    expect(popupHtml(hastings)).toContain('Town of Battle, not the battlefield');
+    expect(popupHtml(hastings)).toContain('Town stand-in, not the site');
+    expect(popupHtml(hastings)).not.toMatch(/battlefield/i);
+
+    const paracas = catalog.events.find((event) => event.packId === 'paracas')!;
+    expect(paracas.standIn).toBe('District stand-in, not the site');
+    const indo = catalog.migrations.find((item) => item.id === 'indo-european')!;
+    expect(indo.waypoints.find((stop) => stop.name === 'Sintashta culture')?.standIn).toBe('Approximate regional point, not the site');
+    expect(indo.waypoints.find((stop) => stop.name === 'Swat District')?.standIn).toBe('District stand-in, not the site');
 
     const flagged = catalog.standIns.filter((item) => item.treatment === 'flagged').map((item) => item.id);
     const hidden = catalog.standIns.filter((item) => item.treatment === 'hidden').map((item) => item.id);
-    expect(flagged).toEqual(['leang-tedongnge', 'hastings', 'aotearoa']);
+    expect(flagged).toEqual(['leang-tedongnge', 'hastings', 'paracas', 'aotearoa', 'sintashta-culture', 'swat-district']);
     expect(hidden).toEqual(['rising-star']);
   });
 
@@ -117,9 +124,23 @@ describe('pack merge', () => {
     expect(standInFromMethod('PROXY: nearest named feature')).toEqual({ treatment: 'hidden', note: 'Proxy location is not plotted' });
     expect(standInFromMethod('REGION centroid only; exact site not given')).toEqual({ treatment: 'flagged', note: 'Region centroid, not the site' });
     expect(standInFromMethod('Country-level centroid only.')).toEqual({ treatment: 'flagged', note: 'Country centroid, not a landing site' });
-    expect(standInFromMethod("Town of Battle, East Sussex; town-level.")).toEqual({ treatment: 'flagged', note: 'Town of Battle, not the battlefield' });
+    expect(standInFromMethod('Town of Battle, East Sussex; town-level.')).toEqual({ treatment: 'flagged', note: 'Town stand-in, not the site' });
+    expect(standInFromMethod("GeoNames id 8349869 ('Paracas (district)'): District-level; Paracas peninsula area.")).toEqual({
+      treatment: 'flagged',
+      note: 'District stand-in, not the site',
+    });
+    expect(standInFromMethod("GeoNames id 1164211 ('Swat'): District-level.")).toEqual({
+      treatment: 'flagged',
+      note: 'District stand-in, not the site',
+    });
+    expect(standInFromMethod("GeoNames id 1490435 ('Syntasty (Sintashta river)'): River after which the type site is named; approximate.")).toEqual({
+      treatment: 'flagged',
+      note: 'Approximate regional point, not the site',
+    });
     expect(standInFromMethod('site-level')).toBeNull();
     expect(standInFromMethod('City-level point for the capital.')).toBeNull();
+    expect(standInFromMethod('Lake (dry lakebed) where the remains were found; lake-level precision.')).toBeNull();
+    expect(standInFromMethod('Park-level point (one of two GeoNames entries); footprints lie within the park.')).toBeNull();
 
     const tricky = '10.1002/(sici)1520-6505(1998)6:4<132::aid-evan3>3.0.co;2-f';
     const slash = tricky.indexOf('/');
@@ -129,6 +150,9 @@ describe('pack merge', () => {
     expect(doiHref({ doi: 'javascript:alert(1)', url: 'https://doi.org/10.1000/xyz' })).toBeUndefined();
     expect(doiHref({ url: 'https://doi.org/10.1038/nature22968' })).toBeUndefined();
     expect(doiHref({ doi: '10.1038/nature22968' })?.startsWith('https://doi.org/')).toBe(true);
+    expect(doiHref({ doi: '10.1000/...' })).toBeUndefined();
+    expect(doiHref({ doi: '10.1000/.' })).toBeUndefined();
+    expect(doiHref({ doi: '10.1000/a.b' })).toBe('https://doi.org/10.1000/a.b');
   });
 
   it('leaves Herto on the app pin and drops culture waypoints with no point', () => {

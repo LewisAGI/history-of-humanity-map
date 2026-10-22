@@ -1,4 +1,5 @@
 import { continentFor } from './continent';
+import { isUluruPin, parksAustraliaUrl } from './links';
 import type { Continent, DateStatus, HistoryEvent, LensId, Provenance } from './types';
 import eventsJson from '../data/events.json';
 import contentJson from '../data/pack/content.json';
@@ -21,6 +22,7 @@ export interface PackPin {
   sensitivity: string | null;
   sources: string[];
   coordMethod?: string;
+  placement?: { treatment: 'flagged' | 'hidden'; note: string } | null;
 }
 
 interface PackMigration {
@@ -29,7 +31,7 @@ interface PackMigration {
   start: number;
   end: number;
   summary: string;
-  path: { name: string; lat: number | null; lng: number | null; coordMethod?: string }[];
+  path: { name: string; lat: number | null; lng: number | null; coordMethod?: string; standIn?: string }[];
   debate?: string;
   sensitivity?: string | null;
   sources: string[];
@@ -240,26 +242,25 @@ export function doiHref(source: { doi?: string; url?: string }): string | undefi
   const doi = source.doi?.trim();
   if (!doi || !DOI_PATTERN.test(doi)) return undefined;
   const slash = doi.indexOf('/');
-  const href = `https://doi.org/${encodeURIComponent(doi.slice(0, slash))}/${encodeURIComponent(doi.slice(slash + 1))}`;
+  const suffix = doi.slice(slash + 1);
+  if (/^\.+$/.test(suffix)) return undefined;
+  const href = `https://doi.org/${encodeURIComponent(doi.slice(0, slash))}/${encodeURIComponent(suffix)}`;
   if (!href.startsWith('https://doi.org/')) return undefined;
   return href;
 }
 
-/** Stand-in treatment read from a pack coordMethod. Site-level points are not stand-ins. */
-export function standInFromMethod(method: string | undefined): { treatment: 'flagged' | 'hidden'; note: string } | null {
-  if (!method) return null;
-  if (/\bPROXY\b/.test(method)) return { treatment: 'hidden', note: 'Proxy location is not plotted' };
-  if (/centroid/i.test(method)) {
-    if (/country/i.test(method)) return { treatment: 'flagged', note: 'Country centroid, not a landing site' };
-    if (/region/i.test(method)) return { treatment: 'flagged', note: 'Region centroid, not the site' };
-    return { treatment: 'flagged', note: 'Centroid, not the site' };
-  }
-  if (/town-level/i.test(method)) {
-    const town = method.match(/Town of ([A-Za-z]+)/);
-    if (town) return { treatment: 'flagged', note: `Town of ${town[1]}, not the battlefield` };
-    return { treatment: 'flagged', note: 'Town stand-in, not the site' };
-  }
-  return null;
+export { standInFromMethod } from './stand-in';
+
+/**
+ * External href for one pin.
+ * Uluru stays unlinkable until the pack supplies an https URL on uluru.gov.au.
+ */
+export function pinLinkHref(
+  event: { id: string; packId?: string },
+  source: { doi?: string; url?: string },
+): string | undefined {
+  if (isUluruPin(event)) return parksAustraliaUrl(source.url);
+  return doiHref(source);
 }
 
 export interface CatalogEntry {
@@ -513,9 +514,7 @@ export function buildCatalog(options?: CatalogBuildOptions): Catalog {
         dropped.push(stop.name);
         return;
       }
-      const point: CatalogWaypoint = { name: stop.name, lat: stop.lat, lng: stop.lng };
-      const placed = standInFromMethod(stop.coordMethod);
-      if (placed?.treatment === 'flagged') point.standIn = placed.note;
+      const point: CatalogWaypoint = { name: stop.name, lat: stop.lat, lng: stop.lng, standIn: stop.standIn };
       waypoints.push(point);
     });
     const eventIds = new Set<string>();
@@ -599,7 +598,7 @@ export function buildCatalog(options?: CatalogBuildOptions): Catalog {
 
   const standIns: StandInReport[] = [];
   content.pins.forEach((pin) => {
-    const placed = standInFromMethod(pin.coordMethod);
+    const placed = pin.placement;
     if (!placed) return;
     const event = events.find((item) => item.packId === pin.id);
     if (placed.treatment === 'flagged' && event) event.standIn = placed.note;

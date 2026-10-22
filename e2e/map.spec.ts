@@ -94,6 +94,22 @@ test.afterEach(() => {
   expect(faults, faults.join('\n')).toEqual([]);
 });
 
+test('preview serves the pages security headers', async ({ page }) => {
+  const response = await page.goto('/');
+  expect(response, 'document response').toBeTruthy();
+  const headers = response!.headers();
+  expect(headers['content-security-policy']).toContain("default-src 'self'");
+  expect(headers['x-content-type-options']).toBe('nosniff');
+  expect(headers['referrer-policy']).toBe('no-referrer');
+  const script = await page.locator('script[src]').first().getAttribute('src');
+  expect(script).toBeTruthy();
+  const asset = await page.request.get(script!);
+  expect(asset.headers()['content-security-policy']).toContain("default-src 'self'");
+  expect(asset.headers()['cache-control']).toContain('immutable');
+  expect(asset.headers()['content-security-policy']).toBe(headers['content-security-policy']);
+  await page.locator('#app[data-ready="true"]').waitFor();
+});
+
 test('timeline, globe, pins, and labels', async ({ page }, testInfo) => {
   const name = testInfo.project.name;
   await page.goto('/');

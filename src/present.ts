@@ -1,8 +1,7 @@
-import { catalog, doiHref } from './catalog';
+import { catalog, pinLinkHref } from './catalog';
 import { formatEventDate } from './dates';
+import { externalRel } from './links';
 import type { HistoryEvent } from './types';
-
-const EXTERNAL_REL = 'noopener noreferrer';
 
 export function markPin(
   element: { dataset: { standIn?: string; status?: string } },
@@ -31,15 +30,16 @@ export function popupHtml(event: HistoryEvent): string {
 
 function reviewMark(event: HistoryEvent): string {
   if (event.matchConfidence !== 'medium') return '';
-  return `<span class="review-mark" role="img" data-tip="Matched by review" aria-label="Matched by review"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 12.5l3 3 7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>`;
+  return `<button type="button" class="review-mark" data-tip="Matched by review" aria-label="Matched by review"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16l-5-3-5 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></button>`;
 }
 
 function doiLinks(event: HistoryEvent): string {
   const links = (event.sourceIds ?? []).flatMap((id) => {
     const source = catalog.sources.get(id);
-    const href = source ? doiHref(source) : undefined;
-    if (!source?.doi || !href) return [];
-    return `<a class="doi-link" href="${escapeHtml(href)}" target="_blank" rel="${EXTERNAL_REL}">${escapeHtml(source.doi)}</a>`;
+    const href = source ? pinLinkHref(event, source) : undefined;
+    if (!source || !href) return [];
+    const label = source.doi && href.startsWith('https://doi.org/') ? source.doi : source.title;
+    return `<a class="doi-link" href="${escapeHtml(href)}" target="_blank" rel="${externalRel()}">${escapeHtml(label)}</a>`;
   });
   if (!links.length) return '';
   return `<div class="source-list">${links.join('')}</div>`;

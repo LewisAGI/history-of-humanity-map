@@ -1,5 +1,7 @@
-import { formatYear, formatYearRange } from './dates';
 import { catalog, doiHref, filtersAreOpen, searchCatalog, type MapFilters } from './catalog';
+import { formatYear, formatYearRange } from './dates';
+import { externalRel, parksAustraliaUrl } from './links';
+import { readerNotice } from './notice';
 import { waypointText } from './present';
 import type { HistoryEvent } from './types';
 
@@ -281,15 +283,10 @@ export function mountDepth(app: HTMLElement, hooks: DepthHooks): DepthController
     catalog.reading.forEach((item) => {
       const source = catalog.sources.get(item.sourceIds[0] ?? '');
       if (source?.url) {
-        const link = document.createElement('a');
-        link.className = 'entry-button';
-        link.href = source.url;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        link.textContent = item.label;
-        list.append(link);
+        const link = externalAnchor(source.url, item.label, 'entry-button');
+        if (link) list.append(link);
       }
-      const dois = doiLinkList(item.sourceIds);
+      const dois = renderDoiLinks(item.sourceIds);
       if (dois.childElementCount) list.append(dois);
     });
     body.append(list);
@@ -303,7 +300,7 @@ export function mountDepth(app: HTMLElement, hooks: DepthHooks): DepthController
     body.append(storyHead(person.name, formatYearRange(person.born, person.died)));
     body.append(paragraph(person.summary));
     if (person.dateNote) body.append(note(person.dateNote));
-    body.append(sourceLinks(person.sourceIds));
+    body.append(renderSourceLinks(person.sourceIds));
     body.append(eventLinks(person.eventIds));
   }
 
@@ -350,7 +347,7 @@ export function mountDepth(app: HTMLElement, hooks: DepthHooks): DepthController
     });
     body.append(stops);
     body.append(eventLinks(migration.eventIds));
-    body.append(sourceLinks(migration.sourceIds));
+    body.append(renderSourceLinks(migration.sourceIds));
   }
 
   function openStandIns() {
@@ -398,59 +395,6 @@ export function mountDepth(app: HTMLElement, hooks: DepthHooks): DepthController
     return list;
   }
 
-  function sourceLinks(ids: string[]) {
-    const list = document.createElement('div');
-    list.className = 'entry-list source-list';
-    ids.forEach((id) => {
-      const source = catalog.sources.get(id);
-      if (!source) return;
-      const href = doiHref(source);
-      if (source.doi && href) {
-        const row = document.createElement('div');
-        row.className = 'entry-button';
-        const title = document.createElement('span');
-        title.className = 'hit-label';
-        title.textContent = source.title;
-        const link = document.createElement('a');
-        link.className = 'doi-link';
-        link.href = href;
-        link.target = '_blank';
-        link.rel = 'noopener noreferrer';
-        link.textContent = source.doi;
-        row.append(title, link);
-        list.append(row);
-        return;
-      }
-      if (!source.url) return;
-      const link = document.createElement('a');
-      link.className = 'entry-button';
-      link.href = source.url;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      link.textContent = source.title;
-      list.append(link);
-    });
-    return list;
-  }
-
-  function doiLinkList(ids: string[]) {
-    const list = document.createElement('div');
-    list.className = 'source-list';
-    ids.forEach((id) => {
-      const source = catalog.sources.get(id);
-      const href = source ? doiHref(source) : undefined;
-      if (!source?.doi || !href) return;
-      const link = document.createElement('a');
-      link.className = 'doi-link';
-      link.href = href;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      link.textContent = source.doi;
-      list.append(link);
-    });
-    return list;
-  }
-
   return {
     closePopouts,
     closeSheet,
@@ -462,10 +406,63 @@ export function mountDepth(app: HTMLElement, hooks: DepthHooks): DepthController
       }
       gateEvent = event;
       onGate = open;
-      gateText.textContent = event.sensitivity;
+      gateText.textContent = readerNotice(event.sensitivity);
       gate.hidden = false;
     },
   };
+}
+
+export function externalAnchor(href: string, label: string, className: string): HTMLAnchorElement | undefined {
+  const uluruArticle = /wikipedia\.org\/wiki\/Uluru\/?(?:$|\?)/i.test(href);
+  const allowed = uluruArticle ? parksAustraliaUrl(href) : href;
+  if (!allowed) return undefined;
+  const link = document.createElement('a');
+  link.className = className;
+  link.href = allowed;
+  link.target = '_blank';
+  link.rel = externalRel();
+  link.textContent = label;
+  return link;
+}
+
+export function renderSourceLinks(ids: string[]): HTMLElement {
+  const list = document.createElement('div');
+  list.className = 'entry-list source-list';
+  ids.forEach((id) => {
+    const source = catalog.sources.get(id);
+    if (!source) return;
+    const doi = doiHref(source);
+    if (source.doi && doi && source.id !== 'wp-uluru') {
+      const row = document.createElement('div');
+      row.className = 'entry-button';
+      const title = document.createElement('span');
+      title.className = 'hit-label';
+      title.textContent = source.title;
+      const link = externalAnchor(doi, source.doi, 'doi-link');
+      if (!link) return;
+      row.append(title, link);
+      list.append(row);
+      return;
+    }
+    const href = source.id === 'wp-uluru' ? parksAustraliaUrl(source.url) : source.url;
+    if (!href) return;
+    const link = externalAnchor(href, source.title, 'entry-button');
+    if (link) list.append(link);
+  });
+  return list;
+}
+
+export function renderDoiLinks(ids: string[]): HTMLElement {
+  const list = document.createElement('div');
+  list.className = 'source-list';
+  ids.forEach((id) => {
+    const source = catalog.sources.get(id);
+    const href = source ? doiHref(source) : undefined;
+    if (!source?.doi || !href || source.id === 'wp-uluru') return;
+    const link = externalAnchor(href, source.doi, 'doi-link');
+    if (link) list.append(link);
+  });
+  return list;
 }
 
 function toggle(label: string, pressed: boolean, mark: string, onClick: () => void): HTMLButtonElement {

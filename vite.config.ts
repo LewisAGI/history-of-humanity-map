@@ -134,7 +134,12 @@ const SENSITIVE_CLAUSE = [
 ];
 
 function readerDateNote(id: string, note: string): string {
-  if (id === 'lake-mungo') return 'The ancestral remains have been returned to their Traditional Owners.';
+  if (id === 'lake-mungo') {
+    return note.replace(
+      'Remains returned to Traditional Owners; deceased-person sensitivity applies.',
+      'The ancestral remains have been returned to their Traditional Owners.',
+    );
+  }
   if (id === 'wairau-bar') {
     return note.replace('Ancestral remains; deceased-person sensitivity.', 'Ancestral remains.');
   }

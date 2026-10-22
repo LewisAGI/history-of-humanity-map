@@ -144,7 +144,8 @@ describe('reader-facing sensitivity', () => {
 
     const mungo = catalog.events.find((event) => event.packId === 'lake-mungo' || event.id === 'lake-mungo');
     const wairau = catalog.events.find((event) => event.packId === 'wairau-bar' || event.id === 'wairau-bar');
-    expect(mungo?.dateNote).toBe('The ancestral remains have been returned to their Traditional Owners.');
+    expect(mungo?.dateNote).toBe('Approx.; about 42-40 ka. The ancestral remains have been returned to their Traditional Owners.');
+    expect(mungo?.dateNote).toContain('Approx.; about 42-40 ka.');
     expect(wairau?.dateNote).toBe('Approx.; ~late 13th century. Ancestral remains.');
     expect(`${mungo?.dateNote} ${wairau?.dateNote}`).not.toMatch(/deceased-person sensitivity/i);
 

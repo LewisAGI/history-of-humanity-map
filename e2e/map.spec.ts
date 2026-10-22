@@ -25,7 +25,7 @@ declare global {
 }
 import fs from 'node:fs';
 import path from 'node:path';
-import { ignorableConsole, ignorablePageError } from './faults';
+import { ignorablePageError, isGibsTileUrl, settleConsoleFaults } from './faults';
 
 const shots = path.join('test-results', 'screenshots');
 const APP_ORIGIN = 'http://127.0.0.1:4173';
@@ -64,6 +64,8 @@ const ROUTES: { id: string; date: string }[] = [
 ];
 
 let faults: string[] = [];
+let failedRequestUrls: string[] = [];
+let pendingConsole: { text: string; locationUrl: string }[] = [];
 
 test.beforeAll(() => {
   fs.mkdirSync(shots, { recursive: true });
@@ -71,30 +73,36 @@ test.beforeAll(() => {
 
 test.beforeEach(async ({ page }) => {
   faults = [];
+  failedRequestUrls = [];
+  pendingConsole = [];
   page.on('pageerror', (error) => {
     if (ignorablePageError(error.message)) return;
     faults.push(`pageerror: ${error.message}`);
   });
   page.on('console', (message) => {
     if (message.type() !== 'error') return;
-    const text = message.text();
-    if (ignorableConsole(text)) return;
-    faults.push(`console: ${text}`);
+    pendingConsole.push({ text: message.text(), locationUrl: message.location().url });
   });
   page.on('response', (response) => {
     if (response.status() < 400) return;
     const url = response.url();
+    if (isGibsTileUrl(url)) {
+      failedRequestUrls.push(url);
+      return;
+    }
     if (!isAppAsset(url)) return;
     faults.push(`http ${response.status()}: ${url}`);
   });
   page.on('requestfailed', (request) => {
     const url = request.url();
+    failedRequestUrls.push(url);
     if (!isAppAsset(url)) return;
     faults.push(`failed: ${url} ${request.failure()?.errorText ?? ''}`);
   });
 });
 
 test.afterEach(() => {
+  settleConsoleFaults(faults, pendingConsole, failedRequestUrls);
   expect(faults, faults.join('\n')).toEqual([]);
 });
 

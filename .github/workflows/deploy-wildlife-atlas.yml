@@ -4,28 +4,40 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: Branch or SHA of LewisAGI/wildlife-migration-atlas to deploy
+        description: Atlas branch, either main or refs/heads/<name>
         required: false
         default: main
         type: string
   schedule:
-    # Production only, and only when atlas main moved since the last deploy.
+    # Every 30 minutes from this repo's default branch. GitHub turns scheduled
+    # workflows off in a public repo after 60 days without a commit here.
+    # Commits in the atlas repo do not count.
     - cron: "*/30 * * * *"
 
-permissions:
-  contents: read
+# Jobs set their own permissions. The build job must not inherit contents access.
+permissions: {}
 
 concurrency:
   group: deploy-wildlife-atlas
   cancel-in-progress: false
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # upload-artifact finalizes through the Actions API. An empty permission
+    # set returns 403, so this job has that one scope, no contents access,
+    # and no secrets. Atlas lifecycle scripts run only in this job.
+    permissions:
+      actions: write
+    outputs:
+      skip: ${{ steps.lock.outputs.skip == 'true' || steps.fetch.outputs.skip == 'true' }}
+      sha: ${{ steps.fetch.outputs.sha }}
+      branch: ${{ steps.resolve.outputs.branch }}
+      production: ${{ steps.resolve.outputs.production }}
     steps:
       - name: Resolve atlas ref
-        id: target
+        id: resolve
         shell: bash
         env:
           ATLAS_REF: ${{ inputs.ref }}
@@ -41,134 +53,200 @@ jobs:
               ref=main
             fi
           fi
-          if [[ ! "$ref" =~ ^[A-Za-z0-9._/-]+$ ]]; then
-            echo "Unsupported atlas ref."
+          if [ "$ref" = "main" ]; then
+            branch=main
+          elif [[ "$ref" =~ ^refs/heads/([A-Za-z0-9._/-]+)$ ]]; then
+            branch="${BASH_REMATCH[1]}"
+          else
+            echo "Ref must be main or refs/heads/<branch>."
             exit 1
           fi
-          case "$ref" in
-            -*|*'..'*)
-              echo "Unsupported atlas ref."
+          case "$branch" in
+            -*|*'..'*|*'@{'*|/*|*/|*//*|*.|*.lock)
+              echo "Unsupported atlas branch."
               exit 1
               ;;
           esac
-          branch="$ref"
-          case "$branch" in
-            refs/heads/*) branch="${branch#refs/heads/}" ;;
-          esac
-          if [ -z "$branch" ]; then
-            echo "Unsupported atlas ref."
-            exit 1
-          fi
           if [ "$branch" = "main" ]; then
             production=true
           else
             production=false
           fi
           {
-            echo "ref=${ref}"
             echo "branch=${branch}"
             echo "production=${production}"
           } >> "$GITHUB_OUTPUT"
 
-      # Last deployed production SHA, so a later schedule can skip an unchanged main.
-      - name: Restore last production SHA
-        id: last-sha
-        if: steps.target.outputs.production == 'true'
-        uses: actions/cache/restore@v4
-        with:
-          path: wildlife-atlas-state
-          key: wildlife-atlas-production-sha-${{ github.run_id }}-${{ github.run_attempt }}
-          restore-keys: |
-            wildlife-atlas-production-sha-
-
-      - name: Check whether atlas main changed
-        id: gate
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [ "$GITHUB_EVENT_NAME" != "schedule" ]; then
-            echo "deploy=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          remote="$(git -c credential.helper= -c http.extraheader= ls-remote https://github.com/LewisAGI/wildlife-migration-atlas.git refs/heads/main)"
-          sha="$(printf '%s\n' "$remote" | awk 'NR==1 {print $1}')"
-          if [[ ! "$sha" =~ ^[0-9a-f]{40}$ ]]; then
-            echo "Could not resolve atlas main."
-            exit 1
-          fi
-          last=""
-          if [ -f wildlife-atlas-state/sha.txt ]; then
-            last="$(tr -d '[:space:]' < wildlife-atlas-state/sha.txt)"
-          fi
-          echo "Atlas main is ${sha}; last production deploy is ${last:-none}."
-          if [ "$sha" = "$last" ]; then
-            {
-              echo "deploy=false"
-              echo "sha=${sha}"
-            } >> "$GITHUB_OUTPUT"
-            echo "HEAD unchanged; skipping deploy."
-            exit 0
-          fi
-          {
-            echo "deploy=true"
-            echo "sha=${sha}"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Checkout atlas
-        id: checkout
-        if: steps.gate.outputs.deploy == 'true'
+      - name: Fetch atlas branch
+        id: fetch
         shell: bash
         env:
-          ATLAS_REF: ${{ steps.target.outputs.ref }}
+          ATLAS_BRANCH: ${{ steps.resolve.outputs.branch }}
         run: |
           set -euo pipefail
           export GIT_TERMINAL_PROMPT=0
+          remote_ref="refs/heads/${ATLAS_BRANCH}"
+          if ! remote_out="$(git -c credential.helper= -c http.extraheader= ls-remote https://github.com/LewisAGI/wildlife-migration-atlas.git "$remote_ref")"; then
+            echo "::warning title=atlas ls-remote::Could not query ${remote_ref} on LewisAGI/wildlife-migration-atlas. Skipping this run."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          sha="$(printf '%s\n' "$remote_out" | awk 'NR==1 {print $1}')"
+          if [[ ! "$sha" =~ ^[0-9a-f]{40}$ ]]; then
+            if [ "$GITHUB_EVENT_NAME" = "schedule" ]; then
+              echo "::warning title=atlas ls-remote::${remote_ref} did not resolve. Skipping this run."
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Atlas branch ${ATLAS_BRANCH} does not exist."
+            exit 1
+          fi
           rm -rf atlas
           git init --quiet atlas
           git -C atlas remote add origin https://github.com/LewisAGI/wildlife-migration-atlas.git
           # Public repository. Do not send a token.
-          git -C atlas -c credential.helper= -c http.extraheader= fetch --depth 1 origin "$ATLAS_REF"
+          git -C atlas -c credential.helper= -c http.extraheader= fetch --depth 1 origin "$remote_ref"
           git -C atlas checkout --detach FETCH_HEAD
-          sha="$(git -C atlas rev-parse HEAD)"
-          if [[ ! "$sha" =~ ^[0-9a-f]{40}$ ]]; then
+          head="$(git -C atlas rev-parse HEAD)"
+          if [[ ! "$head" =~ ^[0-9a-f]{40}$ ]]; then
             echo "Checkout did not resolve a commit."
             exit 1
           fi
-          echo "Checked out ${sha} from ${ATLAS_REF}."
-          echo "sha=${sha}" >> "$GITHUB_OUTPUT"
+          echo "Checked out ${head} from ${remote_ref}."
+          {
+            echo "skip=false"
+            echo "sha=${head}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Check for package-lock.json
+        id: lock
+        if: steps.fetch.outputs.skip != 'true'
+        shell: bash
+        env:
+          ATLAS_SHA: ${{ steps.fetch.outputs.sha }}
+        run: |
+          set -euo pipefail
+          if [ ! -f atlas/package-lock.json ]; then
+            echo "::notice title=atlas build::Atlas ${ATLAS_SHA} has no package-lock.json. Skipping the build and deploy."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "skip=false" >> "$GITHUB_OUTPUT"
 
       - name: Setup Node
-        if: steps.gate.outputs.deploy == 'true'
-        uses: actions/setup-node@v4
+        if: steps.fetch.outputs.skip != 'true' && steps.lock.outputs.skip != 'true'
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: 22
-          cache: npm
-          cache-dependency-path: atlas/package-lock.json
 
       - name: Install dependencies
-        if: steps.gate.outputs.deploy == 'true'
+        if: steps.fetch.outputs.skip != 'true' && steps.lock.outputs.skip != 'true'
         working-directory: atlas
+        env:
+          GITHUB_TOKEN: ""
+          ACTIONS_RUNTIME_TOKEN: ""
         run: npm ci
 
       - name: Build
-        if: steps.gate.outputs.deploy == 'true'
+        if: steps.fetch.outputs.skip != 'true' && steps.lock.outputs.skip != 'true'
         working-directory: atlas
+        env:
+          GITHUB_TOKEN: ""
+          ACTIONS_RUNTIME_TOKEN: ""
         run: npm run build
 
-      - name: Deploy to Cloudflare Pages
-        if: steps.gate.outputs.deploy == 'true'
-        working-directory: atlas
+      - name: Upload dist
+        if: steps.fetch.outputs.skip != 'true' && steps.lock.outputs.skip != 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: wildlife-atlas-dist
+          path: atlas/dist
+          if-no-files-found: error
+          retention-days: 1
+
+  deploy:
+    needs: build
+    if: needs.build.outputs.skip != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: wildlife-atlas
+    permissions:
+      actions: read
+      contents: read
+    steps:
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+
+      - name: Install pinned Wrangler
         shell: bash
+        working-directory: ${{ runner.temp }}
+        run: |
+          set -euo pipefail
+          # Exact version from this repo's package-lock. Ignore dependency scripts.
+          npm install --ignore-scripts --prefix "$RUNNER_TEMP/wrangler" wrangler@4.149.0
+          test -x "$RUNNER_TEMP/wrangler/node_modules/.bin/wrangler"
+
+      - name: Check published production commit
+        id: deployed
+        if: github.event_name == 'schedule' && needs.build.outputs.production == 'true'
+        shell: bash
+        working-directory: ${{ runner.temp }}
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          PAGES_BRANCH: ${{ steps.target.outputs.branch }}
-          PAGES_PRODUCTION: ${{ steps.target.outputs.production }}
-          ATLAS_SHA: ${{ steps.checkout.outputs.sha }}
+          ATLAS_SHA: ${{ needs.build.outputs.sha }}
+          WRANGLER: ${{ runner.temp }}/wrangler/node_modules/.bin/wrangler
         run: |
           set -euo pipefail
-          if [ -z "$PAGES_BRANCH" ]; then
-            echo "Refusing to deploy without a branch name."
+          if [[ ! "$ATLAS_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Refusing to compare an invalid atlas SHA."
+            exit 1
+          fi
+          # wrangler 4.149.0 reports Source as the first 7 characters of the commit.
+          if ! deployments="$("$WRANGLER" pages deployment list --project-name=wildlife-migration-atlas --environment=production --json 2>list.err)"; then
+            projects="$("$WRANGLER" pages project list --json)"
+            found="$(printf '%s\n' "$projects" | jq -r 'any(.[]; .["Project Name"] == "wildlife-migration-atlas")')"
+            if [ "$found" = "false" ]; then
+              echo "deploy=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Could not list production deployments."
+            cat list.err
+            exit 1
+          fi
+          short="$(printf '%s\n' "$deployments" | jq -r 'if type == "array" and length > 0 then .[0].Source // "" else "" end')"
+          if [[ "$short" =~ ^[0-9a-f]{7}$ && "$ATLAS_SHA" == "$short"* ]]; then
+            echo "::notice title=atlas deploy::Production already has ${ATLAS_SHA}. Skipping."
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "deploy=true" >> "$GITHUB_OUTPUT"
+
+      - name: Download dist
+        if: steps.deployed.outputs.deploy != 'false'
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: wildlife-atlas-dist
+          path: ${{ runner.temp }}/wildlife-atlas-site
+
+      - name: Deploy to Cloudflare Pages
+        if: steps.deployed.outputs.deploy != 'false'
+        shell: bash
+        working-directory: ${{ runner.temp }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PAGES_BRANCH: ${{ needs.build.outputs.branch }}
+          PAGES_PRODUCTION: ${{ needs.build.outputs.production }}
+          ATLAS_SHA: ${{ needs.build.outputs.sha }}
+          WRANGLER: ${{ runner.temp }}/wrangler/node_modules/.bin/wrangler
+          SITE: ${{ runner.temp }}/wildlife-atlas-site
+        run: |
+          set -euo pipefail
+          if [ -z "$PAGES_BRANCH" ] || [ -z "$ATLAS_SHA" ]; then
+            echo "Refusing to deploy without the atlas branch and commit."
             exit 1
           fi
           if [ "$PAGES_PRODUCTION" = "true" ]; then
@@ -184,31 +262,31 @@ jobs:
             echo "Refusing to deploy without the atlas commit SHA."
             exit 1
           fi
-          if ! npx --yes wrangler pages project list | grep -F "wildlife-migration-atlas"; then
-            npx --yes wrangler pages project create wildlife-migration-atlas --production-branch main
+          if [[ ! "$PAGES_BRANCH" =~ ^[A-Za-z0-9._/-]+$ ]]; then
+            echo "Refusing to deploy an unexpected branch name."
+            exit 1
           fi
-          npx --yes wrangler pages deploy dist \
+          if [ -e "$SITE/_worker.js" ] || [ -d "$SITE/functions" ] || [ -e "$SITE/_routes.json" ]; then
+            echo "Refusing to deploy Pages Functions from the atlas build."
+            exit 1
+          fi
+          if [ ! -d "$SITE" ] || [ -z "$(find "$SITE" -type f -print -quit)" ]; then
+            echo "Downloaded dist is empty."
+            exit 1
+          fi
+
+          projects="$("$WRANGLER" pages project list --json)"
+          found="$(printf '%s\n' "$projects" | jq -r 'any(.[]; .["Project Name"] == "wildlife-migration-atlas")')"
+          if [ "$found" != "true" ] && [ "$found" != "false" ]; then
+            echo "Could not read the Pages project list."
+            exit 1
+          fi
+          if [ "$found" = "false" ]; then
+            # --force keeps this on Pages if Wrangler would otherwise delegate a new static project.
+            "$WRANGLER" pages project create wildlife-migration-atlas --production-branch main --force
+          fi
+
+          "$WRANGLER" pages deploy "$SITE" \
             --project-name=wildlife-migration-atlas \
             --branch="${PAGES_BRANCH}" \
             --commit-hash="${ATLAS_SHA}"
-
-      - name: Record deployed SHA
-        if: steps.gate.outputs.deploy == 'true' && steps.target.outputs.production == 'true'
-        shell: bash
-        env:
-          ATLAS_SHA: ${{ steps.checkout.outputs.sha }}
-        run: |
-          set -euo pipefail
-          if [[ ! "$ATLAS_SHA" =~ ^[0-9a-f]{40}$ ]]; then
-            echo "Refusing to record an invalid SHA."
-            exit 1
-          fi
-          mkdir -p wildlife-atlas-state
-          printf '%s\n' "$ATLAS_SHA" > wildlife-atlas-state/sha.txt
-
-      - name: Save deployed SHA
-        if: steps.gate.outputs.deploy == 'true' && steps.target.outputs.production == 'true'
-        uses: actions/cache/save@v4
-        with:
-          path: wildlife-atlas-state
-          key: wildlife-atlas-production-sha-${{ github.run_id }}-${{ github.run_attempt }}

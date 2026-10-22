@@ -1,0 +1,8 @@
+{
+  "name": "wildlife-atlas-wrangler",
+  "private": true,
+  "description": "Pinned Wrangler CLI for the wildlife atlas Pages deploy. Install with npm ci --ignore-scripts.",
+  "dependencies": {
+    "wrangler": "4.149.0"
+  }
+}

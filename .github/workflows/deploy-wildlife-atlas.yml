@@ -1,0 +1,576 @@
+name: Deploy wildlife atlas
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Atlas branch, either main or refs/heads/<name>
+        required: false
+        default: main
+        type: string
+  schedule:
+    # Every 30 minutes from this repo's default branch. GitHub turns scheduled
+    # workflows off in a public repo after 60 days without a commit here.
+    # Commits in the atlas repo do not count.
+    - cron: "*/30 * * * *"
+
+# Jobs set their own permissions. Untrusted atlas code must not inherit any.
+permissions: {}
+
+concurrency:
+  # One pending run per ref. Schedule, main, refs/heads/main, and an empty
+  # ref share the production group so two production deploys cannot overlap.
+  # A later cron must not drop a queued preview.
+  group: "deploy-wildlife-atlas-${{ (github.event_name == 'schedule' || inputs.ref == 'main' || inputs.ref == 'refs/heads/main' || inputs.ref == '') && 'main' || inputs.ref }}"
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # wildlife-atlas deployment branch policy is main only. It is set on the
+    # environment; this workflow does not change it.
+    environment: wildlife-atlas
+    # No checkout and no Node action. Listing deployments is a Cloudflare API
+    # call from this step, so atlas code never shares the runner with the token.
+    permissions: {}
+    outputs:
+      skip: ${{ steps.ls.outputs.skip == 'true' || steps.published.outputs.skip == 'true' }}
+      sha: ${{ steps.ls.outputs.sha }}
+      branch: ${{ steps.resolve.outputs.branch }}
+      production: ${{ steps.resolve.outputs.production }}
+    steps:
+      - name: Resolve atlas ref
+        id: resolve
+        shell: bash
+        env:
+          ATLAS_REF: ${{ inputs.ref }}
+        run: |
+          set -euo pipefail
+          if [ "$GITHUB_EVENT_NAME" = "schedule" ]; then
+            ref=main
+          else
+            ref="${ATLAS_REF:-main}"
+            ref="${ref#"${ref%%[![:space:]]*}"}"
+            ref="${ref%"${ref##*[![:space:]]}"}"
+            if [ -z "$ref" ]; then
+              ref=main
+            fi
+          fi
+          if [ "$ref" = "main" ]; then
+            branch=main
+          elif [[ "$ref" =~ ^refs/heads/([A-Za-z0-9._/-]+)$ ]]; then
+            branch="${BASH_REMATCH[1]}"
+          else
+            echo "Ref must be main or refs/heads/<branch>."
+            exit 1
+          fi
+          case "$branch" in
+            -*|*'..'*|*'@{'*|/*|*/|*//*|*.|*.lock)
+              echo "Unsupported atlas branch."
+              exit 1
+              ;;
+          esac
+          if [ "$branch" = "main" ]; then
+            production=true
+          else
+            production=false
+          fi
+          {
+            echo "branch=${branch}"
+            echo "production=${production}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Resolve atlas HEAD
+        id: ls
+        shell: bash
+        env:
+          ATLAS_BRANCH: ${{ steps.resolve.outputs.branch }}
+        run: |
+          set -euo pipefail
+          export GIT_TERMINAL_PROMPT=0
+          if [[ ! "$ATLAS_BRANCH" =~ ^[A-Za-z0-9._/-]+$ ]]; then
+            echo "Unsupported atlas branch."
+            exit 1
+          fi
+          case "$ATLAS_BRANCH" in
+            -*|*'..'*|*'@{'*|/*|*/|*//*|*.|*.lock)
+              echo "Unsupported atlas branch."
+              exit 1
+              ;;
+          esac
+          remote_ref="refs/heads/${ATLAS_BRANCH}"
+          if ! remote_out="$(git -c credential.helper= -c http.extraheader= ls-remote https://github.com/LewisAGI/wildlife-migration-atlas.git "$remote_ref")"; then
+            echo "::warning title=atlas ls-remote::Could not query ${remote_ref} on LewisAGI/wildlife-migration-atlas. Skipping this run."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          sha="$(printf '%s\n' "$remote_out" | awk 'NR==1 {print $1}')"
+          if [[ ! "$sha" =~ ^[0-9a-f]{40}$ ]]; then
+            if [ "$GITHUB_EVENT_NAME" = "schedule" ]; then
+              echo "::warning title=atlas ls-remote::${remote_ref} did not resolve. Skipping this run."
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Atlas branch ${ATLAS_BRANCH} does not exist."
+            exit 1
+          fi
+          {
+            echo "skip=false"
+            echo "sha=${sha}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Skip when production already has this commit
+        id: published
+        # Manual dispatch of main still deploys. Only the schedule is a no-op
+        # when the newest successful production deployment is already this SHA.
+        if: steps.ls.outputs.skip != 'true' && github.event_name == 'schedule' && steps.resolve.outputs.production == 'true'
+        shell: bash
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          ATLAS_SHA: ${{ steps.ls.outputs.sha }}
+        run: |
+          set -euo pipefail
+          # wrangler 4.149.0 lists one page and reports Source as 7 characters
+          # and a successful Status as a relative time. The API returns newest
+          # first, so pagination stops at the first page that contains a
+          # successful production deployment.
+          newest="$(python3 - <<'PY'
+          import json
+          import os
+          import re
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+          from datetime import datetime
+
+          # selection-start
+          def error_codes(payload):
+              codes = set()
+              errors = payload.get("errors") if isinstance(payload, dict) else None
+              if not isinstance(errors, list):
+                  return codes
+              for err in errors:
+                  if not isinstance(err, dict):
+                      continue
+                  code = err.get("code")
+                  if isinstance(code, str) and code.isdigit():
+                      code = int(code)
+                  codes.add(code)
+              return codes
+
+          def created_at(deployment):
+              raw = deployment.get("created_on") or ""
+              if not isinstance(raw, str) or raw == "":
+                  return None
+              if raw.endswith("Z"):
+                  raw = raw[:-1] + "+00:00"
+              try:
+                  return datetime.fromisoformat(raw)
+              except ValueError:
+                  return None
+
+          def newest_successful_hash(deployments):
+              best_at = None
+              best_hash = ""
+              for deployment in deployments:
+                  if not isinstance(deployment, dict):
+                      continue
+                  stage = deployment.get("latest_stage") or {}
+                  if not isinstance(stage, dict) or stage.get("status") != "success":
+                      continue
+                  when = created_at(deployment)
+                  if when is None:
+                      continue
+                  trigger = deployment.get("deployment_trigger") or {}
+                  metadata = trigger.get("metadata") if isinstance(trigger, dict) else {}
+                  commit = metadata.get("commit_hash") if isinstance(metadata, dict) else ""
+                  if not isinstance(commit, str):
+                      commit = ""
+                  if best_at is None or when > best_at:
+                      best_at = when
+                      best_hash = commit
+              return best_hash
+
+          def walk_pages(fetch_page, max_pages=40):
+              page = 1
+              collected = []
+              previous_marker = None
+              while True:
+                  payload = fetch_page(page)
+                  if payload is None:
+                      return None
+                  if not isinstance(payload, dict) or payload.get("success") is not True:
+                      raise SystemExit("Could not list production deployments.")
+                  result = payload.get("result")
+                  if not isinstance(result, list):
+                      raise SystemExit("Could not list production deployments.")
+                  marker = result[0].get("id") if result and isinstance(result[0], dict) else None
+                  if marker is not None and marker == previous_marker:
+                      raise SystemExit("Could not list production deployments.")
+                  previous_marker = marker
+                  collected.extend(result)
+                  # Newest first: the first page that contains a success holds
+                  # the newest successful production deployment.
+                  if any(
+                      isinstance(item, dict)
+                      and isinstance(item.get("latest_stage") or {}, dict)
+                      and (item.get("latest_stage") or {}).get("status") == "success"
+                      for item in result
+                  ):
+                      break
+                  info = payload.get("result_info") or {}
+                  if not isinstance(info, dict):
+                      info = {}
+                  per_page = info.get("per_page")
+                  total = info.get("total_count")
+                  if isinstance(per_page, int) and isinstance(total, int) and per_page > 0:
+                      if page * per_page >= total or len(result) == 0:
+                          break
+                  elif len(result) < 25 or len(result) == 0:
+                      break
+                  if page >= max_pages:
+                      break
+                  page += 1
+              return collected
+          # selection-end
+
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  raise SystemExit("Could not list production deployments.")
+
+          def main():
+              token = os.environ.get("CLOUDFLARE_API_TOKEN") or ""
+              account = os.environ.get("CLOUDFLARE_ACCOUNT_ID") or ""
+              want = os.environ.get("ATLAS_SHA") or ""
+              if token == "" or account == "":
+                  raise SystemExit("Cloudflare credentials are unavailable.")
+              if not re.fullmatch(r"[0-9a-f]{40}", want):
+                  raise SystemExit("Refusing to compare an invalid atlas SHA.")
+              path = "/accounts/" + urllib.parse.quote(account, safe="") + "/pages/projects/wildlife-migration-atlas/deployments"
+              opener = urllib.request.build_opener(NoRedirect)
+
+              def fetch_page(page):
+                  query = urllib.parse.urlencode(
+                      {"env": "production", "per_page": "25", "page": str(page)}
+                  )
+                  url = "https://api.cloudflare.com/client/v4" + path + "?" + query
+                  request = urllib.request.Request(
+                      url,
+                      headers={
+                          "Authorization": "Bearer " + token,
+                          "Accept": "application/json",
+                      },
+                  )
+                  try:
+                      with opener.open(request, timeout=20) as response:
+                          raw = response.read()
+                  except urllib.error.HTTPError as err:
+                      raw = err.read()
+                      try:
+                          payload = json.loads(raw.decode("utf-8"))
+                      except (UnicodeDecodeError, json.JSONDecodeError):
+                          raise SystemExit("Could not list production deployments.")
+                      if 8000007 in error_codes(payload):
+                          return None
+                      raise SystemExit("Could not list production deployments.")
+                  except urllib.error.URLError:
+                      raise SystemExit("Could not list production deployments.")
+                  try:
+                      payload = json.loads(raw.decode("utf-8"))
+                  except (UnicodeDecodeError, json.JSONDecodeError):
+                      raise SystemExit("Could not list production deployments.")
+                  if 8000007 in error_codes(payload):
+                      return None
+                  return payload
+
+              try:
+                  collected = walk_pages(fetch_page)
+              except SystemExit:
+                  raise
+              except Exception:
+                  raise SystemExit("Could not list production deployments.")
+              if collected is None:
+                  print("MISSING")
+                  return
+              digest = newest_successful_hash(collected)
+              if re.fullmatch(r"[0-9a-f]{40}", digest or ""):
+                  print(digest)
+              else:
+                  print("NONE")
+
+          if __name__ == "__main__":
+              main()
+          PY
+          )"
+          if [ "$newest" = "MISSING" ] || [ "$newest" = "NONE" ]; then
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          elif [[ "$newest" =~ ^[0-9a-f]{40}$ ]] && [ "$newest" = "$ATLAS_SHA" ]; then
+            echo "::notice title=atlas deploy::Production already has ${ATLAS_SHA}. Skipping."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+          elif [[ "$newest" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Could not read the newest production deployment."
+            exit 1
+          fi
+
+  build:
+    needs: gate
+    if: ${{ !cancelled() && needs.gate.result == 'success' && needs.gate.outputs.skip != 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # upload-artifact finalizes through the Actions API and 403s without this
+    # scope. Atlas npm runs in a container that is removed before the upload,
+    # and that container is not given a token. There is no setup-node post step.
+    # Nothing may run after the build in this actions: write job without re-review.
+    permissions:
+      actions: write
+    outputs:
+      skip: ${{ steps.lock.outputs.skip == 'true' || steps.fetch.outputs.skip == 'true' }}
+      sha: ${{ steps.fetch.outputs.sha }}
+    steps:
+      - name: Fetch atlas branch
+        id: fetch
+        shell: bash
+        env:
+          ATLAS_BRANCH: ${{ needs.gate.outputs.branch }}
+          GATE_SHA: ${{ needs.gate.outputs.sha }}
+        run: |
+          set -euo pipefail
+          export GIT_TERMINAL_PROMPT=0
+          if [[ ! "$ATLAS_BRANCH" =~ ^[A-Za-z0-9._/-]+$ ]]; then
+            echo "Unsupported atlas branch."
+            exit 1
+          fi
+          case "$ATLAS_BRANCH" in
+            -*|*'..'*|*'@{'*|/*|*/|*//*|*.|*.lock)
+              echo "Unsupported atlas branch."
+              exit 1
+              ;;
+          esac
+          remote_ref="refs/heads/${ATLAS_BRANCH}"
+          if ! remote_out="$(git -c credential.helper= -c http.extraheader= ls-remote https://github.com/LewisAGI/wildlife-migration-atlas.git "$remote_ref")"; then
+            echo "::warning title=atlas ls-remote::Could not query ${remote_ref} on LewisAGI/wildlife-migration-atlas. Skipping this run."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          sha="$(printf '%s\n' "$remote_out" | awk 'NR==1 {print $1}')"
+          if [[ ! "$sha" =~ ^[0-9a-f]{40}$ ]]; then
+            if [ "$GITHUB_EVENT_NAME" = "schedule" ]; then
+              echo "::warning title=atlas ls-remote::${remote_ref} did not resolve. Skipping this run."
+              echo "skip=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Atlas branch ${ATLAS_BRANCH} does not exist."
+            exit 1
+          fi
+          rm -rf atlas
+          git init --quiet atlas
+          git -C atlas remote add origin https://github.com/LewisAGI/wildlife-migration-atlas.git
+          git -C atlas -c credential.helper= -c http.extraheader= fetch --depth 1 origin "$remote_ref"
+          git -C atlas -c core.hooksPath=/dev/null checkout --detach FETCH_HEAD
+          head="$(git -C atlas rev-parse HEAD)"
+          if [[ ! "$head" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Checkout did not resolve a commit."
+            exit 1
+          fi
+          if [[ "$GATE_SHA" =~ ^[0-9a-f]{40}$ ]] && [ "$head" != "$GATE_SHA" ]; then
+            echo "::notice title=atlas fetch::Branch moved from ${GATE_SHA} to ${head}. Deploying the fetched commit."
+          fi
+          echo "Checked out ${head} from ${remote_ref}."
+          {
+            echo "skip=false"
+            echo "sha=${head}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Check for package-lock.json
+        id: lock
+        if: steps.fetch.outputs.skip != 'true'
+        shell: bash
+        env:
+          ATLAS_SHA: ${{ steps.fetch.outputs.sha }}
+        run: |
+          set -euo pipefail
+          if [ ! -f atlas/package-lock.json ]; then
+            echo "::notice title=atlas build::Atlas ${ATLAS_SHA} has no package-lock.json. Skipping the build and deploy."
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+
+      - name: Build in container
+        if: steps.fetch.outputs.skip != 'true' && steps.lock.outputs.skip != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Same manifest-list digest as node:22 on 2026-10-22. The container
+          # gets HOME only: no job token, and the daemon socket is not mounted.
+          # --rm stops any process atlas started before the upload step.
+          image="node:22-bookworm@sha256:63538dfe497cc29dfafdda25ada09b46db68a3f4cc205abf1f5d6bf0913f3384"
+          docker run --rm \
+            --network=bridge \
+            --user "$(id -u):$(id -g)" \
+            -e HOME=/tmp \
+            -v "$PWD/atlas:/w" \
+            -w /w \
+            "$image" \
+            sh -c 'npm ci && npm run build'
+
+      # Nothing may run after the build in this actions: write job without re-review.
+      # upload-artifact follows symlinks, so dist is copied below and only that copy is uploaded.
+      - name: Copy dist without following links
+        if: steps.fetch.outputs.skip != 'true' && steps.lock.outputs.skip != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          dist="$PWD/atlas/dist"
+          if [ ! -d "$dist" ] || [ -L "$dist" ]; then
+            echo "dist must be a real directory."
+            exit 1
+          fi
+          if [ -n "$(find "$dist" \( -type l -o ! \( -type f -o -type d \) \) -print -quit)" ]; then
+            echo "Refusing to upload symlinks or special files from the atlas build."
+            exit 1
+          fi
+          stage="${RUNNER_TEMP}/wildlife-atlas-dist"
+          rm -rf "$stage"
+          mkdir -p "$stage"
+          # GNU tar follows a symlink only with --dereference. Leaving that off
+          # is the --no-dereference behavior: a link is stored as a link.
+          tar -C "$dist" -cf - . | tar -C "$stage" -xf -
+          if [ -n "$(find "$stage" \( -type l -o ! \( -type f -o -type d \) \) -print -quit)" ]; then
+            echo "Refusing to upload symlinks or special files from the atlas build."
+            exit 1
+          fi
+          chmod -R u-s,g-s "$stage"
+
+      - name: Upload dist
+        if: steps.fetch.outputs.skip != 'true' && steps.lock.outputs.skip != 'true'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: wildlife-atlas-dist
+          path: ${{ runner.temp }}/wildlife-atlas-dist
+          if-no-files-found: error
+          retention-days: 1
+
+  deploy:
+    needs: [gate, build]
+    if: ${{ !cancelled() && needs.build.result == 'success' && needs.build.outputs.skip != 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # wildlife-atlas deployment branch policy is main only. It is set on the
+    # environment; this workflow does not change it.
+    environment: wildlife-atlas
+    permissions:
+      actions: read
+    steps:
+      - name: Setup Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          # This release caches only when `cache` is set. An empty token keeps
+          # the post step from receiving the job token as INPUT_TOKEN.
+          token: ""
+
+      - name: Fetch pinned Wrangler
+        shell: bash
+        run: |
+          set -euo pipefail
+          export GIT_TERMINAL_PROMPT=0
+          if [[ ! "$GITHUB_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Refusing to fetch an unexpected commit."
+            exit 1
+          fi
+          if [[ ! "$GITHUB_REPOSITORY" =~ ^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$ ]]; then
+            echo "Unexpected repository name."
+            exit 1
+          fi
+          dest="${RUNNER_TEMP}/hohm"
+          rm -rf "$dest"
+          git init --quiet "$dest"
+          git -C "$dest" remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
+          git -C "$dest" -c credential.helper= -c http.extraheader= fetch --depth 1 origin "$GITHUB_SHA"
+          git -C "$dest" -c core.hooksPath=/dev/null checkout --detach FETCH_HEAD
+          test -f "$dest/tools/wrangler/package.json"
+          test -f "$dest/tools/wrangler/package-lock.json"
+
+      - name: Install pinned Wrangler
+        shell: bash
+        working-directory: ${{ runner.temp }}/hohm/tools/wrangler
+        run: |
+          set -euo pipefail
+          npm ci --ignore-scripts
+          test -x node_modules/.bin/wrangler
+
+      - name: Download dist
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: wildlife-atlas-dist
+          path: ${{ runner.temp }}/wildlife-atlas-site
+
+      - name: Deploy to Cloudflare Pages
+        shell: bash
+        working-directory: ${{ runner.temp }}
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PAGES_BRANCH: ${{ needs.gate.outputs.branch }}
+          PAGES_PRODUCTION: ${{ needs.gate.outputs.production }}
+          ATLAS_SHA: ${{ needs.build.outputs.sha }}
+          WRANGLER: ${{ runner.temp }}/hohm/tools/wrangler/node_modules/.bin/wrangler
+          SITE: ${{ runner.temp }}/wildlife-atlas-site
+        run: |
+          set -euo pipefail
+          if [ -z "$PAGES_BRANCH" ] || [ -z "$ATLAS_SHA" ]; then
+            echo "Refusing to deploy without the atlas branch and commit."
+            exit 1
+          fi
+          if [ "$PAGES_PRODUCTION" = "true" ]; then
+            if [ "$PAGES_BRANCH" != "main" ]; then
+              echo "Refusing to deploy production from ${PAGES_BRANCH}."
+              exit 1
+            fi
+          elif [ "$PAGES_BRANCH" = "main" ]; then
+            echo "Refusing to publish a preview deployment to production."
+            exit 1
+          fi
+          if [[ ! "$ATLAS_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+            echo "Refusing to deploy without the atlas commit SHA."
+            exit 1
+          fi
+          if [[ ! "$PAGES_BRANCH" =~ ^[A-Za-z0-9._/-]+$ ]]; then
+            echo "Refusing to deploy an unexpected branch name."
+            exit 1
+          fi
+          case "$PAGES_BRANCH" in
+            -*|*'..'*|*'@{'*|/*|*/|*//*|*.|*.lock)
+              echo "Refusing to deploy an unexpected branch name."
+              exit 1
+              ;;
+          esac
+          if [ -e "$SITE/_worker.js" ] || [ -d "$SITE/functions" ] || [ -e "$SITE/_routes.json" ]; then
+            echo "Refusing to deploy Pages Functions from the atlas build."
+            exit 1
+          fi
+          if [ ! -d "$SITE" ] || [ -z "$(find "$SITE" -type f -print -quit)" ]; then
+            echo "Downloaded dist is empty."
+            exit 1
+          fi
+
+          projects="$("$WRANGLER" pages project list --json)"
+          found="$(printf '%s\n' "$projects" | jq -r 'any(.[]; .["Project Name"] == "wildlife-migration-atlas")')"
+          if [ "$found" != "true" ] && [ "$found" != "false" ]; then
+            echo "Could not read the Pages project list."
+            exit 1
+          fi
+          if [ "$found" = "false" ]; then
+            # --force keeps a new static project on Pages instead of Workers.
+            "$WRANGLER" pages project create wildlife-migration-atlas --production-branch main --force
+          fi
+
+          "$WRANGLER" pages deploy "$SITE" \
+            --project-name=wildlife-migration-atlas \
+            --branch="${PAGES_BRANCH}" \
+            --commit-hash="${ATLAS_SHA}"

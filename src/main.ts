@@ -1,12 +1,23 @@
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { catalog, eventVisible, type MapFilters } from './catalog';
 import { formatYearRange, parseDateInput } from './dates';
 import { createMap } from './map-view';
+import { mountDepth } from './panels';
 import { eventOverlapsPeriod, periodByIndex, periodsForEra, presentYear, resolvePeriod, shiftPeriod } from './timeline';
-import type { Era, HistoryEvent, Period } from './types';
-import eventsJson from '../data/events.json';
+import type { DateStatus, Era, HistoryEvent, Period } from './types';
 
-const events = eventsJson as HistoryEvent[];
+const events = catalog.events;
 const present = presentYear();
+const filters: MapFilters = {
+  history: true,
+  myth: true,
+  established: true,
+  approximate: true,
+  traditional: true,
+  contested: true,
+  unsourced: true,
+  lens: 'all',
+};
 const PLAY_MS = 1500;
 
 const app = document.querySelector<HTMLElement>('#app');
@@ -19,11 +30,36 @@ app.innerHTML = `
     <button type="button" id="zoom-in" class="icon-button" data-tip="Zoom in" aria-label="Zoom in">${iconPlus()}</button>
     <button type="button" id="zoom-out" class="icon-button" data-tip="Zoom out" aria-label="Zoom out">${iconMinus()}</button>
   </div>
+  <div class="dock">
+    <button type="button" id="search-button" class="icon-button" data-tip="Search" aria-label="Search" aria-expanded="false">${iconSearch()}</button>
+    <button type="button" id="library-button" class="icon-button" data-tip="Library" aria-label="Library" aria-expanded="false" aria-pressed="false">${iconLibrary()}</button>
+    <div id="search-popout" class="popout dock-popout" hidden>
+      <form id="search-form">
+        <input id="search-input" aria-label="Search" autocomplete="off" enterkeyhint="search" />
+      </form>
+      <div id="search-results"></div>
+    </div>
+    <div id="library-popout" class="popout dock-popout" hidden>
+      <div class="icon-row">
+        <button type="button" id="filter-button" class="icon-button era-option" data-tip="Filter" aria-label="Filter" aria-expanded="false">${iconFilter()}</button>
+        <button type="button" id="timeline-button" class="icon-button era-option" data-tip="Timeline" aria-label="Timeline">${iconTimeline()}</button>
+        <button type="button" id="stories-button" class="icon-button era-option" data-tip="Stories" aria-label="Stories">${iconStories()}</button>
+        <button type="button" id="routes-button" class="icon-button era-option" data-tip="Routes" aria-label="Routes">${iconRoutes()}</button>
+        <button type="button" id="standins-button" class="icon-button era-option" data-tip="Stand-ins" aria-label="Stand-ins">${iconDiamond()}</button>
+      </div>
+      <div id="filter-popout" hidden>
+        <div id="filter-types" class="icon-row"></div>
+        <div id="filter-status" class="icon-row"></div>
+        <div id="filter-lenses" class="icon-row"></div>
+      </div>
+    </div>
+  </div>
   <div class="key-wrap">
     <button type="button" id="key-button" class="icon-button" data-tip="Key" aria-label="Key" aria-expanded="false">${iconKey()}</button>
     <div id="key-panel" class="popout key-panel" hidden>
       <p class="key-row" data-kind="history" role="img" aria-label="History" data-tip="History"><span class="swatch history"></span></p>
       <p class="key-row" data-kind="myth" role="img" aria-label="Myth" data-tip="Myth"><span class="swatch myth"></span></p>
+      <p class="key-row" data-kind="stand-in" role="img" aria-label="Stand-in" data-tip="Stand-in"><span class="swatch stand-in"></span></p>
     </div>
   </div>
   <div class="time">
@@ -49,6 +85,17 @@ app.innerHTML = `
       </form>
       <button type="button" class="era-option" data-era="before" data-tip="Before civilisation" aria-label="Before civilisation">${iconAxe()}</button>
       <button type="button" class="era-option" data-era="after" data-tip="After civilisation" aria-label="After civilisation">${iconTemple()}</button>
+    </div>
+  </div>
+  <aside id="depth-sheet" class="depth-sheet" hidden>
+    <button type="button" id="depth-close" class="depth-close" aria-label="Close">×</button>
+    <div id="depth-body" class="sheet-body"></div>
+  </aside>
+  <div id="gate" class="gate" hidden>
+    <p id="gate-text"></p>
+    <div class="gate-actions">
+      <button type="button" id="gate-no" class="icon-button" data-tip="Close" aria-label="Close">${iconX()}</button>
+      <button type="button" id="gate-yes" class="icon-button" data-tip="Open" aria-label="Open">${iconCheck()}</button>
     </div>
   </div>
 `;
@@ -80,9 +127,17 @@ let playTimer: ReturnType<typeof setInterval> | null = null;
 
 mapView.onSelect((event) => {
   closePopouts();
-  selected = event;
-  retainRoute = false;
-  render();
+  if (!event) {
+    selected = null;
+    retainRoute = false;
+    render();
+    return;
+  }
+  depth.ask(event, (allowed) => {
+    selected = allowed;
+    retainRoute = false;
+    render();
+  });
 });
 
 mapView.onPopupClose(() => {
@@ -96,13 +151,16 @@ app.querySelector<HTMLButtonElement>('#zoom-in')!.addEventListener('click', () =
 app.querySelector<HTMLButtonElement>('#zoom-out')!.addEventListener('click', () => mapView.zoomOut());
 
 stepBack.addEventListener('click', () => {
+  mapView.showSchematic(null);
   applyPeriod(shiftPeriod(period, -1, present));
 });
 stepForward.addEventListener('click', () => {
+  mapView.showSchematic(null);
   applyPeriod(shiftPeriod(period, 1, present));
 });
 
 slider.addEventListener('input', () => {
+  mapView.showSchematic(null);
   applyPeriod(periodByIndex(period.era, Number(slider.value), present));
 });
 
@@ -195,17 +253,17 @@ keyButton.addEventListener('click', () => {
 
 window.addEventListener('resize', refreshRuler);
 
-function applyPeriod(next: Period) {
+function applyPeriod(next: Period, select: HistoryEvent | null = null, framePoles = true) {
   period = next;
   memory[next.era] = next;
-  selected = null;
+  selected = select;
   retainRoute = false;
-  render({ framePoles: true });
+  render({ framePoles: framePoles && !select });
 }
 
 function render(options?: { framePoles?: boolean }) {
   const inEra = periodsForEra(period.era, present);
-  const visible = events.filter((event) => eventOverlapsPeriod(event, period));
+  const visible = events.filter((event) => eventOverlapsPeriod(event, period) && eventVisible(event, filters));
   if (selected && !visible.some((event) => event.id === selected?.id)) selected = null;
 
   const label = formatYearRange(period.start, period.end);
@@ -408,7 +466,43 @@ function closePopouts() {
   keyButton.setAttribute('aria-expanded', 'false');
   periodButton.setAttribute('aria-expanded', 'false');
   dateButton.setAttribute('aria-expanded', 'false');
+  depth.closePopouts();
 }
+
+function reveal(event: HistoryEvent) {
+  if (event.type === 'history') filters.history = true;
+  if (event.type === 'myth') filters.myth = true;
+  const status: DateStatus = event.dateStatus ?? 'unsourced';
+  filters[status] = true;
+  if (filters.lens !== 'all' && !(event.lenses ?? []).includes(filters.lens)) filters.lens = 'all';
+  depth.sync();
+}
+
+function openEvent(id: string) {
+  const event = events.find((item) => item.id === id);
+  if (!event) return;
+  depth.ask(event, (allowed) => {
+    reveal(allowed);
+    depth.closeSheet();
+    applyPeriod(resolvePeriod(allowed.start, present), allowed, false);
+  });
+}
+
+const depth = mountDepth(app, {
+  openEvent,
+  openEra: (start) => {
+    mapView.showSchematic(null);
+    applyPeriod(resolvePeriod(start, present));
+  },
+  showRoute: (id) => {
+    const migration = catalog.migrations.find((item) => item.id === id);
+    if (!migration) return;
+    applyPeriod(resolvePeriod(migration.start, present), null, false);
+    mapView.showSchematic(migration.waypoints);
+  },
+  filters,
+  onFilters: () => render(),
+});
 
 function iconPlus() {
   return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
@@ -440,6 +534,33 @@ function iconAxe() {
 }
 function iconTemple() {
   return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h16M6.5 20V9.5M12 20V9.5M17.5 20V9.5M3.5 9.5h17M6 9.5V6.5h12V9.5M12 6.5V4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+}
+function iconSearch() {
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="5.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M15 15l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+}
+function iconLibrary() {
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+}
+function iconFilter() {
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+}
+function iconTimeline() {
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h16M8 8v8M12 6v12M16 9v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+}
+function iconStories() {
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h8a3 3 0 0 1 3 3v11H8a3 3 0 0 0-3 3V8a3 3 0 0 1 3-3z" fill="none" stroke="currentColor" stroke-width="2"/></svg>';
+}
+function iconRoutes() {
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 18c4-1 4-6 8-7s5-5 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="6" cy="18" r="1.6" fill="currentColor"/><circle cx="18" cy="6" r="1.6" fill="currentColor"/></svg>';
+}
+function iconDiamond() {
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l7 8-7 8-7-8z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>';
+}
+function iconX() {
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+}
+function iconCheck() {
+  return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5L19 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 }
 
 render();

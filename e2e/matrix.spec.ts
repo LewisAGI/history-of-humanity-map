@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { expect, type Page, test } from '@playwright/test';
+import { ignorablePageError, isGibsTileUrl, settleConsoleFaults } from './faults';
 
 declare global {
   interface Window {
@@ -91,6 +92,8 @@ const PINS: { id: string; date: string }[] = [
 ];
 
 let faults: string[] = [];
+let failedRequestUrls: string[] = [];
+let pendingConsole: { text: string; locationUrl: string }[] = [];
 
 test.beforeAll(() => {
   fs.mkdirSync(shots, { recursive: true });
@@ -98,25 +101,39 @@ test.beforeAll(() => {
 
 test.beforeEach(async ({ page }) => {
   faults = [];
-  page.on('pageerror', (error) => faults.push(`pageerror: ${error.message}`));
+  failedRequestUrls = [];
+  pendingConsole = [];
+  page.on('pageerror', (error) => {
+    if (ignorablePageError(error.message)) return;
+    faults.push(`pageerror: ${error.message}`);
+  });
   page.on('console', (message) => {
     if (message.type() !== 'error') return;
-    const text = message.text();
-    if (ignorableConsole(text)) return;
-    faults.push(`console: ${text}`);
+    pendingConsole.push({ text: message.text(), locationUrl: message.location().url });
+  });
+  page.on('requestfailed', (request) => {
+    failedRequestUrls.push(request.url());
   });
   page.on('response', (response) => {
     if (response.status() < 400) return;
+    const url = response.url();
+    if (isGibsTileUrl(url)) {
+      failedRequestUrls.push(url);
+      return;
+    }
+    let origin = '';
     try {
-      if (new URL(response.url()).origin !== 'http://127.0.0.1:4173') return;
+      origin = new URL(url).origin;
     } catch {
       return;
     }
-    faults.push(`http ${response.status()} ${response.url()}`);
+    if (origin !== 'http://127.0.0.1:4173') return;
+    faults.push(`http ${response.status()} ${url}`);
   });
 });
 
 test.afterEach(() => {
+  settleConsoleFaults(faults, pendingConsole, failedRequestUrls);
   expect(faults).toEqual([]);
 });
 
@@ -494,8 +511,3 @@ async function blackEdge(page: Page) {
   }, png.toString('base64'));
 }
 
-function ignorableConsole(text: string): boolean {
-  if (/Worker failed to load/i.test(text)) return false;
-  if (/gibs\.earthdata\.nasa\.gov/i.test(text)) return true;
-  return /^Failed to load resource: /i.test(text) && !/127\.0\.0\.1|\/assets\//.test(text);
-}

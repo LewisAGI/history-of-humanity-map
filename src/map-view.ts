@@ -1,7 +1,7 @@
 import { GeoJSONSource, Map as MapLibreMap, Marker, Popup, setWorkerUrl, type StyleSpecification } from 'maplibre-gl';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
-import { formatEventDate } from './dates';
 import { arrivalBearing, pathCoordinates, routeLines, unwrappedPath } from './geo';
+import { markPin, popupHtml } from './present';
 import { placementsFor, spreadOverlaps, type ScreenPosition } from './spread';
 import { LABEL_MIN_ZOOM, visibleLabelIds, type LabelBox } from './labels';
 import type { HistoryEvent } from './types';
@@ -18,6 +18,7 @@ export interface MapView {
   getZoom: () => number;
   setEvents: (events: HistoryEvent[]) => void;
   setSelected: (event: HistoryEvent | null, options?: { keepRoute?: boolean; framePoles?: boolean }) => void;
+  showSchematic: (stops: { name: string; lat: number; lng: number; standIn?: string }[] | null) => void;
   onSelect: (handler: (event: HistoryEvent | null) => void) => void;
   onPopupClose: (handler: () => void) => void;
   onMove: (handler: () => void) => void;
@@ -69,6 +70,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       });
       addArrowImage(map);
       map.addSource('migration', { type: 'geojson', data: EMPTY });
+      map.addSource('schematic', { type: 'geojson', data: EMPTY });
       map.addLayer({
         id: 'migration-casing',
         type: 'line',
@@ -99,6 +101,42 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
           'icon-size': 1.15,
           'icon-rotate': ['get', 'bearing'],
           'icon-rotation-alignment': 'map',
+          'icon-allow-overlap': true,
+          'icon-ignore-placement': true,
+        },
+      });
+      map.addLayer({
+        id: 'schematic-line',
+        type: 'line',
+        source: 'schematic',
+        filter: ['==', ['get', 'role'], 'line'],
+        paint: {
+          'line-color': '#9fd0ff',
+          'line-width': 2,
+          'line-dasharray': [1.2, 1.2],
+        },
+        layout: { 'line-cap': 'butt', 'line-join': 'round' },
+      });
+      map.addLayer({
+        id: 'schematic-stop',
+        type: 'circle',
+        source: 'schematic',
+        filter: ['==', ['get', 'role'], 'stop'],
+        paint: {
+          'circle-radius': 4,
+          'circle-color': '#f7f4ee',
+          'circle-stroke-width': 2,
+          'circle-stroke-color': '#070b12',
+        },
+      });
+      map.addLayer({
+        id: 'schematic-standin',
+        type: 'symbol',
+        source: 'schematic',
+        filter: ['==', ['get', 'role'], 'standin'],
+        layout: {
+          'icon-image': 'standin-diamond',
+          'icon-size': 0.85,
           'icon-allow-overlap': true,
           'icon-ignore-placement': true,
         },
@@ -245,6 +283,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     element.dataset.type = event.type;
     element.dataset.lat = String(event.lat);
     element.dataset.lng = String(event.lng);
+    markPin(element, event);
     element.setAttribute('aria-label', event.title);
     element.innerHTML = `<span class="dot"></span><span class="pin-label"></span>`;
     const label = element.querySelector('.pin-label') as HTMLElement;
@@ -425,6 +464,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       sheet.classList.remove('is-covering');
       restoreCoveredChrome();
       restoreZoom();
+      restoreDock();
       return;
     }
     const margin = 12;
@@ -434,10 +474,12 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       parkKey();
       parkAttribution();
       restoreZoom();
+      hideDock();
     } else {
       restoreKey();
       restoreAttribution();
       restoreZoom();
+      restoreDock();
     }
     const wordmark = visibleRect(document.querySelector('.wordmark'));
     const time = visibleRect(document.querySelector('.time'));
@@ -554,12 +596,21 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     document.querySelector('.time')?.classList.add('is-covered');
     document.querySelector('.key-wrap')?.classList.add('is-covered');
     document.querySelector('.maplibregl-ctrl-bottom-right')?.classList.add('is-covered');
+    hideDock();
   }
 
   function restoreCoveredChrome() {
     document.querySelector('.time')?.classList.remove('is-covered');
     document.querySelector('.key-wrap')?.classList.remove('is-covered');
     document.querySelector('.maplibregl-ctrl-bottom-right')?.classList.remove('is-covered');
+  }
+
+  function hideDock() {
+    document.querySelector('.dock')?.classList.add('is-covered');
+  }
+
+  function restoreDock() {
+    document.querySelector('.dock')?.classList.remove('is-covered');
   }
 
   /** A bottom sheet on a short portrait phone runs through the zoom column. Lift it clear. */
@@ -663,6 +714,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     if (rect.bottom > limits.bottom) dy = limits.bottom - rect.bottom;
     if (rect.top + dy < limits.top) dy = limits.top - rect.top;
     ({ dx, dy } = clearOfKey(rect, dx, dy, limits));
+    ({ dx, dy } = clearOfDock(rect, dx, dy, limits));
     ({ dx, dy } = clearOfSelection(rect, dx, dy, limits));
     element.style.marginLeft = `${dx}px`;
     element.style.marginTop = `${dy}px`;
@@ -1030,7 +1082,46 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     onMove: (handler) => {
       moveHandler = handler;
     },
+    showSchematic: (stops) => {
+      void ready.then(() => drawSchematic(stops));
+    },
   };
+
+  function drawSchematic(stops: { name: string; lat: number; lng: number; standIn?: string }[] | null) {
+    const source = map.getSource('schematic') as GeoJSONSource | undefined;
+    if (!source) return;
+    if (!stops || stops.length === 0) {
+      source.setData(EMPTY);
+      delete root.dataset.schematic;
+      return;
+    }
+    const features: GeoJSON.Feature[] = [];
+    const line = stops.map((stop) => ({ lat: stop.lat, lng: stop.lng }));
+    if (line.length >= 2) {
+      pathCoordinates(line, 1).forEach((coordinates) => {
+        features.push({
+          type: 'Feature',
+          properties: { role: 'line' },
+          geometry: { type: 'LineString', coordinates },
+        });
+      });
+    }
+    stops.forEach((stop) => {
+      features.push({
+        type: 'Feature',
+        properties: { role: stop.standIn ? 'standin' : 'stop', name: stop.name },
+        geometry: { type: 'Point', coordinates: [stop.lng, stop.lat] },
+      });
+    });
+    source.setData({ type: 'FeatureCollection', features });
+    root.dataset.schematic = '1';
+    const mid = stops[Math.floor(stops.length / 2)];
+    map.easeTo({
+      center: [wrapLng(mid.lng), clampCenterLat(mid.lat)],
+      zoom: Math.max(map.getMinZoom(), Math.min(2.2, map.getZoom())),
+      duration: 700,
+    });
+  }
 }
 
 interface Pin {
@@ -1088,6 +1179,26 @@ function popupLimits(): BoxLimits {
   };
 }
 
+function clearOfDock(rect: DOMRect, dx: number, dy: number, limits: BoxLimits): { dx: number; dy: number } {
+  const dockEl = document.querySelector('.dock');
+  if (!dockEl || dockEl.classList.contains('is-covered')) return { dx, dy };
+  const dock = visibleRect(dockEl);
+  if (!dock) return { dx, dy };
+  const gap = 8;
+  const box = shifted(rect, dx, dy);
+  const hit =
+    box.left < dock.right + gap && box.right > dock.left - gap && box.top < dock.bottom + gap && box.bottom > dock.top - gap;
+  if (!hit) return { dx, dy };
+  const right = dock.right + gap - box.left;
+  if (rect.right + dx + right <= limits.right) dx += right;
+  else dy += dock.bottom + gap - box.top;
+  if (rect.right + dx > limits.right) dx = limits.right - rect.right;
+  if (rect.left + dx < limits.left) dx = limits.left - rect.left;
+  if (rect.top + dy < limits.top) dy = limits.top - rect.top;
+  if (rect.bottom + dy > limits.bottom) dy = limits.bottom - rect.bottom;
+  return { dx, dy };
+}
+
 function clearOfKey(rect: DOMRect, dx: number, dy: number, limits: BoxLimits): { dx: number; dy: number } {
   const key = visibleRect(document.querySelector('.key-wrap'));
   if (!key) return { dx, dy };
@@ -1121,7 +1232,7 @@ function boxInside(rect: DOMRect, limits: BoxLimits): boolean {
 
 function hitsControls(rect: DOMRect): boolean {
   const covering = !!document.querySelector('.event-sheet.is-covering');
-  const selectors = covering ? ['.zoom', '.wordmark'] : ['.zoom', '.key-wrap', '.time', '.wordmark'];
+  const selectors = covering ? ['.zoom', '.wordmark'] : ['.zoom', '.key-wrap', '.time', '.wordmark', '.dock'];
   return selectors.some((selector) => {
     const element = document.querySelector(selector);
     if (!element || element.classList.contains('is-hidden') || element.classList.contains('is-covered')) return false;
@@ -1136,24 +1247,6 @@ function visibleRect(element: Element | null): DOMRect | null {
   const rect = element.getBoundingClientRect();
   if (rect.width < 2 || rect.height < 2) return null;
   return rect;
-}
-
-function popupHtml(event: HistoryEvent): string {
-  return `
-    <h2 class="popup-title">${escapeHtml(event.title)}</h2>
-    <p class="popup-date">${escapeHtml(formatEventDate(event.start, event.end, event.dateNote))}</p>
-    <p class="popup-place">${escapeHtml(event.place)}</p>
-    <p class="popup-summary">${escapeHtml(event.summary)}</p>
-    <p class="popup-note">${escapeHtml(event.dateNote)}</p>
-  `;
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;');
 }
 
 function addArrowImage(map: MapLibreMap) {
@@ -1176,6 +1269,24 @@ function addArrowImage(map: MapLibreMap) {
   context.stroke();
   const image = context.getImageData(0, 0, 40, 40);
   if (!map.hasImage('migration-arrow')) map.addImage('migration-arrow', image);
+  if (!map.hasImage('standin-diamond')) {
+    const mark = document.createElement('canvas');
+    mark.width = 32;
+    mark.height = 32;
+    const pen = mark.getContext('2d');
+    if (pen) {
+      pen.translate(16, 16);
+      pen.rotate(Math.PI / 4);
+      pen.strokeStyle = '#f7f4ee';
+      pen.lineWidth = 3;
+      pen.strokeRect(-7, -7, 14, 14);
+      pen.strokeStyle = '#e2b31a';
+      pen.lineWidth = 1.5;
+      pen.strokeRect(-5, -5, 10, 10);
+      const diamond = pen.getImageData(0, 0, 32, 32);
+      map.addImage('standin-diamond', diamond);
+    }
+  }
 }
 
 function mapStyle(): StyleSpecification {

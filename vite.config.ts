@@ -68,7 +68,7 @@ function slimContent(data: {
       const slim = pick(pin, ['id', 'title', 'type', 'start', 'end', 'place', 'lat', 'lng', 'summary', 'dateNote', 'dateStatus', 'sources']);
       slim.sensitivity = sensitivityCode(pin.sensitivity);
       if (placement) slim.placement = placement;
-      return slim;
+      return readerPin(slim);
     }),
     migrations: data.migrations.map((migration) => ({
       ...pick(migration, ['id', 'title', 'start', 'end', 'summary', 'debate', 'sources']),
@@ -82,7 +82,7 @@ function slimContent(data: {
     })),
     eras: data.eras,
     people: data.people,
-    timeline: data.timeline,
+    timeline: readerTimeline(data.timeline),
     furtherReading: data.furtherReading,
   });
 }
@@ -99,18 +99,72 @@ function slimVerdicts(data: { accept: unknown; reject: unknown }) {
   return { accept: data.accept, reject: data.reject };
 }
 
-function sensitivityCode(value: unknown): string | null {
+/** Unknown editor text becomes the generic code. It is never copied through. */
+export function sensitivityCode(value: unknown): string | null {
   if (typeof value !== 'string' || !value) return null;
   if (SENSITIVITY_CODES.has(value)) return value;
   return SENSITIVITY_CODE[value] ?? 'notice';
 }
 
-/** Gazetteer and Pleiades ids are join keys only. The digits stay out of the bundle. */
+const PIN_READER: Record<string, { title: string; summary: string; dateNote: string }> = {
+  'uluru-link': {
+    title: 'Uluru',
+    summary: 'A sacred Anangu place. Its Tjukurpa stories are not retold here.',
+    dateNote: 'Living tradition.',
+  },
+};
+
+function readerPin(pin: Record<string, unknown>): Record<string, unknown> {
+  const id = String(pin.id ?? '');
+  const copy = PIN_READER[id];
+  if (copy) {
+    pin.title = copy.title;
+    pin.summary = copy.summary;
+    pin.dateNote = copy.dateNote;
+  }
+  if (typeof pin.dateNote === 'string') pin.dateNote = readerDateNote(id, pin.dateNote);
+  return pin;
+}
+
+function readerDateNote(id: string, note: string): string {
+  if (id === 'lake-mungo') {
+    return note.replace(
+      'Remains returned to Traditional Owners; deceased-person sensitivity applies.',
+      'The ancestral remains have been returned.',
+    );
+  }
+  if (id === 'wairau-bar') {
+    return note.replace('Ancestral remains; deceased-person sensitivity.', 'Ancestral remains.');
+  }
+  return note;
+}
+
+function readerTimeline(entries: unknown): unknown {
+  if (!Array.isArray(entries)) return entries;
+  return entries.map((entry) => {
+    if (!entry || typeof entry !== 'object') return entry;
+    const row = entry as Record<string, unknown>;
+    if (row.ref === 'uluru-link') return { ...row, label: 'Uluru' };
+    return row;
+  });
+}
+
+let gazetteerKeys: Map<string, string> | null = null;
+
+/** Stable opaque keys. The original gazetteer digits are not recoverable from them. */
+function gazetteerKeyMap(): Map<string, string> {
+  if (gazetteerKeys) return gazetteerKeys;
+  const ids = new Set<string>();
+  ['data/pack/content.json', 'data/pack/sources.json'].forEach((file) => {
+    for (const match of readFileSync(file, 'utf8').matchAll(/\b(?:geonames|pleiades)-\d+\b/g)) ids.add(match[0]);
+  });
+  gazetteerKeys = new Map([...ids].sort().map((id, index) => [id, `s${String(index + 1).padStart(3, '0')}`]));
+  return gazetteerKeys;
+}
+
 function publicSourceId(id: string): string {
-  const match = id.match(/^(geonames|pleiades)-(\d+)$/);
-  if (!match) return id;
-  const letters = match[2].replace(/\d/g, (digit) => 'abcdefghij'[Number(digit)]);
-  return `gazetteer-${match[1] === 'pleiades' ? 'p' : 'g'}-${letters}`;
+  if (!/^(?:geonames|pleiades)-\d+$/.test(id)) return id;
+  return gazetteerKeyMap().get(id) ?? 's000';
 }
 
 function scrub(value: unknown): unknown {

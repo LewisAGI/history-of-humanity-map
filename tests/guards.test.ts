@@ -5,11 +5,12 @@ import sources from '../data/pack/sources.json';
 import { catalog, pinLinkHref } from '../src/catalog';
 import { externalRel } from '../src/links';
 import { readerNotice } from '../src/notice';
+import { sensitivityCode } from '../vite.config';
 import { parsePagesHeaders } from '../src/pages-headers';
 import { externalAnchor, mountDepth, renderDoiLinks, renderSourceLinks } from '../src/panels';
 import { popupHtml } from '../src/present';
 
-const EDITOR_NOTE = /handle respectfully|link to .* only|follow .* guidance/i;
+const EDITOR_NOTE = /handle respectfully|link to .* only|follow .* guidance|link (only|to Parks)|by request/i;
 
 class FakeNode {
   id = '';
@@ -89,9 +90,18 @@ describe('reader-facing sensitivity', () => {
       },
       onFilters: () => {},
     });
+    content.pins.forEach((pin) => {
+      expect(pin.title, pin.id).not.toMatch(EDITOR_NOTE);
+      expect(pin.summary, pin.id).not.toMatch(EDITOR_NOTE);
+      expect(pin.dateNote, pin.id).not.toMatch(EDITOR_NOTE);
+    });
+    catalog.timeline.forEach((entry) => expect(entry.label, entry.ref).not.toMatch(EDITOR_NOTE));
     const seen = new Set<string>();
     catalog.events.forEach((event) => {
-      expect(popupHtml(event)).not.toMatch(EDITOR_NOTE);
+      expect(event.title, event.id).not.toMatch(EDITOR_NOTE);
+      expect(event.summary, event.id).not.toMatch(EDITOR_NOTE);
+      expect(event.dateNote, event.id).not.toMatch(EDITOR_NOTE);
+      expect(popupHtml(event), event.id).not.toMatch(EDITOR_NOTE);
       if (!event.sensitivity) return;
       seen.add(event.sensitivity);
       depth.ask(event, () => {});
@@ -122,6 +132,21 @@ describe('reader-facing sensitivity', () => {
     );
     const wording = [...seen].map((code) => readerNotice(code));
     expect(new Set(wording).size).toBe(wording.length);
+
+    const unlisted = 'Cataloguer: mention the dispute in the editor note only.';
+    expect(sensitivityCode(unlisted)).toBe('notice');
+    expect(sensitivityCode(null)).toBeNull();
+    expect(sensitivityCode('')).toBeNull();
+    expect(sensitivityCode('genocide')).toBe('genocide');
+    expect(readerNotice('notice')).toBe('This entry asks for care.');
+    expect(readerNotice(unlisted)).toBe('This entry asks for care.');
+    expect(readerNotice('not-a-listed-code')).toBe('This entry asks for care.');
+
+    const mungo = catalog.events.find((event) => event.packId === 'lake-mungo' || event.id === 'lake-mungo');
+    const wairau = catalog.events.find((event) => event.packId === 'wairau-bar' || event.id === 'wairau-bar');
+    expect(mungo?.dateNote).toBe('Approx.; about 42-40 ka. The ancestral remains have been returned.');
+    expect(wairau?.dateNote).toBe('Approx.; ~late 13th century. Ancestral remains.');
+    expect(`${mungo?.dateNote} ${wairau?.dateNote}`).not.toMatch(/deceased-person sensitivity/i);
   });
 });
 
@@ -129,7 +154,13 @@ describe('uluru link', () => {
   it('renders no external link until the pack supplies uluru.gov.au', () => {
     const uluru = catalog.events.find((event) => event.id === 'uluru-link' || event.packId === 'uluru-link');
     expect(uluru).toBeTruthy();
+    expect(uluru?.title).toBe('Uluru');
+    expect(uluru?.summary).toBe('A sacred Anangu place. Its Tjukurpa stories are not retold here.');
+    expect(uluru?.dateNote).toBe('Living tradition.');
     const html = popupHtml(uluru!);
+    expect(html).toContain('>Uluru<');
+    expect(html).toContain('A sacred Anangu place. Its Tjukurpa stories are not retold here.');
+    expect(html).not.toMatch(EDITOR_NOTE);
     expect(html).not.toMatch(/<a\b/i);
     expect(html).not.toContain('wikipedia.org');
     expect(html).not.toContain('uluru.gov.au');
@@ -188,6 +219,33 @@ describe('review mark', () => {
     expect(css).toMatch(/\.review-mark\s*\{[^}]*width:\s*44px;\s*height:\s*44px;/s);
     expect(css).toContain('.review-mark:focus-visible');
     expect(readFileSync('src/main.ts', 'utf8')).toContain('M5 12l5 5L19 7');
+  });
+});
+
+describe('shipped gazetteer ids', () => {
+  it('keeps GeoNames, Pleiades, and revision numbers out of the bundle', () => {
+    const raw = [readFileSync('data/pack/content.json', 'utf8'), readFileSync('data/pack/sources.json', 'utf8')];
+    const numbers = new Set<string>();
+    const letterSwaps = new Set<string>();
+    raw.forEach((text) => {
+      for (const match of text.matchAll(/GeoNames id (\d+)/g)) numbers.add(match[1]);
+      for (const match of text.matchAll(/Pleiades id (\d+)/g)) numbers.add(match[1]);
+      for (const match of text.matchAll(/\(rev (\d+)\)/g)) numbers.add(match[1]);
+      for (const match of text.matchAll(/"revision":\s*(\d+)/g)) numbers.add(match[1]);
+      for (const match of text.matchAll(/\b(?:geonames|pleiades)-(\d+)\b/g)) {
+        numbers.add(match[1]);
+        letterSwaps.add(match[1].replace(/\d/g, (digit) => 'abcdefghij'[Number(digit)]));
+      }
+    });
+    const packed = JSON.stringify({ content, sources });
+    numbers.forEach((number) => expect(packed, number).not.toContain(number));
+    letterSwaps.forEach((encoded) => expect(packed, encoded).not.toContain(encoded));
+    const gazetteers = sources.sources.filter((source) => source.type === 'gazetteer');
+    expect(gazetteers.length).toBeGreaterThan(0);
+    gazetteers.forEach((source) => {
+      expect(source.id).toMatch(/^s\d{3}$/);
+      expect(source.url).toBeUndefined();
+    });
   });
 });
 

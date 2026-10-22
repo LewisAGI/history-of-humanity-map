@@ -48,6 +48,10 @@ export interface HistoryEvent {
   path?: Waypoint[] | Waypoint[][];
   /** Pack pin merged onto this event, when one was accepted. */
   packId?: string;
+  /** Mapping confidence: exact, high, or medium. Medium was accepted by review. */
+  matchConfidence?: string;
+  /** Why a medium-confidence match was accepted. */
+  matchReason?: string;
   dateStatus?: DateStatus;
   sourceIds?: string[];
   /** Shown before the pin opens. */

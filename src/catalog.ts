@@ -29,10 +29,8 @@ interface PackMigration {
   start: number;
   end: number;
   summary: string;
-  path: { name: string; lat: number | null; lng: number | null; coordMethod?: string; sources?: string[] }[];
-  pathMethod: string;
+  path: { name: string; lat: number | null; lng: number | null; coordMethod?: string }[];
   debate?: string;
-  uncertainty?: string;
   sensitivity?: string | null;
   sources: string[];
 }
@@ -82,15 +80,13 @@ interface PackSource {
 interface MappingRow {
   packId: string;
   appId: string;
-  appTitle: string;
   confidence: string;
-  basis: string;
 }
 
 interface VerdictRow {
   packId: string;
   appId: string;
-  verdict: 'accept' | 'reject';
+  verdict: string;
   reason: string;
 }
 
@@ -196,9 +192,7 @@ export interface CatalogMigration {
   start: number;
   end: number;
   summary: string;
-  pathMethod: string;
   debate?: string;
-  uncertainty?: string;
   sensitivity?: string;
   sourceIds: string[];
   waypoints: CatalogWaypoint[];
@@ -236,11 +230,36 @@ export interface CatalogSource {
   authors?: string[];
 }
 
-/** Resolvable DOI link. The pack stores the resolver URL when Crossref verified it. */
+const DOI_PATTERN = /^10\.\d{4,9}\/[-._;()/:A-Za-z0-9<>]+$/;
+
+/**
+ * DOI resolver link built only from a DOI string.
+ * The pack URL is ignored so a javascript: URL that mentions doi.org cannot pass.
+ */
 export function doiHref(source: { doi?: string; url?: string }): string | undefined {
-  if (!source.doi) return undefined;
-  if (source.url && source.url.includes('doi.org')) return source.url;
-  return `https://doi.org/${source.doi}`;
+  const doi = source.doi?.trim();
+  if (!doi || !DOI_PATTERN.test(doi)) return undefined;
+  const slash = doi.indexOf('/');
+  const href = `https://doi.org/${encodeURIComponent(doi.slice(0, slash))}/${encodeURIComponent(doi.slice(slash + 1))}`;
+  if (!href.startsWith('https://doi.org/')) return undefined;
+  return href;
+}
+
+/** Stand-in treatment read from a pack coordMethod. Site-level points are not stand-ins. */
+export function standInFromMethod(method: string | undefined): { treatment: 'flagged' | 'hidden'; note: string } | null {
+  if (!method) return null;
+  if (/\bPROXY\b/.test(method)) return { treatment: 'hidden', note: 'Proxy location is not plotted' };
+  if (/centroid/i.test(method)) {
+    if (/country/i.test(method)) return { treatment: 'flagged', note: 'Country centroid, not a landing site' };
+    if (/region/i.test(method)) return { treatment: 'flagged', note: 'Region centroid, not the site' };
+    return { treatment: 'flagged', note: 'Centroid, not the site' };
+  }
+  if (/town-level/i.test(method)) {
+    const town = method.match(/Town of ([A-Za-z]+)/);
+    if (town) return { treatment: 'flagged', note: `Town of ${town[1]}, not the battlefield` };
+    return { treatment: 'flagged', note: 'Town stand-in, not the site' };
+  }
+  return null;
 }
 
 export interface CatalogEntry {
@@ -259,11 +278,16 @@ export interface CatalogReading {
 }
 
 export interface StandInReport {
-  id: 'rising-star' | 'hastings' | 'aotearoa';
+  id: string;
+  label: string;
   treatment: 'flagged' | 'hidden';
   eventId?: string;
   migrationId?: string;
   note: string;
+}
+
+export interface CatalogBuildOptions {
+  verdicts?: { accept: VerdictRow[]; reject: VerdictRow[] };
 }
 
 export interface Verdict {
@@ -408,11 +432,12 @@ function cloneEvent(event: HistoryEvent): HistoryEvent {
   return next;
 }
 
-export function buildCatalog(): Catalog {
+export function buildCatalog(options?: CatalogBuildOptions): Catalog {
   const appEvents = (eventsJson as HistoryEvent[]).map(cloneEvent);
   const byApp = new Map(appEvents.map((event) => [event.id, event]));
   const pins = new Map(content.pins.map((pin) => [pin.id, pin]));
-  const verdicts: Verdict[] = [...verdictFile.accept, ...verdictFile.reject];
+  const verdictSource = options?.verdicts ?? verdictFile;
+  const verdicts = [...verdictSource.accept, ...verdictSource.reject] as Verdict[];
   const verdictByPack = new Map(verdicts.map((row) => [row.packId, row]));
   const accepted = new Set<string>();
   const mergedPinIds = new Set<string>();
@@ -427,6 +452,8 @@ export function buildCatalog(): Catalog {
     accepted.add(row.packId);
     event.provenance = 'merged';
     event.packId = row.packId;
+    event.matchConfidence = row.confidence;
+    if (row.confidence === 'medium' && verdict?.verdict === 'accept') event.matchReason = verdict.reason;
     if (pin) {
       mergedPinIds.add(pin.id);
       event.dateStatus = pin.dateStatus;
@@ -436,9 +463,6 @@ export function buildCatalog(): Catalog {
       if (lenses.length) event.lenses = lenses;
     }
   });
-
-  const hastings = byApp.get('hastings');
-  if (hastings) hastings.standIn = 'Town of Battle, not the battlefield';
 
   const added: HistoryEvent[] = [];
   const unlocated: Catalog['unlocated'] = [];
@@ -490,7 +514,8 @@ export function buildCatalog(): Catalog {
         return;
       }
       const point: CatalogWaypoint = { name: stop.name, lat: stop.lat, lng: stop.lng };
-      if (stop.name === 'Aotearoa') point.standIn = 'Country centroid, not a landing site';
+      const placed = standInFromMethod(stop.coordMethod);
+      if (placed?.treatment === 'flagged') point.standIn = placed.note;
       waypoints.push(point);
     });
     const eventIds = new Set<string>();
@@ -503,14 +528,12 @@ export function buildCatalog(): Catalog {
       start: migration.start,
       end: migration.end,
       summary: migration.summary,
-      pathMethod: migration.pathMethod,
       sourceIds: [...migration.sources],
       waypoints,
       dropped,
       eventIds: [...eventIds],
     };
     if (migration.debate) record.debate = migration.debate;
-    if (migration.uncertainty) record.uncertainty = migration.uncertainty;
     if (migration.sensitivity) record.sensitivity = migration.sensitivity;
     return record;
   });
@@ -574,26 +597,32 @@ export function buildCatalog(): Catalog {
     });
   });
 
-  const standIns: StandInReport[] = [
-    {
-      id: 'hastings',
-      treatment: 'flagged',
-      eventId: 'hastings',
-      note: 'Town of Battle, not the battlefield',
-    },
-    {
-      id: 'aotearoa',
-      treatment: 'flagged',
-      migrationId: 'austronesian',
-      note: 'Country centroid, not a landing site',
-    },
-    {
-      id: 'rising-star',
-      treatment: 'hidden',
-      eventId: 'homo-naledi',
-      note: 'Sterkfontein Caves proxy is not plotted; the pin is the Rising Star cave',
-    },
-  ];
+  const standIns: StandInReport[] = [];
+  content.pins.forEach((pin) => {
+    const placed = standInFromMethod(pin.coordMethod);
+    if (!placed) return;
+    const event = events.find((item) => item.packId === pin.id);
+    if (placed.treatment === 'flagged' && event) event.standIn = placed.note;
+    standIns.push({
+      id: pin.id,
+      label: pin.title,
+      treatment: placed.treatment,
+      eventId: event?.id,
+      note: placed.note,
+    });
+  });
+  migrations.forEach((migration) => {
+    migration.waypoints.forEach((stop) => {
+      if (!stop.standIn) return;
+      standIns.push({
+        id: stop.name.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+        label: stop.name,
+        treatment: 'flagged',
+        migrationId: migration.id,
+        note: stop.standIn,
+      });
+    });
+  });
 
   return {
     events,

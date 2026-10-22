@@ -1,8 +1,7 @@
 import { GeoJSONSource, Map as MapLibreMap, Marker, Popup, setWorkerUrl, type StyleSpecification } from 'maplibre-gl';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
-import { catalog, doiHref } from './catalog';
-import { formatEventDate } from './dates';
 import { arrivalBearing, pathCoordinates, routeLines, unwrappedPath } from './geo';
+import { markPin, popupHtml } from './present';
 import { placementsFor, spreadOverlaps, type ScreenPosition } from './spread';
 import { LABEL_MIN_ZOOM, visibleLabelIds, type LabelBox } from './labels';
 import type { HistoryEvent } from './types';
@@ -284,8 +283,7 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     element.dataset.type = event.type;
     element.dataset.lat = String(event.lat);
     element.dataset.lng = String(event.lng);
-    if (event.standIn) element.dataset.standIn = 'true';
-    if (event.dateStatus) element.dataset.status = event.dateStatus;
+    markPin(element, event);
     element.setAttribute('aria-label', event.title);
     element.innerHTML = `<span class="dot"></span><span class="pin-label"></span>`;
     const label = element.querySelector('.pin-label') as HTMLElement;
@@ -1249,38 +1247,6 @@ function visibleRect(element: Element | null): DOMRect | null {
   const rect = element.getBoundingClientRect();
   if (rect.width < 2 || rect.height < 2) return null;
   return rect;
-}
-
-function popupHtml(event: HistoryEvent): string {
-  const stand = event.standIn ? `<p class="popup-standin">${escapeHtml(event.standIn)}</p>` : '';
-  return `
-    <h2 class="popup-title">${escapeHtml(event.title)}</h2>
-    <p class="popup-date" data-status="${escapeHtml(event.dateStatus ?? '')}">${escapeHtml(formatEventDate(event.start, event.end, event.dateNote))}</p>
-    <p class="popup-place">${escapeHtml(event.place)}</p>
-    ${doiLinks(event)}
-    <p class="popup-summary">${escapeHtml(event.summary)}</p>
-    <p class="popup-note">${escapeHtml(event.dateNote)}</p>
-    ${stand}
-  `;
-}
-
-function doiLinks(event: HistoryEvent): string {
-  const links = (event.sourceIds ?? []).flatMap((id) => {
-    const source = catalog.sources.get(id);
-    const href = source ? doiHref(source) : undefined;
-    if (!source?.doi || !href) return [];
-    return `<a class="doi-link" href="${escapeHtml(href)}" target="_blank" rel="noreferrer">${escapeHtml(source.doi)}</a>`;
-  });
-  if (!links.length) return '';
-  return `<div class="source-list">${links.join('')}</div>`;
-}
-
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;');
 }
 
 function addArrowImage(map: MapLibreMap) {

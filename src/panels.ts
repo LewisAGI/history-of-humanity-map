@@ -1,5 +1,6 @@
 import { formatYear, formatYearRange } from './dates';
 import { catalog, doiHref, filtersAreOpen, searchCatalog, type MapFilters } from './catalog';
+import { waypointText } from './present';
 import type { HistoryEvent } from './types';
 
 export interface DepthHooks {
@@ -284,7 +285,7 @@ export function mountDepth(app: HTMLElement, hooks: DepthHooks): DepthController
         link.className = 'entry-button';
         link.href = source.url;
         link.target = '_blank';
-        link.rel = 'noreferrer';
+        link.rel = 'noopener noreferrer';
         link.textContent = item.label;
         list.append(link);
       }
@@ -338,7 +339,7 @@ export function mountDepth(app: HTMLElement, hooks: DepthHooks): DepthController
     migration.waypoints.forEach((stop) => {
       const row = document.createElement('p');
       row.className = 'waypoint';
-      row.textContent = stop.standIn ? `${stop.name} · ${stop.standIn}` : stop.name;
+      row.textContent = waypointText(stop);
       stops.append(row);
     });
     migration.dropped.forEach((name) => {
@@ -361,7 +362,7 @@ export function mountDepth(app: HTMLElement, hooks: DepthHooks): DepthController
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'entry-button';
-      button.innerHTML = `<span class="hit-label">${escapeHtml(labelForStandIn(item.id))}</span><span class="hit-detail">${escapeHtml(item.treatment)}</span><span class="hit-note">${escapeHtml(item.note)}</span>`;
+        button.innerHTML = `<span class="hit-label">${escapeHtml(item.label)}</span><span class="hit-detail">${escapeHtml(item.treatment)}</span><span class="hit-note">${escapeHtml(item.note)}</span>`;
       button.addEventListener('click', () => {
         if (item.eventId) hooks.openEvent(item.eventId);
         if (item.migrationId) {
@@ -414,7 +415,7 @@ export function mountDepth(app: HTMLElement, hooks: DepthHooks): DepthController
         link.className = 'doi-link';
         link.href = href;
         link.target = '_blank';
-        link.rel = 'noreferrer';
+        link.rel = 'noopener noreferrer';
         link.textContent = source.doi;
         row.append(title, link);
         list.append(row);
@@ -425,7 +426,7 @@ export function mountDepth(app: HTMLElement, hooks: DepthHooks): DepthController
       link.className = 'entry-button';
       link.href = source.url;
       link.target = '_blank';
-      link.rel = 'noreferrer';
+      link.rel = 'noopener noreferrer';
       link.textContent = source.title;
       list.append(link);
     });
@@ -443,7 +444,7 @@ export function mountDepth(app: HTMLElement, hooks: DepthHooks): DepthController
       link.className = 'doi-link';
       link.href = href;
       link.target = '_blank';
-      link.rel = 'noreferrer';
+      link.rel = 'noopener noreferrer';
       link.textContent = source.doi;
       list.append(link);
     });
@@ -465,12 +466,6 @@ export function mountDepth(app: HTMLElement, hooks: DepthHooks): DepthController
       gate.hidden = false;
     },
   };
-}
-
-function labelForStandIn(id: string): string {
-  if (id === 'hastings') return 'Hastings';
-  if (id === 'aotearoa') return 'Aotearoa';
-  return 'Rising Star';
 }
 
 function toggle(label: string, pressed: boolean, mark: string, onClick: () => void): HTMLButtonElement {

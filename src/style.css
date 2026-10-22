@@ -642,6 +642,18 @@ html, body {
   font: 600 18px/1.25 "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif;
 }
 
+.review-mark {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin-left: 6px;
+  vertical-align: -3px;
+  color: var(--ink);
+}
+
+.review-mark svg { width: 16px; height: 16px; display: block; }
+
 .source-list {
   display: flex;
   flex-direction: column;

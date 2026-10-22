@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { catalog, countInSpan, doiHref, eventVisible, OPEN_FILTERS, searchCatalog } from '../src/catalog';
+import { buildCatalog, catalog, countInSpan, doiHref, eventVisible, OPEN_FILTERS, searchCatalog, standInFromMethod } from '../src/catalog';
 import { continentFor } from '../src/continent';
+import { markPin, popupHtml, waypointText } from '../src/present';
 import { CONTINENTS } from '../src/types';
 import verdicts from '../data/match-verdicts.json';
 import mapping from '../data/pack/app-id-mapping.json';
@@ -25,6 +26,7 @@ describe('pack merge', () => {
     const sample = catalog.sources.get('doi-10-1038-nature22968');
     expect(sample?.doi).toBe('10.1038/nature22968');
     expect(doiHref(sample!)).toBe('https://doi.org/10.1038/nature22968');
+    expect(doiHref({ doi: '10.1038/nature22968', url: 'javascript:alert(1)//doi.org' })).toBe('https://doi.org/10.1038/nature22968');
     const madjedbebe = catalog.events.find((event) => event.id === 'madjedbebe');
     expect(madjedbebe?.sourceIds).toContain('doi-10-1038-nature22968');
 
@@ -41,8 +43,18 @@ describe('pack merge', () => {
     verdicts.accept.forEach((row) => {
       const event = catalog.events.find((item) => item.id === row.appId);
       expect(event?.packId, row.packId).toBe(row.packId);
+      expect(event?.matchConfidence).toBe('medium');
+      expect(event?.matchReason).toBe(row.reason);
       expect(catalog.events.some((item) => item.id === row.packId && item.id !== row.appId)).toBe(false);
+      const html = popupHtml(event!);
+      expect(html).toContain('data-tip="Matched by review"');
+      expect(html).toContain('review-mark');
+      expect(html).not.toContain(row.reason);
     });
+    const exact = catalog.events.find((event) => event.id === 'hastings')!;
+    expect(exact.matchConfidence).toBe('exact');
+    expect(exact.matchReason).toBeUndefined();
+    expect(popupHtml(exact)).not.toContain('review-mark');
     verdicts.reject.forEach((row) => {
       const appEvent = catalog.events.find((item) => item.id === row.appId);
       const packEvent = catalog.events.find((item) => item.id === row.packId);
@@ -68,10 +80,55 @@ describe('pack merge', () => {
     expect(aotearoa?.standIn).toMatch(/Country centroid/);
     expect(aotearoa).toMatchObject({ lat: -42, lng: 174 });
 
+    const leang = catalog.events.find((event) => event.packId === 'leang-tedongnge')!;
+    expect(leang.id).toBe('sulawesi-cave-art');
+    expect(leang.standIn).toMatch(/Region centroid/);
+    expect(leang.lat).toBeCloseTo(-5, 2);
+    expect(popupHtml(leang)).toContain('Region centroid, not the site');
+    const leangPin = { dataset: {} as { standIn?: string; status?: string } };
+    markPin(leangPin, leang);
+    expect(leangPin.dataset.standIn).toBe('true');
+    const plain = { dataset: {} as { standIn?: string; status?: string } };
+    markPin(plain, { standIn: undefined });
+    expect(plain.dataset.standIn).toBeUndefined();
+    expect(waypointText(aotearoa!)).toBe('Aotearoa · Country centroid, not a landing site');
+    expect(popupHtml(hastings)).toContain('Town of Battle, not the battlefield');
+
     const flagged = catalog.standIns.filter((item) => item.treatment === 'flagged').map((item) => item.id);
     const hidden = catalog.standIns.filter((item) => item.treatment === 'hidden').map((item) => item.id);
-    expect(flagged).toEqual(['hastings', 'aotearoa']);
+    expect(flagged).toEqual(['leang-tedongnge', 'hastings', 'aotearoa']);
     expect(hidden).toEqual(['rising-star']);
+  });
+
+  it('does not merge a medium match that has no verdict', () => {
+    const built = buildCatalog({ verdicts: { accept: [], reject: verdicts.reject } });
+    verdicts.accept.forEach((row) => {
+      const appEvent = built.events.find((event) => event.id === row.appId)!;
+      expect(appEvent.packId, row.packId).not.toBe(row.packId);
+      expect(appEvent.matchConfidence).toBeUndefined();
+      expect(appEvent.matchReason).toBeUndefined();
+      expect(built.events.some((event) => event.packId === row.packId && event.provenance === 'pack')).toBe(true);
+    });
+    expect(built.events.find((event) => event.id === 'hastings')?.matchConfidence).toBe('exact');
+    expect(built.events.find((event) => event.id === 'homo-naledi')?.packId).toBe('rising-star');
+  });
+
+  it('reads stand-ins from coordMethod and builds only https DOI links', () => {
+    expect(standInFromMethod('PROXY: nearest named feature')).toEqual({ treatment: 'hidden', note: 'Proxy location is not plotted' });
+    expect(standInFromMethod('REGION centroid only; exact site not given')).toEqual({ treatment: 'flagged', note: 'Region centroid, not the site' });
+    expect(standInFromMethod('Country-level centroid only.')).toEqual({ treatment: 'flagged', note: 'Country centroid, not a landing site' });
+    expect(standInFromMethod("Town of Battle, East Sussex; town-level.")).toEqual({ treatment: 'flagged', note: 'Town of Battle, not the battlefield' });
+    expect(standInFromMethod('site-level')).toBeNull();
+    expect(standInFromMethod('City-level point for the capital.')).toBeNull();
+
+    const tricky = '10.1002/(sici)1520-6505(1998)6:4<132::aid-evan3>3.0.co;2-f';
+    const slash = tricky.indexOf('/');
+    expect(doiHref({ doi: tricky, url: 'javascript:alert(1)//doi.org/10.1000/x' })).toBe(
+      `https://doi.org/${encodeURIComponent(tricky.slice(0, slash))}/${encodeURIComponent(tricky.slice(slash + 1))}`,
+    );
+    expect(doiHref({ doi: 'javascript:alert(1)', url: 'https://doi.org/10.1000/xyz' })).toBeUndefined();
+    expect(doiHref({ url: 'https://doi.org/10.1038/nature22968' })).toBeUndefined();
+    expect(doiHref({ doi: '10.1038/nature22968' })?.startsWith('https://doi.org/')).toBe(true);
   });
 
   it('leaves Herto on the app pin and drops culture waypoints with no point', () => {

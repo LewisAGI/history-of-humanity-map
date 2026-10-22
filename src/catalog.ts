@@ -74,6 +74,7 @@ interface PackSource {
   type: string;
   title: string;
   url?: string;
+  doi?: string;
   year?: number;
   authors?: string[];
 }
@@ -230,8 +231,16 @@ export interface CatalogSource {
   type: string;
   title: string;
   url?: string;
+  doi?: string;
   year?: number;
   authors?: string[];
+}
+
+/** Resolvable DOI link. The pack stores the resolver URL when Crossref verified it. */
+export function doiHref(source: { doi?: string; url?: string }): string | undefined {
+  if (!source.doi) return undefined;
+  if (source.url && source.url.includes('doi.org')) return source.url;
+  return `https://doi.org/${source.doi}`;
 }
 
 export interface CatalogEntry {
@@ -559,6 +568,7 @@ export function buildCatalog(): Catalog {
       type: source.type,
       title: source.title,
       url: source.url,
+      doi: source.doi,
       year: source.year,
       authors: source.authors,
     });

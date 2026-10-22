@@ -1,5 +1,5 @@
 import { formatYear, formatYearRange } from './dates';
-import { catalog, filtersAreOpen, searchCatalog, type MapFilters } from './catalog';
+import { catalog, doiHref, filtersAreOpen, searchCatalog, type MapFilters } from './catalog';
 import type { HistoryEvent } from './types';
 
 export interface DepthHooks {
@@ -288,6 +288,8 @@ export function mountDepth(app: HTMLElement, hooks: DepthHooks): DepthController
         link.textContent = item.label;
         list.append(link);
       }
+      const dois = doiLinkList(item.sourceIds);
+      if (dois.childElementCount) list.append(dois);
     });
     body.append(list);
   }
@@ -397,16 +399,52 @@ export function mountDepth(app: HTMLElement, hooks: DepthHooks): DepthController
 
   function sourceLinks(ids: string[]) {
     const list = document.createElement('div');
-    list.className = 'entry-list';
+    list.className = 'entry-list source-list';
     ids.forEach((id) => {
       const source = catalog.sources.get(id);
-      if (!source?.url) return;
+      if (!source) return;
+      const href = doiHref(source);
+      if (source.doi && href) {
+        const row = document.createElement('div');
+        row.className = 'entry-button';
+        const title = document.createElement('span');
+        title.className = 'hit-label';
+        title.textContent = source.title;
+        const link = document.createElement('a');
+        link.className = 'doi-link';
+        link.href = href;
+        link.target = '_blank';
+        link.rel = 'noreferrer';
+        link.textContent = source.doi;
+        row.append(title, link);
+        list.append(row);
+        return;
+      }
+      if (!source.url) return;
       const link = document.createElement('a');
       link.className = 'entry-button';
       link.href = source.url;
       link.target = '_blank';
       link.rel = 'noreferrer';
       link.textContent = source.title;
+      list.append(link);
+    });
+    return list;
+  }
+
+  function doiLinkList(ids: string[]) {
+    const list = document.createElement('div');
+    list.className = 'source-list';
+    ids.forEach((id) => {
+      const source = catalog.sources.get(id);
+      const href = source ? doiHref(source) : undefined;
+      if (!source?.doi || !href) return;
+      const link = document.createElement('a');
+      link.className = 'doi-link';
+      link.href = href;
+      link.target = '_blank';
+      link.rel = 'noreferrer';
+      link.textContent = source.doi;
       list.append(link);
     });
     return list;

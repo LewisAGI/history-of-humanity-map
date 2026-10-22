@@ -1,5 +1,6 @@
 import { GeoJSONSource, Map as MapLibreMap, Marker, Popup, setWorkerUrl, type StyleSpecification } from 'maplibre-gl';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
+import { catalog, doiHref } from './catalog';
 import { formatEventDate } from './dates';
 import { arrivalBearing, pathCoordinates, routeLines, unwrappedPath } from './geo';
 import { placementsFor, spreadOverlaps, type ScreenPosition } from './spread';
@@ -1256,10 +1257,22 @@ function popupHtml(event: HistoryEvent): string {
     <h2 class="popup-title">${escapeHtml(event.title)}</h2>
     <p class="popup-date" data-status="${escapeHtml(event.dateStatus ?? '')}">${escapeHtml(formatEventDate(event.start, event.end, event.dateNote))}</p>
     <p class="popup-place">${escapeHtml(event.place)}</p>
+    ${doiLinks(event)}
     <p class="popup-summary">${escapeHtml(event.summary)}</p>
     <p class="popup-note">${escapeHtml(event.dateNote)}</p>
     ${stand}
   `;
+}
+
+function doiLinks(event: HistoryEvent): string {
+  const links = (event.sourceIds ?? []).flatMap((id) => {
+    const source = catalog.sources.get(id);
+    const href = source ? doiHref(source) : undefined;
+    if (!source?.doi || !href) return [];
+    return `<a class="doi-link" href="${escapeHtml(href)}" target="_blank" rel="noreferrer">${escapeHtml(source.doi)}</a>`;
+  });
+  if (!links.length) return '';
+  return `<div class="source-list">${links.join('')}</div>`;
 }
 
 function escapeHtml(value: string): string {

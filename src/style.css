@@ -642,6 +642,23 @@ html, body {
   font: 600 18px/1.25 "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif;
 }
 
+.source-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  max-width: 100%;
+  margin-top: 8px;
+}
+
+.doi-link {
+  color: inherit;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .popup-date { margin: 0; font-weight: 700; font-size: 13px; }
 .popup-place { margin: 2px 0 8px; color: var(--muted); font-size: 13px; }
 .popup-summary { margin: 0; }

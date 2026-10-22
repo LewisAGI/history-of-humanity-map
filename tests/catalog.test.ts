@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { catalog, countInSpan, eventVisible, OPEN_FILTERS, searchCatalog } from '../src/catalog';
+import { catalog, countInSpan, doiHref, eventVisible, OPEN_FILTERS, searchCatalog } from '../src/catalog';
 import { continentFor } from '../src/continent';
 import { CONTINENTS } from '../src/types';
 import verdicts from '../data/match-verdicts.json';
 import mapping from '../data/pack/app-id-mapping.json';
+import content from '../data/pack/content.json';
+import sources from '../data/pack/sources.json';
 
 describe('pack merge', () => {
   it('keeps every pack pin and the reviewed medium matches', () => {
@@ -15,7 +17,16 @@ describe('pack merge', () => {
     expect(catalog.people).toHaveLength(30);
     expect(catalog.timeline).toHaveLength(233);
     expect(catalog.reading).toHaveLength(11);
-    expect(catalog.sources.size).toBe(364);
+    expect(catalog.sources.size).toBe(451);
+    const bySource = new Map(sources.sources.map((source) => [source.id, source]));
+    const scholarlyPins = content.pins.filter((pin) => pin.sources.some((id) => bySource.get(id)?.doi));
+    expect(sources.sources).toHaveLength(451);
+    expect(scholarlyPins).toHaveLength(108);
+    const sample = catalog.sources.get('doi-10-1038-nature22968');
+    expect(sample?.doi).toBe('10.1038/nature22968');
+    expect(doiHref(sample!)).toBe('https://doi.org/10.1038/nature22968');
+    const madjedbebe = catalog.events.find((event) => event.id === 'madjedbebe');
+    expect(madjedbebe?.sourceIds).toContain('doi-10-1038-nature22968');
 
     const medium = mapping.mappings.filter((row) => row.confidence === 'medium');
     expect(medium).toHaveLength(20);

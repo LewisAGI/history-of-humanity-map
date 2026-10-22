@@ -1,8 +1,23 @@
 {
  "sources": [
   {
+   "id": "doi-10-1002-9781119055280-ch10",
+   "type": "scholarly-work",
+   "doi": "10.1002/9781119055280.ch10",
+   "url": "https://doi.org/10.1002/9781119055280.ch10",
+   "title": "Excavations at Harappa, 1986–2010",
+   "authors": [
+    "Kenoyer",
+    "Meadow"
+   ],
+   "year": 2016,
+   "journal": "A Companion to South Asia in the Past",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
    "id": "doi-10-1002-sici-1520-6505-1998-6-4-132-aid-evan3-3-0-co-2-f",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1002/(sici)1520-6505(1998)6:4<132::aid-evan3>3.0.co;2-f",
    "url": "https://doi.org/10.1002/(sici)1520-6505(1998)6:4<132::aid-evan3>3.0.co;2-f",
    "title": "When did humans first arrive in greater Australia and why is it important to know?",
@@ -12,12 +27,157 @@
    ],
    "year": 1998,
    "journal": "Evolutionary Anthropology: Issues, News, and Reviews",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1007-978-1-4615-0597-6-4",
+   "type": "scholarly-work",
+   "doi": "10.1007/978-1-4615-0597-6_4",
+   "url": "https://doi.org/10.1007/978-1-4615-0597-6_4",
+   "title": "Differentiating Paracas Necropolis and Early Nasca Textiles",
+   "authors": [
+    "Silverman"
+   ],
+   "year": 2002,
+   "journal": "Andean Archaeology II",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1007-978-3-030-01075-1-15",
+   "type": "scholarly-work",
+   "doi": "10.1007/978-3-030-01075-1_15",
+   "url": "https://doi.org/10.1007/978-3-030-01075-1_15",
+   "title": "The Rock-Hewn Churches of Lalibela",
+   "authors": [
+    "Folkers",
+    "van Buiten"
+   ],
+   "year": 2019,
+   "journal": "Modern Architecture in Africa",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1007-978-3-030-92766-0-3",
+   "type": "scholarly-work",
+   "doi": "10.1007/978-3-030-92766-0_3",
+   "url": "https://doi.org/10.1007/978-3-030-92766-0_3",
+   "title": "Machu Picchu in the Context of the Expansion of the Inca State: Between Historical and Radiocarbon Chronologies",
+   "authors": [
+    "Ziółkowski",
+    "Pawlyta",
+    "Sieczkowska"
+   ],
+   "year": 2022,
+   "journal": "Machu Picchu in Context",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1007-978-3-319-47052-8-11",
+   "type": "scholarly-work",
+   "doi": "10.1007/978-3-319-47052-8_11",
+   "url": "https://doi.org/10.1007/978-3-319-47052-8_11",
+   "title": "Nasca Geoglyphs: Technical Aspects and Overview of Studies and Interpretations",
+   "authors": [
+    "Masini",
+    "Orefici",
+    "Lancho Rojas"
+   ],
+   "year": 2016,
+   "journal": "The Ancient Nasca World",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1007-978-981-97-9562-8-3",
+   "type": "scholarly-work",
+   "doi": "10.1007/978-981-97-9562-8_3",
+   "url": "https://doi.org/10.1007/978-981-97-9562-8_3",
+   "title": "Negotiation on Sovereignty and Administration",
+   "authors": [
+    "Gao"
+   ],
+   "year": 2024,
+   "journal": "Sino-British Negotiations on the Handover of Hong Kong (1979–1997)",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1007-s10437-025-09627-7",
+   "type": "scholarly-work",
+   "doi": "10.1007/s10437-025-09627-7",
+   "url": "https://doi.org/10.1007/s10437-025-09627-7",
+   "title": "The Walls of Benin Reconsidered: Interpreting West African Linear Earthworks Using A. J. H. Goodwin’s Unpublished Excavation Data",
+   "authors": [
+    "Evans"
+   ],
+   "year": 2025,
+   "journal": "African Archaeological Review",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1016-0143-6228-92-90006-9",
+   "type": "scholarly-work",
+   "doi": "10.1016/0143-6228(92)90006-9",
+   "url": "https://doi.org/10.1016/0143-6228(92)90006-9",
+   "title": "The treaty of Waitangi and the Waitangi tribunal: Maori claims in New Zealand",
+   "authors": [
+    "Stokes"
+   ],
+   "year": 1992,
+   "journal": "Applied Geography",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1016-0160-9327-85-90072-9",
+   "type": "scholarly-work",
+   "doi": "10.1016/0160-9327(85)90072-9",
+   "url": "https://doi.org/10.1016/0160-9327(85)90072-9",
+   "title": "Mohenjo-Daro, city of the Indus Valley",
+   "authors": [
+    "Jansen"
+   ],
+   "year": 1985,
+   "journal": "Endeavour",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1016-j-yqres-2016-08-002",
+   "type": "scholarly-work",
+   "doi": "10.1016/j.yqres.2016.08.002",
+   "url": "https://doi.org/10.1016/j.yqres.2016.08.002",
+   "title": "Earliest direct evidence of monument building at the archaeological site of Nan Madol (Pohnpei, Micronesia) identified using230Th/U coral dating and geochemical sourcing of megalithic architectural stone",
+   "authors": [
+    "McCoy",
+    "Alderson",
+    "Hemi"
+   ],
+   "year": 2016,
+   "journal": "Quaternary Research",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1017-9781108770354-002",
+   "type": "scholarly-work",
+   "doi": "10.1017/9781108770354.002",
+   "url": "https://doi.org/10.1017/9781108770354.002",
+   "title": "The Fall of Saigon",
+   "authors": [],
+   "year": 2021,
+   "journal": "After Saigon's Fall",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1017-cbo9780511978807-018",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1017/cbo9780511978807.018",
    "url": "https://doi.org/10.1017/cbo9780511978807.018",
    "title": "Swamp cultivators at Kuk, New Guinea",
@@ -26,12 +186,65 @@
    ],
    "year": 2015,
    "journal": "The Cambridge World History",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1017-cbo9781139128872-006",
+   "type": "scholarly-work",
+   "doi": "10.1017/cbo9781139128872.006",
+   "url": "https://doi.org/10.1017/cbo9781139128872.006",
+   "title": "Embedding Identity: Marking the Ife Body",
+   "authors": [],
+   "year": null,
+   "journal": "Art and Risk in Ancient Yoruba",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1017-cbo9781139196277-010",
+   "type": "scholarly-work",
+   "doi": "10.1017/cbo9781139196277.010",
+   "url": "https://doi.org/10.1017/cbo9781139196277.010",
+   "title": "Guadalcanal and Milne Bay",
+   "authors": [],
+   "year": 2012,
+   "journal": "The Kokoda Campaign 1942",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1017-cbo9781139227209-011",
+   "type": "scholarly-work",
+   "doi": "10.1017/cbo9781139227209.011",
+   "url": "https://doi.org/10.1017/cbo9781139227209.011",
+   "title": "Fractious Farmers at Tikal",
+   "authors": [
+    "Webster",
+    "Murtha"
+   ],
+   "year": 2015,
+   "journal": "Tikal",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1017-cho9781139035606-022",
+   "type": "scholarly-work",
+   "doi": "10.1017/cho9781139035606.022",
+   "url": "https://doi.org/10.1017/cho9781139035606.022",
+   "title": "Different cities: Jenne-jeno and African urbanism",
+   "authors": [
+    "McIntosh"
+   ],
+   "year": 2015,
+   "journal": "The Cambridge World History",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1017-s0003598x00047840",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1017/s0003598x00047840",
    "url": "https://doi.org/10.1017/s0003598x00047840",
    "title": "The role of cult and feasting in the emergence of Neolithic communities. New evidence from Göbekli Tepe, south-eastern Turkey",
@@ -42,12 +255,27 @@
    ],
    "year": 2012,
    "journal": "Antiquity",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1017-s0003598x00050754",
+   "type": "scholarly-work",
+   "doi": "10.1017/s0003598x00050754",
+   "url": "https://doi.org/10.1017/s0003598x00050754",
+   "title": "An Aboriginal shield collected in 1770 at Kamay Botany Bay: an indicator of pre-colonial exchange systems in south-eastern Australia",
+   "authors": [
+    "Attenbrow",
+    "Cartwright"
+   ],
+   "year": 2014,
+   "journal": "Antiquity",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1017-s0003598x00088360",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1017/s0003598x00088360",
    "url": "https://doi.org/10.1017/s0003598x00088360",
    "title": "Dating the first New Zealanders: the chronology of Wairau Bar",
@@ -58,12 +286,60 @@
    ],
    "year": 1999,
    "journal": "Antiquity",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1017-s0003598x00097295",
+   "type": "scholarly-work",
+   "doi": "10.1017/s0003598x00097295",
+   "url": "https://doi.org/10.1017/s0003598x00097295",
+   "title": "The water management network of Angkor, Cambodia",
+   "authors": [
+    "Fletcher",
+    "Penny",
+    "Evans"
+   ],
+   "year": 2008,
+   "journal": "Antiquity",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1017-s0003598x00097738",
+   "type": "scholarly-work",
+   "doi": "10.1017/s0003598x00097738",
+   "url": "https://doi.org/10.1017/s0003598x00097738",
+   "title": "Monumentality and the development of the Tongan maritime chiefdom",
+   "authors": [
+    "Clark",
+    "Burley",
+    "Murray"
+   ],
+   "year": 2008,
+   "journal": "Antiquity",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1038-43865",
+   "type": "scholarly-work",
+   "doi": "10.1038/43865",
+   "url": "https://doi.org/10.1038/43865",
+   "title": "Oldest playable musical instruments found at Jiahu early Neolithic site in China",
+   "authors": [
+    "Zhang",
+    "Harbottle",
+    "Wang"
+   ],
+   "year": 1999,
+   "journal": "Nature",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1038-nature01383",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1038/nature01383",
    "url": "https://doi.org/10.1038/nature01383",
    "title": "New ages for human occupation and climatic change at Lake Mungo, Australia",
@@ -74,12 +350,12 @@
    ],
    "year": 2003,
    "journal": "Nature",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1038-nature01669",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1038/nature01669",
    "url": "https://doi.org/10.1038/nature01669",
    "title": "Pleistocene Homo sapiens from Middle Awash, Ethiopia",
@@ -90,12 +366,12 @@
    ],
    "year": 2003,
    "journal": "Nature",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1038-nature06204",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1038/nature06204",
    "url": "https://doi.org/10.1038/nature06204",
    "title": "Early human use of marine resources and pigment in South Africa during the Middle Pleistocene",
@@ -106,12 +382,12 @@
    ],
    "year": 2007,
    "journal": "Nature",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1038-nature09710",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1038/nature09710",
    "url": "https://doi.org/10.1038/nature09710",
    "title": "Genetic history of an archaic hominin group from Denisova Cave in Siberia",
@@ -122,12 +398,12 @@
    ],
    "year": 2010,
    "journal": "Nature",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1038-nature14317",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1038/nature14317",
    "url": "https://doi.org/10.1038/nature14317",
    "title": "Massive migration from the steppe was a source for Indo-European languages in Europe",
@@ -138,12 +414,12 @@
    ],
    "year": 2015,
    "journal": "Nature",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1038-nature19792",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1038/nature19792",
    "url": "https://doi.org/10.1038/nature19792",
    "title": "Genomic analyses inform on migration events during the peopling of Eurasia",
@@ -154,12 +430,12 @@
    ],
    "year": 2016,
    "journal": "Nature",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1038-nature22336",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1038/nature22336",
    "url": "https://doi.org/10.1038/nature22336",
    "title": "New fossils from Jebel Irhoud, Morocco and the pan-African origin of Homo sapiens",
@@ -170,12 +446,12 @@
    ],
    "year": 2017,
    "journal": "Nature",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1038-nature22968",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1038/nature22968",
    "url": "https://doi.org/10.1038/nature22968",
    "title": "Human occupation of northern Australia by 65,000 years ago",
@@ -186,12 +462,12 @@
    ],
    "year": 2017,
    "journal": "Nature",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1038-nature25967",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1038/nature25967",
    "url": "https://doi.org/10.1038/nature25967",
    "title": "Humans thrived in South Africa through the Toba eruption about 74,000 years ago",
@@ -202,12 +478,12 @@
    ],
    "year": 2018,
    "journal": "Nature",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1038-s41586-020-2259-z",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1038/s41586-020-2259-z",
    "url": "https://doi.org/10.1038/s41586-020-2259-z",
    "title": "Initial Upper Palaeolithic Homo sapiens from Bacho Kiro Cave, Bulgaria",
@@ -218,12 +494,12 @@
    ],
    "year": 2020,
    "journal": "Nature",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1038-s41586-021-03972-8",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1038/s41586-021-03972-8",
    "url": "https://doi.org/10.1038/s41586-021-03972-8",
    "title": "Evidence for European presence in the Americas in ad 1021",
@@ -234,12 +510,12 @@
    ],
    "year": 2021,
    "journal": "Nature",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1038-s41586-021-04275-8",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1038/s41586-021-04275-8",
    "url": "https://doi.org/10.1038/s41586-021-04275-8",
    "title": "Age of the oldest known Homo sapiens from eastern Africa",
@@ -250,12 +526,12 @@
    ],
    "year": 2022,
    "journal": "Nature",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1038-s41586-023-06770-6",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1038/s41586-023-06770-6",
    "url": "https://doi.org/10.1038/s41586-023-06770-6",
    "title": "The genetic legacy of the expansion of Bantu-speaking peoples in Africa",
@@ -266,12 +542,123 @@
    ],
    "year": 2023,
    "journal": "Nature",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1080-1031461x-2017-1414862",
+   "type": "scholarly-work",
+   "doi": "10.1080/1031461x.2017.1414862",
+   "url": "https://doi.org/10.1080/1031461x.2017.1414862",
+   "title": "A Case of Identity: The Artefacts of the 1770 Kamay (Botany Bay) Encounter",
+   "authors": [
+    "Thomas"
+   ],
+   "year": 2018,
+   "journal": "Australian Historical Studies",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1080-13698010902752830",
+   "type": "scholarly-work",
+   "doi": "10.1080/13698010902752830",
+   "url": "https://doi.org/10.1080/13698010902752830",
+   "title": "FINAL COMMUNIQUÉ OF THE ASIAN-AFRICAN CONFERENCE",
+   "authors": [],
+   "year": 2009,
+   "journal": "Interventions",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1093-9780190941604-003-0011",
+   "type": "scholarly-work",
+   "doi": "10.1093/9780190941604.003.0011",
+   "url": "https://doi.org/10.1093/9780190941604.003.0011",
+   "title": "Refugees from the Eruption of 79 ce",
+   "authors": [
+    "Tuck"
+   ],
+   "year": 2026,
+   "journal": "The Oxford Handbook of Pompeii and Its Environs",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1093-acref-9780195301731-013-42376",
+   "type": "scholarly-work",
+   "doi": "10.1093/acref/9780195301731.013.42376",
+   "url": "https://doi.org/10.1093/acref/9780195301731.013.42376",
+   "title": "Mbanza Kongo",
+   "authors": [
+    "Thornton"
+   ],
+   "year": 2005,
+   "journal": "African American Studies Center",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1093-acref-9780195301731-013-48712",
+   "type": "scholarly-work",
+   "doi": "10.1093/acref/9780195301731.013.48712",
+   "url": "https://doi.org/10.1093/acref/9780195301731.013.48712",
+   "title": "Ezana of Aksum",
+   "authors": [
+    "Hahn"
+   ],
+   "year": 2011,
+   "journal": "African American Studies Center",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1093-actrade-9780199760275-003-0006",
+   "type": "scholarly-work",
+   "doi": "10.1093/actrade/9780199760275.003.0006",
+   "url": "https://doi.org/10.1093/actrade/9780199760275.003.0006",
+   "title": "6. Returning to Hisarlik: Carl Blegen and Manfred Korfmann",
+   "authors": [
+    "Cline"
+   ],
+   "year": 2013,
+   "journal": "The Trojan War",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1093-gao-9781884446054-article-t047762",
+   "type": "scholarly-work",
+   "doi": "10.1093/gao/9781884446054.article.t047762",
+   "url": "https://doi.org/10.1093/gao/9781884446054.article.t047762",
+   "title": "Kotosh",
+   "authors": [
+    "Onuki",
+    "Barnes"
+   ],
+   "year": 2003,
+   "journal": "Oxford Art Online",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1093-gao-9781884446054-article-t058826",
+   "type": "scholarly-work",
+   "doi": "10.1093/gao/9781884446054.article.t058826",
+   "url": "https://doi.org/10.1093/gao/9781884446054.article.t058826",
+   "title": "Mohenjo-daro",
+   "authors": [
+    "Possehl"
+   ],
+   "year": 2003,
+   "journal": "Oxford Art Online",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1093-molbev-msw117",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1093/molbev/msw117",
    "url": "https://doi.org/10.1093/molbev/msw117",
    "title": "Malagasy Genetic Ancestry Comes from an Historical Malay Trading Post in Southeast Borneo",
@@ -282,12 +669,111 @@
    ],
    "year": 2016,
    "journal": "Molecular Biology and Evolution",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1093-obo-9780199791279-0174",
+   "type": "scholarly-work",
+   "doi": "10.1093/obo/9780199791279-0174",
+   "url": "https://doi.org/10.1093/obo/9780199791279-0174",
+   "title": "Battle of Dien Bien Phu",
+   "authors": [
+    "Arzalier"
+   ],
+   "year": 2017,
+   "journal": "Oxford Bibliographies in Military History",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1093-oxfordhb-9780190219352-013-44",
+   "type": "scholarly-work",
+   "doi": "10.1093/oxfordhb/9780190219352.013.44",
+   "url": "https://doi.org/10.1093/oxfordhb/9780190219352.013.44",
+   "title": "Inca Transformations of the Chachapoya Region",
+   "authors": [
+    "Schjellerup"
+   ],
+   "year": 2018,
+   "journal": "Oxford Handbooks Online",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1093-oxfordhb-9780197800324-013-0009",
+   "type": "scholarly-work",
+   "doi": "10.1093/oxfordhb/9780197800324.013.0009",
+   "url": "https://doi.org/10.1093/oxfordhb/9780197800324.013.0009",
+   "title": "The Mausoleum Complex of Emperor Qin Shihuang",
+   "authors": [
+    "Xiuzhen",
+    "Hein"
+   ],
+   "year": 2026,
+   "journal": "The Oxford Handbook of the History and Practice of Chinese Archaeology",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1093-oxfordhb-9780198788218-013-5",
+   "type": "scholarly-work",
+   "doi": "10.1093/oxfordhb/9780198788218.013.5",
+   "url": "https://doi.org/10.1093/oxfordhb/9780198788218.013.5",
+   "title": "Rediscovering the Winter Solstice Alignment at Newgrange, Ireland",
+   "authors": [
+    "Hensey"
+   ],
+   "year": 2017,
+   "journal": "The Oxford Handbook of Light in Archaeology",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1093-oxfordhb-9780199328369-013-16",
+   "type": "scholarly-work",
+   "doi": "10.1093/oxfordhb/9780199328369.013.16",
+   "url": "https://doi.org/10.1093/oxfordhb/9780199328369.013.16",
+   "title": "Late Shang Ritual and Residential Architecture at Great City Shang, Yinxu in Anyang, Henan",
+   "authors": [
+    "Childs-Johnson"
+   ],
+   "year": 2020,
+   "journal": "The Oxford Handbook of Early China",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1111-j-1468-0092-2007-00291-x",
+   "type": "scholarly-work",
+   "doi": "10.1111/j.1468-0092.2007.00291.x",
+   "url": "https://doi.org/10.1111/j.1468-0092.2007.00291.x",
+   "title": "PROCESSION AND SYMBOLISM AT TARA: ANALYSIS OF TECH MIDCHÚARTA (THE ‘BANQUETING HALL’) IN THE CONTEXT OF THE SACRAL CAMPUS",
+   "authors": [
+    "NEWMAN"
+   ],
+   "year": 2007,
+   "journal": "Oxford Journal of Archaeology",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1111-j-1468-0254-2009-00246-x",
+   "type": "scholarly-work",
+   "doi": "10.1111/j.1468-0254.2009.00246.x",
+   "url": "https://doi.org/10.1111/j.1468-0254.2009.00246.x",
+   "title": "Excavations at Tintagel Castle, Cornwall, 1990–1999 ‐ By Rachel Barrowman, Colleen Batey and Christopher Morris",
+   "authors": [
+    "TURNER"
+   ],
+   "year": 2009,
+   "journal": "Early Medieval Europe",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1126-sciadv-abd4648",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1126/sciadv.abd4648",
    "url": "https://doi.org/10.1126/sciadv.abd4648",
    "title": "Oldest cave art found in Sulawesi",
@@ -298,12 +784,12 @@
    ],
    "year": 2021,
    "journal": "Science Advances",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1126-science-1059519",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1126/science.1059519",
    "url": "https://doi.org/10.1126/science.1059519",
    "title": "Dating Caral, a Preceramic Site in the Supe Valley on the Central Coast of Peru",
@@ -314,12 +800,12 @@
    ],
    "year": 2001,
    "journal": "Science",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1126-science-1067575",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1126/science.1067575",
    "url": "https://doi.org/10.1126/science.1067575",
    "title": "Emergence of Modern Human Behavior: Middle Stone Age Engravings from South Africa",
@@ -330,12 +816,12 @@
    ],
    "year": 2002,
    "journal": "Science",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1126-science-1121879",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1126/science.1121879",
    "url": "https://doi.org/10.1126/science.1121879",
    "title": "Late Colonization of Easter Island",
@@ -345,12 +831,12 @@
    ],
    "year": 2006,
    "journal": "Science",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1126-science-1137166",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1126/science.1137166",
    "url": "https://doi.org/10.1126/science.1137166",
    "title": "Redefining the Age of Clovis: Implications for the Peopling of the Americas",
@@ -360,12 +846,12 @@
    ],
    "year": 2007,
    "journal": "Science",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1126-science-1166083",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1126/science.1166083",
    "url": "https://doi.org/10.1126/science.1166083",
    "title": "The Peopling of the Pacific from a Bacterial Perspective",
@@ -376,12 +862,12 @@
    ],
    "year": 2009,
    "journal": "Science",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1126-science-1166858",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1126/science.1166858",
    "url": "https://doi.org/10.1126/science.1166858",
    "title": "Language Phylogenies Reveal Expansion Pulses and Pauses in Pacific Settlement",
@@ -392,12 +878,28 @@
    ],
    "year": 2009,
    "journal": "Science",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1126-science-1219957",
+   "type": "scholarly-work",
+   "doi": "10.1126/science.1219957",
+   "url": "https://doi.org/10.1126/science.1219957",
+   "title": "U-Series Dating of Paleolithic Art in 11 Caves in Spain",
+   "authors": [
+    "Pike",
+    "Hoffmann",
+    "García-Diez"
+   ],
+   "year": 2012,
+   "journal": "Science",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1126-science-276-5314-932",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1126/science.276.5314.932",
    "url": "https://doi.org/10.1126/science.276.5314.932",
    "title": "The Initial Domestication of Cucurbita pepo in the Americas 10,000 Years Ago",
@@ -406,12 +908,12 @@
    ],
    "year": 1997,
    "journal": "Science",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1126-science-aap8369",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1126/science.aap8369",
    "url": "https://doi.org/10.1126/science.aap8369",
    "title": "The earliest modern humans outside Africa",
@@ -422,12 +924,12 @@
    ],
    "year": 2018,
    "journal": "Science",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1126-science-abg0818",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1126/science.abg0818",
    "url": "https://doi.org/10.1126/science.abg0818",
    "title": "Language trees with sampled ancestors support a hybrid model for the origin of Indo-European languages",
@@ -438,12 +940,12 @@
    ],
    "year": 2023,
    "journal": "Science",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1126-science-abg7586",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1126/science.abg7586",
    "url": "https://doi.org/10.1126/science.abg7586",
    "title": "Evidence of humans in North America during the Last Glacial Maximum",
@@ -454,12 +956,12 @@
    ],
    "year": 2021,
    "journal": "Science",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1126-science-abm4247",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1126/science.abm4247",
    "url": "https://doi.org/10.1126/science.abm4247",
    "title": "The genetic history of the Southern Arc: A bridge between West Asia and Europe",
@@ -470,12 +972,12 @@
    ],
    "year": 2022,
    "journal": "Science",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1126-science-adh5007",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1126/science.adh5007",
    "url": "https://doi.org/10.1126/science.adh5007",
    "title": "Independent age estimates resolve the controversy of ancient human footprints at White Sands",
@@ -486,12 +988,96 @@
    ],
    "year": 2023,
    "journal": "Science",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1142-9781938368318-0007",
+   "type": "scholarly-work",
+   "doi": "10.1142/9781938368318_0007",
+   "url": "https://doi.org/10.1142/9781938368318_0007",
+   "title": "The Period of Overall Maintenance for the Great Wall — Ming and Qing Dynasties",
+   "authors": [],
+   "year": 2015,
+   "journal": "A History of the Great Wall of China",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1163-9789004493063-004",
+   "type": "scholarly-work",
+   "doi": "10.1163/9789004493063_004",
+   "url": "https://doi.org/10.1163/9789004493063_004",
+   "title": "Rising Tensions after the Proclamation of the Republic",
+   "authors": [
+    "Zürcher"
+   ],
+   "year": 1991,
+   "journal": "Political Opposition in the Early Turkish Republic",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1163-9789004536890-009",
+   "type": "scholarly-work",
+   "doi": "10.1163/9789004536890_009",
+   "url": "https://doi.org/10.1163/9789004536890_009",
+   "title": "Understanding S-21 at the Tuol Sleng Genocide Museum",
+   "authors": [
+    "Thimm"
+   ],
+   "year": 2024,
+   "journal": "Tuol Sleng Genocide Museum",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1179-jfa-1997-24-4-405",
+   "type": "scholarly-work",
+   "doi": "10.1179/jfa.1997.24.4.405",
+   "url": "https://doi.org/10.1179/jfa.1997.24.4.405",
+   "title": "Metal Sources and the Bronzes From Igbo-Ukwu, Nigeria",
+   "authors": [
+    "Craddock",
+    "Ambers",
+    "Hook"
+   ],
+   "year": 1997,
+   "journal": "Journal of Field Archaeology",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-12795-spal-2021-i30-12",
+   "type": "scholarly-work",
+   "doi": "10.12795/spal.2021.i30.12",
+   "url": "https://doi.org/10.12795/spal.2021.i30.12",
+   "title": "Los depósitos y las áreas de almacenamiento en la urbe Chimú: Chan Chan, Trujillo, Perú",
+   "authors": [
+    "Correa-Trigoso"
+   ],
+   "year": 2021,
+   "journal": "SPAL. Revista de Prehistoria y Arqueología de la Universidad de Sevilla",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1299-jsmemovic-2010-2k11-1",
+   "type": "scholarly-work",
+   "doi": "10.1299/jsmemovic.2010._2k11-1_",
+   "url": "https://doi.org/10.1299/jsmemovic.2010._2k11-1_",
+   "title": "2K11 Present and future state of high speed railways : From the Tokaido Shinkansen to the Superconducting Maglev",
+   "authors": [
+    "Shirakuni"
+   ],
+   "year": 2010,
+   "journal": "The Proceedings of the Symposium on the Motion and Vibration Control",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-1371-journal-pone-0141923",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.1371/journal.pone.0141923",
    "url": "https://doi.org/10.1371/journal.pone.0141923",
    "title": "New Archaeological Evidence for an Early Human Presence at Monte Verde, Chile",
@@ -502,12 +1088,276 @@
    ],
    "year": 2015,
    "journal": "PLOS ONE",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-14321-jwestafrihist-1-1-0195",
+   "type": "scholarly-work",
+   "doi": "10.14321/jwestafrihist.1.1.0195",
+   "url": "https://doi.org/10.14321/jwestafrihist.1.1.0195",
+   "title": "The Manuscripts of TimbuktuThe Meanings of Timbuktu333 Saints: A Life of Scholarship in Timbuktu",
+   "authors": [
+    "Skinner"
+   ],
+   "year": 2015,
+   "journal": "Journal of West African History",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1515-9780773566088-008",
+   "type": "scholarly-work",
+   "doi": "10.1515/9780773566088-008",
+   "url": "https://doi.org/10.1515/9780773566088-008",
+   "title": "The North Atlantic Triangle, China, and the Korean Armistice Negotiations, 1951-1953",
+   "authors": [],
+   "year": 1996,
+   "journal": "Outposts of Empire",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1515-9780824885342-010",
+   "type": "scholarly-work",
+   "doi": "10.1515/9780824885342-010",
+   "url": "https://doi.org/10.1515/9780824885342-010",
+   "title": "9. Mahatma Gandhi and Civil Disobedience",
+   "authors": [
+    "Power"
+   ],
+   "year": 1971,
+   "journal": "The Meanings of Gandhi",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1515-9781685856977-020",
+   "type": "scholarly-work",
+   "doi": "10.1515/9781685856977-020",
+   "url": "https://doi.org/10.1515/9781685856977-020",
+   "title": "The Iranian Revolution (1979)",
+   "authors": [],
+   "year": 2011,
+   "journal": "Understanding Revolution",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1515-9781685856977-022",
+   "type": "scholarly-work",
+   "doi": "10.1515/9781685856977-022",
+   "url": "https://doi.org/10.1515/9781685856977-022",
+   "title": "The Tiananmen Square Prodemocracy Movement (1989)",
+   "authors": [],
+   "year": 2011,
+   "journal": "Understanding Revolution",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1515-9781846158735",
+   "type": "scholarly-work",
+   "doi": "10.1515/9781846158735",
+   "url": "https://doi.org/10.1515/9781846158735",
+   "title": "Foundations of an African Civilisation",
+   "authors": [
+    "Phillipson"
+   ],
+   "year": 2012,
+   "journal": "",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1515-9783110810011-327",
+   "type": "scholarly-work",
+   "doi": "10.1515/9783110810011.327",
+   "url": "https://doi.org/10.1515/9783110810011.327",
+   "title": "Toward the Development of the Tiahuanaco (Tiwanaku) State",
+   "authors": [
+    "BROWMAN"
+   ],
+   "year": 1978,
+   "journal": "Advances in Andean Archaeology",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-15184-aqy-2019-207",
+   "type": "scholarly-work",
+   "doi": "10.15184/aqy.2019.207",
+   "url": "https://doi.org/10.15184/aqy.2019.207",
+   "title": "New Neanderthal remains associated with the ‘flower burial’ at Shanidar Cave",
+   "authors": [
+    "Pomeroy",
+    "Bennett",
+    "Hunt"
+   ],
+   "year": 2020,
+   "journal": "Antiquity",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-15184-aqy-2021-153",
+   "type": "scholarly-work",
+   "doi": "10.15184/aqy.2021.153",
+   "url": "https://doi.org/10.15184/aqy.2021.153",
+   "title": "Mapping Karakorum, the capital of the Mongol Empire",
+   "authors": [
+    "Bemmann",
+    "Linzen",
+    "Reichert"
+   ],
+   "year": 2021,
+   "journal": "Antiquity",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1525-9780520910874-006",
+   "type": "scholarly-work",
+   "doi": "10.1525/9780520910874-006",
+   "url": "https://doi.org/10.1525/9780520910874-006",
+   "title": "2. The Founding of Communist Cells and the First Congress",
+   "authors": [],
+   "year": 1991,
+   "journal": "From Friend to Comrade",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1525-ap3a-2005-14-071",
+   "type": "scholarly-work",
+   "doi": "10.1525/ap3a.2005.14.071",
+   "url": "https://doi.org/10.1525/ap3a.2005.14.071",
+   "title": "The Evolution of Authority and Power at Chavin de Huantar, Peru",
+   "authors": [
+    "Rick"
+   ],
+   "year": 2005,
+   "journal": "Archeological Papers of the American Anthropological Association",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-1525-california-9780520220065-003-0002",
+   "type": "scholarly-work",
+   "doi": "10.1525/california/9780520220065.003.0002",
+   "url": "https://doi.org/10.1525/california/9780520220065.003.0002",
+   "title": "Aggression, Victimization, and Chinese Historiography of the Nanjing Massacre",
+   "authors": [
+    "Eykholt"
+   ],
+   "year": 2000,
+   "journal": "The Nanjing Massacre in History and Historiography",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-15366-archaeofauna2018-27-002",
+   "type": "scholarly-work",
+   "doi": "10.15366/archaeofauna2018.27.002",
+   "url": "https://doi.org/10.15366/archaeofauna2018.27.002",
+   "title": "Fishes from Complex A offerings of Templo Mayor of Tenochtitlan (Mexico City, Mexico)",
+   "authors": [
+    "Guzmán"
+   ],
+   "year": 2018,
+   "journal": "Archaeofauna",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-20529-ijme-2011-036",
+   "type": "scholarly-work",
+   "doi": "10.20529/ijme.2011.036",
+   "url": "https://doi.org/10.20529/ijme.2011.036",
+   "title": "The Bhopal gas disaster: focus on communit health and environmental effects",
+   "authors": [
+    "Sheehan"
+   ],
+   "year": 2011,
+   "journal": "Indian Journal of Medical Ethics",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-21313-hawaii-9780824866068-003-0002",
+   "type": "scholarly-work",
+   "doi": "10.21313/hawaii/9780824866068.003.0002",
+   "url": "https://doi.org/10.21313/hawaii/9780824866068.003.0002",
+   "title": "Buddhist Landscape and Cultural Memory",
+   "authors": [
+    "Peleggi"
+   ],
+   "year": 2017,
+   "journal": "Monastery, Monument, Museum",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-2307-2171305",
+   "type": "scholarly-work",
+   "doi": "10.2307/2171305",
+   "url": "https://doi.org/10.2307/2171305",
+   "title": "British Relations with the Malay Rulers from Decentralization to Malayan Independence, 1930-1957.",
+   "authors": [
+    "Fair",
+    "Smith"
+   ],
+   "year": 1997,
+   "journal": "The American Historical Review",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-2307-281085",
+   "type": "scholarly-work",
+   "doi": "10.2307/281085",
+   "url": "https://doi.org/10.2307/281085",
+   "title": "Great Pueblo Architecture of Chaco Canyon New Mexico",
+   "authors": [
+    "Anyon",
+    "Lekson"
+   ],
+   "year": 1987,
+   "journal": "American Antiquity",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-2307-3334795",
+   "type": "scholarly-work",
+   "doi": "10.2307/3334795",
+   "url": "https://doi.org/10.2307/3334795",
+   "title": "The Igbo-Ukwu Bronzes",
+   "authors": [
+    "Shaw"
+   ],
+   "year": 1973,
+   "journal": "African Arts",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-2307-3537016",
+   "type": "scholarly-work",
+   "doi": "10.2307/3537016",
+   "url": "https://doi.org/10.2307/3537016",
+   "title": "Royal Tombs of Sipán. Walter Alva and Christopher B. Donnan. University of California Press, Berkeley, 1993. 230 pp., 161 plates, 82 illustrations, bibliography. $50.00 (cloth); $35.00 (paper).",
+   "authors": [
+    "Bourget"
+   ],
+   "year": 1996,
+   "journal": "Latin American Antiquity",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-2307-3858043",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.2307/3858043",
    "url": "https://doi.org/10.2307/3858043",
    "title": "Mapungubwe and the Origins of the Zimbabwe Culture",
@@ -516,12 +1366,206 @@
    ],
    "year": 2000,
    "journal": "Goodwin Series",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-2307-4200236",
+   "type": "scholarly-work",
+   "doi": "10.2307/4200236",
+   "url": "https://doi.org/10.2307/4200236",
+   "title": "Chronology of the Royal Cemetery of Ur",
+   "authors": [
+    "Pollock"
+   ],
+   "year": 1985,
+   "journal": "Iraq",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-2307-4421489",
+   "type": "scholarly-work",
+   "doi": "10.2307/4421489",
+   "url": "https://doi.org/10.2307/4421489",
+   "title": "The Skara Brae Village in Orkney",
+   "authors": [
+    "Smith"
+   ],
+   "year": 1933,
+   "journal": "The British Museum Quarterly",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-2307-j-ctt18z4gjq-46",
+   "type": "scholarly-work",
+   "doi": "10.2307/j.ctt18z4gjq.46",
+   "url": "https://doi.org/10.2307/j.ctt18z4gjq.46",
+   "title": "Royal Shaft Graves Outside Mycenae",
+   "authors": [
+    "Iakovidis"
+   ],
+   "year": 2015,
+   "journal": "Temple University Aegean Symposium: A Compendium",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-2307-j-ctt1g69z2n-37",
+   "type": "scholarly-work",
+   "doi": "10.2307/j.ctt1g69z2n.37",
+   "url": "https://doi.org/10.2307/j.ctt1g69z2n.37",
+   "title": "The ancient Kushite city of Meroe",
+   "authors": [
+    "Chimblri"
+   ],
+   "year": 2015,
+   "journal": "Petrie Museum of Egyptian Archaeology",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-2307-j-ctvqmp3br-8",
+   "type": "scholarly-work",
+   "doi": "10.2307/j.ctvqmp3br.8",
+   "url": "https://doi.org/10.2307/j.ctvqmp3br.8",
+   "title": "Popular Japanese Responses to the Pearl Harbor Attack:",
+   "authors": [
+    "Yamashita"
+   ],
+   "year": 2019,
+   "journal": "Beyond Pearl Harbor",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-2307-jj-12011257-21",
+   "type": "scholarly-work",
+   "doi": "10.2307/jj.12011257.21",
+   "url": "https://doi.org/10.2307/jj.12011257.21",
+   "title": "The Pyramid Builders of Giza",
+   "authors": [],
+   "year": 2024,
+   "journal": "Mountains of the Pharaohs",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-2307-jj-30625921-8",
+   "type": "scholarly-work",
+   "doi": "10.2307/jj.30625921.8",
+   "url": "https://doi.org/10.2307/jj.30625921.8",
+   "title": "Writing at Hattusa Scribal Education and Scribal Environment",
+   "authors": [],
+   "year": 2025,
+   "journal": "Hittite Logograms and Hittite Scholarship",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-30861-9780860548683",
+   "type": "scholarly-work",
+   "doi": "10.30861/9780860548683",
+   "url": "https://doi.org/10.30861/9780860548683",
+   "title": "Recherches archéologiques sur la capitale de l’empire de Ghana: Etude d’un secteur d’habitat à Koumbi Saleh, Mauritanie. Campagnes II-III-IV-V (1975-1976)-(1980-1981)",
+   "authors": [
+    "Berthier"
+   ],
+   "year": 1997,
+   "journal": "",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-30861-9781407309224",
+   "type": "scholarly-work",
+   "doi": "10.30861/9781407309224",
+   "url": "https://doi.org/10.30861/9781407309224",
+   "title": "Norse in Newfoundland: A critical examination of archaeological research at the Norse site at L’Anse aux Meadows, Newfoundland",
+   "authors": [
+    "Kay"
+   ],
+   "year": 2012,
+   "journal": "",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-3406-arnil-2016-1102",
+   "type": "scholarly-work",
+   "doi": "10.3406/arnil.2016.1102",
+   "url": "https://doi.org/10.3406/arnil.2016.1102",
+   "title": "Uruk: Early Administration Practices and the Development of Proto-Cuneiform Writing",
+   "authors": [
+    "Nissen"
+   ],
+   "year": 2016,
+   "journal": "Archéo-Nil. Revue de la société pour l'étude des cultures prépharaoniques de la vallée du Nil",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-3406-paleo-1974-4188",
+   "type": "scholarly-work",
+   "doi": "10.3406/paleo.1974.4188",
+   "url": "https://doi.org/10.3406/paleo.1974.4188",
+   "title": "Observation on the article : \"Five Plastered Skulls from Pre-Pottery Neolithic B. Jericho\", by Eugen Strouhal in Paléorient, 1/2, 1973.",
+   "authors": [
+    "Kenyon"
+   ],
+   "year": 1974,
+   "journal": "Paléorient",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-3406-paleo-1980-4279",
+   "type": "scholarly-work",
+   "doi": "10.3406/paleo.1980.4279",
+   "url": "https://doi.org/10.3406/paleo.1980.4279",
+   "title": "Les fouilles de Mehrgarh, Pakistan : problèmes chronologiques",
+   "authors": [
+    "Jarrige",
+    "Lechevallier"
+   ],
+   "year": 1980,
+   "journal": "Paléorient",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-3998-mpub-11396257",
+   "type": "scholarly-work",
+   "doi": "10.3998/mpub.11396257",
+   "url": "https://doi.org/10.3998/mpub.11396257",
+   "title": "Wari Imperialism in Middle Horizon Peru",
+   "authors": [
+    "Schreiber"
+   ],
+   "year": 1992,
+   "journal": "",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-4000-aaa-1398",
+   "type": "scholarly-work",
+   "doi": "10.4000/aaa.1398",
+   "url": "https://doi.org/10.4000/aaa.1398",
+   "title": "The making of “Nok terracotta”",
+   "authors": [
+    "Breunig",
+    "Ameje"
+   ],
+   "year": 2006,
+   "journal": "Afrique : Archeologie et Arts",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-4312-dp-35-11",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.4312/dp.35.11",
    "url": "https://doi.org/10.4312/dp.35.11",
    "title": "The Stonehenge Riverside Project: exploring the Neolithic landscape of Stonehenge",
@@ -532,12 +1576,12 @@
    ],
    "year": 2008,
    "journal": "Documenta Praehistorica",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-4324-9780367810412-5",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.4324/9780367810412-5",
    "url": "https://doi.org/10.4324/9780367810412-5",
    "title": "Chronology of Great Zimbabwe – relative, absolute, and integrated",
@@ -546,12 +1590,137 @@
    ],
    "year": 2020,
    "journal": "Great Zimbabwe",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-4324-9781003319665-2",
+   "type": "scholarly-work",
+   "doi": "10.4324/9781003319665-2",
+   "url": "https://doi.org/10.4324/9781003319665-2",
+   "title": "The Jallianwala Bagh",
+   "authors": [
+    "Furneaux"
+   ],
+   "year": 2022,
+   "journal": "Massacre at Amritsar",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-4324-9781003463627-12",
+   "type": "scholarly-work",
+   "doi": "10.4324/9781003463627-12",
+   "url": "https://doi.org/10.4324/9781003463627-12",
+   "title": "The Liberation War of Bangladesh (1971) and Pakistani Media Narratives",
+   "authors": [
+    "Jabeen",
+    "Abbas"
+   ],
+   "year": 2024,
+   "journal": "The Aftermath of the Bangladesh Liberation War of 1971",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-4324-9781315691459-24",
+   "type": "scholarly-work",
+   "doi": "10.4324/9781315691459-24",
+   "url": "https://doi.org/10.4324/9781315691459-24",
+   "title": "Kilwa Kisiwani and Songo Mnara",
+   "authors": [
+    "Wynne-Jones"
+   ],
+   "year": 2017,
+   "journal": "The Swahili World",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-5040-9780755611355-ch-001",
+   "type": "scholarly-work",
+   "doi": "10.5040/9780755611355.ch-001",
+   "url": "https://doi.org/10.5040/9780755611355.ch-001",
+   "title": "Achaemenid Imperial Architecture: Performative Porticoes of Persepolis",
+   "authors": [
+    "Root"
+   ],
+   "year": 2015,
+   "journal": "Persian Kingship and Architecture",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-5040-9781350241619-ch-003",
+   "type": "scholarly-work",
+   "doi": "10.5040/9781350241619.ch-003",
+   "url": "https://doi.org/10.5040/9781350241619.ch-003",
+   "title": "From Village to Palace: Neolithic and Early Bronze Age (Early Minoan) Knossos",
+   "authors": [],
+   "year": 2023,
+   "journal": "Knossos",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-5040-9798216418320-ch-003",
+   "type": "scholarly-work",
+   "doi": "10.5040/9798216418320.ch-003",
+   "url": "https://doi.org/10.5040/9798216418320.ch-003",
+   "title": "The Spectacle of Daily Performance at Catalhoyuk",
+   "authors": [
+    "Hodder"
+   ],
+   "year": 2006,
+   "journal": "Archaeology of Performance",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-5117-9789048560837-3",
+   "type": "scholarly-work",
+   "doi": "10.5117/9789048560837-3",
+   "url": "https://doi.org/10.5117/9789048560837-3",
+   "title": "The Proclamation May–September 1945",
+   "authors": [
+    "Poeze",
+    "Nordholt",
+    "Marini"
+   ],
+   "year": 2025,
+   "journal": "Merdeka",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-5744-florida-9780813069333-003-0001",
+   "type": "scholarly-work",
+   "doi": "10.5744/florida/9780813069333.003.0001",
+   "url": "https://doi.org/10.5744/florida/9780813069333.003.0001",
+   "title": "Pachacamac in the Development of Andean Archaeology",
+   "authors": [],
+   "year": 2022,
+   "journal": "Unveiling Pachacamac",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-5744-florida-9781683401612-003-0002",
+   "type": "scholarly-work",
+   "doi": "10.5744/florida/9781683401612.003.0002",
+   "url": "https://doi.org/10.5744/florida/9781683401612.003.0002",
+   "title": "Culture Contact and the Cahokia Phenomenon",
+   "authors": [
+    "Friberg"
+   ],
+   "year": 2020,
+   "journal": "The Making of Mississippian Tradition",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "doi-10-7554-elife-24231",
-   "type": "journal-article",
+   "type": "scholarly-work",
    "doi": "10.7554/eLife.24231",
    "url": "https://doi.org/10.7554/eLife.24231",
    "title": "The age of Homo naledi and associated sediments in the Rising Star Cave, South Africa",
@@ -562,8 +1731,63 @@
    ],
    "year": 2017,
    "journal": "eLife",
-   "verified": "Crossref API 2026-10-22: DOI resolves, title/authors match",
-   "reliability": "primary/peer-reviewed"
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-7560-311493",
+   "type": "scholarly-work",
+   "doi": "10.7560/311493",
+   "url": "https://doi.org/10.7560/311493",
+   "title": "Where the Land Meets the Sea",
+   "authors": [],
+   "year": 2017,
+   "journal": "",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-7560-718678-011",
+   "type": "scholarly-work",
+   "doi": "10.7560/718678-011",
+   "url": "https://doi.org/10.7560/718678-011",
+   "title": "9. The Priests of the Bicephalus Arc: Tombs and Effigies Found in Huaca de la Luna and Their Relation to Moche Rituals",
+   "authors": [
+    "Uceda"
+   ],
+   "year": 2008,
+   "journal": "The Art and Archaeology of the Moche",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-7560-766655",
+   "type": "scholarly-work",
+   "doi": "10.7560/766655",
+   "url": "https://doi.org/10.7560/766655",
+   "title": "The Last Civilized Place",
+   "authors": [
+    "Messier",
+    "Miller"
+   ],
+   "year": 2015,
+   "journal": "",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
+  },
+  {
+   "id": "doi-10-7560-775565-009",
+   "type": "scholarly-work",
+   "doi": "10.7560/775565-009",
+   "url": "https://doi.org/10.7560/775565-009",
+   "title": "7. Teotihuacan: City, State, and Civilization",
+   "authors": [
+    "Millon"
+   ],
+   "year": 2015,
+   "journal": "Supplement to the Handbook of Middle American Indians, Volume 1",
+   "verified": "Crossref API 2026-10-22: DOI resolves; title/authors recorded from Crossref metadata",
+   "reliability": "scholarly (journal, academic press or reference work)"
   },
   {
    "id": "geonames-1164211",

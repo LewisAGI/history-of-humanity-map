@@ -13,7 +13,6 @@ on:
           - indigenous-australia
           - celtic-ireland
           - ancient-greece-med
-          - wildlife-migration-atlas
 
 # Jobs that run untrusted site code replace this. The choice input is not a
 # security boundary: the API can submit other values, so every job allowlists.
@@ -29,9 +28,6 @@ jobs:
   gate:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    # Deployment branch policy is main only. It is set on the wildlife-atlas
-    # environment; this workflow does not change it.
-    environment: wildlife-atlas
     # No checkout and no Node action. Site code never shares a runner with
     # Cloudflare credentials; those are only on the deploy job.
     permissions: {}
@@ -57,7 +53,6 @@ jobs:
             indigenous-australia) SITE_NAME=indigenous-australia ;;
             celtic-ireland) SITE_NAME=celtic-ireland ;;
             ancient-greece-med) SITE_NAME=ancient-greece-med ;;
-            wildlife-migration-atlas) SITE_NAME=wildlife-migration-atlas ;;
             *)
               echo "Site is not in the allowlist."
               exit 1
@@ -99,10 +94,6 @@ jobs:
               SITE_NAME=ancient-greece-med
               SITE_REMOTE=https://github.com/LewisAGI/ancient-greece-med.git
               ;;
-            wildlife-migration-atlas)
-              SITE_NAME=wildlife-migration-atlas
-              SITE_REMOTE=https://github.com/LewisAGI/wildlife-migration-atlas.git
-              ;;
             *)
               echo "Site is not in the allowlist."
               exit 1
@@ -138,7 +129,7 @@ jobs:
       skip: ${{ steps.lock.outputs.skip == 'true' || steps.fetch.outputs.skip == 'true' }}
       sha: ${{ steps.fetch.outputs.sha }}
     steps:
-      - name: Fetch site main
+      - name: Fetch site commit
         id: fetch
         shell: bash
         env:
@@ -169,10 +160,6 @@ jobs:
               SITE_NAME=ancient-greece-med
               SITE_REMOTE=https://github.com/LewisAGI/ancient-greece-med.git
               ;;
-            wildlife-migration-atlas)
-              SITE_NAME=wildlife-migration-atlas
-              SITE_REMOTE=https://github.com/LewisAGI/wildlife-migration-atlas.git
-              ;;
             *)
               echo "Site is not in the allowlist."
               exit 1
@@ -182,33 +169,29 @@ jobs:
             echo "Refusing to build without the gate commit SHA."
             exit 1
           fi
-          if ! remote_out="$(git -c credential.helper= -c http.extraheader= ls-remote "$SITE_REMOTE" refs/heads/main)"; then
-            echo "::warning title=site ls-remote::Could not query refs/heads/main on LewisAGI/${SITE_NAME}. Skipping this run."
-            echo "skip=true" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          sha="$(printf '%s\n' "$remote_out" | awk 'NR==1 {print $1}')"
-          if [[ ! "$sha" =~ ^[0-9a-f]{40}$ ]]; then
-            echo "LewisAGI/${SITE_NAME} main did not resolve."
-            exit 1
-          fi
           rm -rf site
           git init --quiet site
           git -C site remote add origin "$SITE_REMOTE"
-          git -C site -c credential.helper= -c http.extraheader= fetch --depth 1 origin refs/heads/main
-          git -C site -c core.hooksPath=/dev/null checkout --detach FETCH_HEAD
-          head="$(git -C site rev-parse HEAD)"
-          if [[ ! "$head" =~ ^[0-9a-f]{40}$ ]]; then
-            echo "Checkout did not resolve a commit."
+          # The gate already resolved main. Fetch that commit, not main again.
+          if ! git -C site -c credential.helper= -c http.extraheader= fetch --depth 1 origin "$GATE_SHA"; then
+            echo "Could not fetch the commit the gate resolved."
             exit 1
           fi
-          if [ "$head" != "$GATE_SHA" ]; then
-            echo "::notice title=site fetch::Branch moved from ${GATE_SHA} to ${head}. Deploying the fetched commit."
+          fetched="$(git -C site rev-parse FETCH_HEAD)"
+          if [ "$fetched" != "$GATE_SHA" ]; then
+            echo "Fetch did not return the commit the gate resolved."
+            exit 1
           fi
-          echo "Checked out ${head} from refs/heads/main of LewisAGI/${SITE_NAME}."
+          git -C site -c core.hooksPath=/dev/null checkout --detach FETCH_HEAD
+          checked_out="$(git -C site rev-parse HEAD)"
+          if [ "$checked_out" != "$GATE_SHA" ]; then
+            echo "Checkout did not match the commit the gate resolved."
+            exit 1
+          fi
+          echo "Checked out ${GATE_SHA} from LewisAGI/${SITE_NAME}."
           {
             echo "skip=false"
-            echo "sha=${head}"
+            echo "sha=${GATE_SHA}"
           } >> "$GITHUB_OUTPUT"
 
       - name: Check for package-lock.json
@@ -353,6 +336,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           PAGES_BRANCH: ${{ needs.gate.outputs.branch }}
           PAGES_PRODUCTION: ${{ needs.gate.outputs.production }}
+          GATE_SHA: ${{ needs.gate.outputs.sha }}
           SITE_SHA: ${{ needs.build.outputs.sha }}
           SITE_INPUT: ${{ needs.gate.outputs.site }}
           WRANGLER: ${{ runner.temp }}/hohm/tools/wrangler/node_modules/.bin/wrangler
@@ -361,12 +345,26 @@ jobs:
           set -euo pipefail
           shopt -u nocasematch
           case "$SITE_INPUT" in
-            health-claims) SITE_NAME=health-claims ;;
-            psychedelics) SITE_NAME=psychedelics ;;
-            indigenous-australia) SITE_NAME=indigenous-australia ;;
-            celtic-ireland) SITE_NAME=celtic-ireland ;;
-            ancient-greece-med) SITE_NAME=ancient-greece-med ;;
-            wildlife-migration-atlas) SITE_NAME=wildlife-migration-atlas ;;
+            health-claims)
+              SITE_NAME=health-claims
+              EXPECTED_SUBDOMAIN=health-claims.pages.dev
+              ;;
+            psychedelics)
+              SITE_NAME=psychedelics
+              EXPECTED_SUBDOMAIN=psychedelics.pages.dev
+              ;;
+            indigenous-australia)
+              SITE_NAME=indigenous-australia
+              EXPECTED_SUBDOMAIN=indigenous-australia.pages.dev
+              ;;
+            celtic-ireland)
+              SITE_NAME=celtic-ireland
+              EXPECTED_SUBDOMAIN=celtic-ireland.pages.dev
+              ;;
+            ancient-greece-med)
+              SITE_NAME=ancient-greece-med
+              EXPECTED_SUBDOMAIN=ancient-greece-med.pages.dev
+              ;;
             *)
               echo "Site is not in the allowlist."
               exit 1
@@ -380,8 +378,8 @@ jobs:
             echo "Refusing to deploy anything except main as production."
             exit 1
           fi
-          if [[ ! "$SITE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
-            echo "Refusing to deploy without the site commit SHA."
+          if [[ ! "$GATE_SHA" =~ ^[0-9a-f]{40}$ ]] || [[ ! "$SITE_SHA" =~ ^[0-9a-f]{40}$ ]] || [ "$SITE_SHA" != "$GATE_SHA" ]; then
+            echo "Refusing to deploy a commit other than the one the gate resolved."
             exit 1
           fi
           if [ -e "$DIST/_worker.js" ] || [ -d "$DIST/functions" ] || [ -e "$DIST/_routes.json" ]; then
@@ -404,7 +402,78 @@ jobs:
             "$WRANGLER" pages project create "$SITE_NAME" --production-branch main --force
           fi
 
+          # Read the project subdomain from the API. Do not print the token,
+          # the account id, or the response body.
+          export SITE_NAME EXPECTED_SUBDOMAIN
+          python3 - <<'PY'
+          import json
+          import os
+          import urllib.error
+          import urllib.parse
+          import urllib.request
+
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self, req, fp, code, msg, headers, newurl):
+                  raise SystemExit("Could not read the Pages project.")
+
+          def main():
+              token = os.environ.get("CLOUDFLARE_API_TOKEN") or ""
+              account = os.environ.get("CLOUDFLARE_ACCOUNT_ID") or ""
+              site = os.environ.get("SITE_NAME") or ""
+              expected = os.environ.get("EXPECTED_SUBDOMAIN") or ""
+              if token == "" or account == "":
+                  raise SystemExit("Cloudflare credentials are unavailable.")
+              if expected != site + ".pages.dev":
+                  raise SystemExit(
+                      "Refusing to deploy because the Pages subdomain is not the site pages.dev hostname."
+                  )
+              path = (
+                  "/accounts/"
+                  + urllib.parse.quote(account, safe="")
+                  + "/pages/projects/"
+                  + urllib.parse.quote(site, safe="")
+              )
+              opener = urllib.request.build_opener(NoRedirect)
+              request = urllib.request.Request(
+                  "https://api.cloudflare.com/client/v4" + path,
+                  headers={
+                      "Authorization": "Bearer " + token,
+                      "Accept": "application/json",
+                  },
+                  method="GET",
+              )
+              try:
+                  with opener.open(request, timeout=20) as response:
+                      raw = response.read()
+              except urllib.error.HTTPError as err:
+                  err.read()
+                  raise SystemExit("Could not read the Pages project.")
+              except urllib.error.URLError:
+                  raise SystemExit("Could not read the Pages project.")
+              try:
+                  payload = json.loads(raw.decode("utf-8"))
+              except (UnicodeDecodeError, json.JSONDecodeError):
+                  raise SystemExit("Could not read the Pages project.")
+              if not isinstance(payload, dict) or payload.get("success") is not True:
+                  raise SystemExit("Could not read the Pages project.")
+              result = payload.get("result")
+              if not isinstance(result, dict):
+                  raise SystemExit("Could not read the Pages project.")
+              if result.get("name") != site or result.get("subdomain") != expected:
+                  raise SystemExit(
+                      "Refusing to deploy because the Pages subdomain is not the site pages.dev hostname."
+                  )
+
+          if __name__ == "__main__":
+              try:
+                  main()
+              except SystemExit:
+                  raise
+              except Exception:
+                  raise SystemExit("Could not read the Pages project.")
+          PY
+
           "$WRANGLER" pages deploy "$DIST" \
             --project-name="$SITE_NAME" \
             --branch=main \
-            --commit-hash="$SITE_SHA"
+            --commit-hash="$GATE_SHA"

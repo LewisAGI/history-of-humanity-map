@@ -15,3 +15,10 @@ jobs:
       - run: npm ci
       - run: npx playwright install --with-deps webkit
       - run: npx playwright test --project=landscape-webkit --project=matrix-webkit
+      - name: Upload Playwright traces
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: playwright-traces-webkit
+          path: test-results
+          if-no-files-found: ignore

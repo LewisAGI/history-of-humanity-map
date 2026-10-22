@@ -97,6 +97,15 @@ describe('basemap fault filter', () => {
     expect(ignorablePageError(`${hyphen} due to access control checks.`)).toBe(false);
   });
 
+  it('does not ignore a WebKit line logged from a bundle URL', () => {
+    const bundle = 'http://127.0.0.1:4173/assets/index-DwqXXe_P.js';
+    expect(ignorableConsole(WEBKIT, { locationUrl: bundle, failedRequestUrls: [GIBS] })).toBe(false);
+    expect(ignorableConsole(WEBKIT, { locationUrl: 'http://127.0.0.1:4173/index.html', failedRequestUrls: [GIBS] })).toBe(true);
+    expect(ignorableConsole(WEBKIT, { locationUrl: 'http://127.0.0.1:4173/index.html?x=1', failedRequestUrls: [GIBS] })).toBe(false);
+    expect(ignorableConsole(WEBKIT, { locationUrl: 'http://127.0.0.1:4173/index.html#map', failedRequestUrls: [GIBS] })).toBe(false);
+    expect(ignorableConsole(WEBKIT, { locationUrl: 'http://localhost:4173/', failedRequestUrls: [GIBS] })).toBe(true);
+  });
+
   it('does not let a GIBS failure mask a local failure', () => {
     expect(
       ignorableConsole(WEBKIT, {

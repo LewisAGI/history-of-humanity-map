@@ -292,8 +292,11 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     // Scott and Amundsen share the pole. Shift the labels apart so both can show.
     if (event.id === 'scott-pole') label.style.transform = 'translateX(calc(-50% - 78px))';
     if (event.id === 'amundsen-pole') label.style.transform = 'translateX(calc(-50% + 78px))';
-    // MapLibre only preventDefaults a marker press, so the press still bubbles
-    // and starts a map drag. That drag can swallow the click or close the card.
+    // The marker listener only calls preventDefault. Drag pan listens on the
+    // canvas container in the bubble phase and ignores that, so a press that
+    // reaches the container starts a pan, and a move past the 1px click
+    // tolerance swallows the click. Stopping the bubble keeps the press off
+    // that listener. Selecting the pin still eases the camera; that is framing.
     element.addEventListener('mousedown', (mouse) => {
       mouse.stopPropagation();
     });
@@ -675,14 +678,12 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       root.dataset.popup = '';
       return;
     }
-    clearMapScroll();
-    const placed = sheet.getBoundingClientRect();
     const inside =
-      placed.left >= -1 &&
-      placed.top >= -1 &&
-      placed.right <= window.innerWidth + 1 &&
-      placed.bottom <= window.innerHeight + 1;
-    root.dataset.popup = inside && !hitsControls(placed) ? 'in' : '';
+      rect.left >= -1 &&
+      rect.top >= -1 &&
+      rect.right <= window.innerWidth + 1 &&
+      rect.bottom <= window.innerHeight + 1;
+    root.dataset.popup = inside && !hitsControls(rect) ? 'in' : '';
   }
 
   function pinLngLat(event: HistoryEvent): [number, number] {
@@ -700,17 +701,6 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
     });
   }
 
-  /**
-   * A click on a pin past the edge scrolls this container to reveal it.
-   * The canvas does not move with that scroll, so the card is measured in the wrong place.
-   */
-  function clearMapScroll() {
-    const container = map.getContainer();
-    if (!container.scrollLeft && !container.scrollTop) return;
-    container.scrollLeft = 0;
-    container.scrollTop = 0;
-  }
-
   function settlePopup(attempt = 0, generation = ++settleGeneration) {
     if (generation !== settleGeneration) return;
     const element = popup?.getElement();
@@ -718,7 +708,6 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       root.dataset.popup = '';
       return;
     }
-    clearMapScroll();
     element.style.marginLeft = '0px';
     element.style.marginTop = '0px';
     const tip = element.querySelector<HTMLElement>('.maplibregl-popup-tip');
@@ -759,7 +748,6 @@ export function createMap(container: HTMLElement, root: HTMLElement): MapView {
       requestAnimationFrame(() => settlePopup(attempt + 1, generation));
       return;
     }
-    if (generation !== settleGeneration) return;
     root.dataset.popup = outside ? '' : 'in';
   }
 

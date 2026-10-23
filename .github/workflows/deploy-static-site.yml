@@ -15,6 +15,7 @@ on:
           - ancient-greece-med
           - uk-medicinal-plants
           - geography-quiz
+          - pdf-to-audiobook
 
 # Jobs that run untrusted site code replace this. The choice input is not a
 # security boundary: the API can submit other values, so every job allowlists.
@@ -57,6 +58,7 @@ jobs:
             ancient-greece-med) SITE_NAME=ancient-greece-med ;;
             uk-medicinal-plants) SITE_NAME=uk-medicinal-plants ;;
             geography-quiz) SITE_NAME=geography-quiz ;;
+            pdf-to-audiobook) SITE_NAME=pdf-to-audiobook ;;
             *)
               echo "Site is not in the allowlist."
               exit 1
@@ -105,6 +107,10 @@ jobs:
             geography-quiz)
               SITE_NAME=geography-quiz
               SITE_REMOTE=https://github.com/LewisAGI/geography-quiz.git
+              ;;
+            pdf-to-audiobook)
+              SITE_NAME=pdf-to-audiobook
+              SITE_REMOTE=https://github.com/LewisAGI/pdf-to-audiobook.git
               ;;
             *)
               echo "Site is not in the allowlist."
@@ -179,6 +185,10 @@ jobs:
             geography-quiz)
               SITE_NAME=geography-quiz
               SITE_REMOTE=https://github.com/LewisAGI/geography-quiz.git
+              ;;
+            pdf-to-audiobook)
+              SITE_NAME=pdf-to-audiobook
+              SITE_REMOTE=https://github.com/LewisAGI/pdf-to-audiobook.git
               ;;
             *)
               echo "Site is not in the allowlist."
@@ -397,6 +407,10 @@ jobs:
               PAGES_PROJECT=lewisagi-geography-quiz
               EXPECTED_SUBDOMAIN=lewisagi-geography-quiz.pages.dev
               ;;
+            pdf-to-audiobook)
+              PAGES_PROJECT=lewisagi-pdf-to-audiobook
+              EXPECTED_SUBDOMAIN=lewisagi-pdf-to-audiobook.pages.dev
+              ;;
             *)
               echo "Site is not in the allowlist."
               exit 1
@@ -454,6 +468,7 @@ jobs:
               "lewisagi-ancient-greece-med": "lewisagi-ancient-greece-med.pages.dev",
               "lewisagi-uk-medicinal-plants": "lewisagi-uk-medicinal-plants.pages.dev",
               "lewisagi-geography-quiz": "lewisagi-geography-quiz.pages.dev",
+              "lewisagi-pdf-to-audiobook": "lewisagi-pdf-to-audiobook.pages.dev",
           }
 
           class NoRedirect(urllib.request.HTTPRedirectHandler):

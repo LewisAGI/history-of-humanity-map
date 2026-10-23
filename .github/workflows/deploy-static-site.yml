@@ -13,6 +13,8 @@ on:
           - indigenous-australia
           - celtic-ireland
           - ancient-greece-med
+          - uk-medicinal-plants
+          - geography-quiz
 
 # Jobs that run untrusted site code replace this. The choice input is not a
 # security boundary: the API can submit other values, so every job allowlists.
@@ -53,6 +55,8 @@ jobs:
             indigenous-australia) SITE_NAME=indigenous-australia ;;
             celtic-ireland) SITE_NAME=celtic-ireland ;;
             ancient-greece-med) SITE_NAME=ancient-greece-med ;;
+            uk-medicinal-plants) SITE_NAME=uk-medicinal-plants ;;
+            geography-quiz) SITE_NAME=geography-quiz ;;
             *)
               echo "Site is not in the allowlist."
               exit 1
@@ -93,6 +97,14 @@ jobs:
             ancient-greece-med)
               SITE_NAME=ancient-greece-med
               SITE_REMOTE=https://github.com/LewisAGI/ancient-greece-med.git
+              ;;
+            uk-medicinal-plants)
+              SITE_NAME=uk-medicinal-plants
+              SITE_REMOTE=https://github.com/LewisAGI/uk-medicinal-plants.git
+              ;;
+            geography-quiz)
+              SITE_NAME=geography-quiz
+              SITE_REMOTE=https://github.com/LewisAGI/geography-quiz.git
               ;;
             *)
               echo "Site is not in the allowlist."
@@ -159,6 +171,14 @@ jobs:
             ancient-greece-med)
               SITE_NAME=ancient-greece-med
               SITE_REMOTE=https://github.com/LewisAGI/ancient-greece-med.git
+              ;;
+            uk-medicinal-plants)
+              SITE_NAME=uk-medicinal-plants
+              SITE_REMOTE=https://github.com/LewisAGI/uk-medicinal-plants.git
+              ;;
+            geography-quiz)
+              SITE_NAME=geography-quiz
+              SITE_REMOTE=https://github.com/LewisAGI/geography-quiz.git
               ;;
             *)
               echo "Site is not in the allowlist."
@@ -369,6 +389,14 @@ jobs:
               PAGES_PROJECT=lewisagi-ancient-greece-med
               EXPECTED_SUBDOMAIN=lewisagi-ancient-greece-med.pages.dev
               ;;
+            uk-medicinal-plants)
+              PAGES_PROJECT=lewisagi-uk-medicinal-plants
+              EXPECTED_SUBDOMAIN=lewisagi-uk-medicinal-plants.pages.dev
+              ;;
+            geography-quiz)
+              PAGES_PROJECT=lewisagi-geography-quiz
+              EXPECTED_SUBDOMAIN=lewisagi-geography-quiz.pages.dev
+              ;;
             *)
               echo "Site is not in the allowlist."
               exit 1
@@ -424,6 +452,8 @@ jobs:
               "lewisagi-indigenous-australia": "lewisagi-indigenous-australia.pages.dev",
               "lewisagi-celtic-ireland": "lewisagi-celtic-ireland.pages.dev",
               "lewisagi-ancient-greece-med": "lewisagi-ancient-greece-med.pages.dev",
+              "lewisagi-uk-medicinal-plants": "lewisagi-uk-medicinal-plants.pages.dev",
+              "lewisagi-geography-quiz": "lewisagi-geography-quiz.pages.dev",
           }
 
           class NoRedirect(urllib.request.HTTPRedirectHandler):
